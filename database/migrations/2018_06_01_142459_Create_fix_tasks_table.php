@@ -22,8 +22,8 @@ class CreateFixTasksTable extends Migration
             $table->text('ref_link')->nullable();
             $table->string('assigned_by')->nullable();
             $table->float('hour')->nullable();
-            $table->string('fix')->nullable();
-            $table->string('rate')->nullable();
+            $table->float('fix')->nullable();
+            $table->float('rate')->nullable();
             $table->integer('invoice_status')->comment('0-Unmap Invoice, 1-Map Invoice');
             $table->timestamps();
 

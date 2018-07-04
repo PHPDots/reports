@@ -125,7 +125,9 @@ class AdminAction extends Model
     public $EDIT_SOFTWARE_LICENSE = 80; 
     public $DELETE_SOFTWARE_LICENSE = 81;
 	
-  
+    public $ADD_FIX_TASK = 82;
+    public $EDIT_FIX_TASK = 83;
+    public $DELETE_FIX_TASK = 84;  
 
      
 }

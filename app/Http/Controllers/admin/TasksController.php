@@ -60,51 +60,51 @@ class TasksController extends Controller
         $data['add_url'] = route($this->moduleRouteText.'.create');
         $data['btnAdd'] = \App\Models\Admin::isAccess(\App\Models\Admin::$ADD_TASKS);
         $data['projects'] = \App\Models\Project::getList();
-		$dates = \DB::table(TBL_TASK)->select(\DB::raw("MIN(task_date)as mindate,MAX(task_date) as maxdate"))->get();
+        $dates = \DB::table(TBL_TASK)->select(\DB::raw("MIN(task_date)as mindate,MAX(task_date) as maxdate"))->get();
         foreach ($dates as $date) 
-		{
-			$start_date = $date->mindate;
+        {
+            $start_date = $date->mindate;
             $mindate = date_create($date->mindate);
             $maxdate = date_create($date->maxdate);
-		
-		} 
-		
+        
+        } 
+        
         //$maxdate->modify('+1 month');
-		
+        
         $data['task_data'] = [];
-		$start_date = $start_date;
+        $start_date = $start_date;
         $end_date = date('Y-m-d h:m:s');
 
-		while (strtotime($start_date) <= strtotime($end_date))
-		{
-			$start_date = date('Y-M',strtotime($start_date));
-			$data['task_data'][date('Y-m',strtotime($start_date))] = $start_date; 
-			$start_date = date ("Y-M", strtotime("+1 month", strtotime($start_date)));
-		}
-		
+        while (strtotime($start_date) <= strtotime($end_date))
+        {
+            $start_date = date('Y-M',strtotime($start_date));
+            $data['task_data'][date('Y-m',strtotime($start_date))] = $start_date; 
+            $start_date = date ("Y-M", strtotime("+1 month", strtotime($start_date)));
+        }
+        
         /*for ($i=$mindate; $i <= $maxdate; $i->modify('+1 month')) 
-		{            
+        {            
             $data['task_data'][$i->format('Y-m')] = $i->format('M-Y');          
         }*/
-		
+        
         $auth_id = \Auth::guard('admins')->user()->user_type_id;
 
         if($auth_id == NORMAL_USER){
             $data['users']='';
-			$data['clients']='';
+            $data['clients']='';
             $viewName = $this->moduleViewName.".userIndex";
         }
         else if($auth_id == ADMIN_USER_TYPE){
             $data['users'] = User::getList();
             $data['clients'] = Client::pluck("name","id")->all();
-			
-			$is_download = $request->get("isDownload");
-			$is_download_xls = $request->get("isDownloadXls");
+            
+            $is_download = $request->get("isDownload");
+            $is_download_xls = $request->get("isDownloadXls");
 
             if (!empty($is_download) && $is_download == 1) {
-	
-				$total = $request->get("is_total");
-				
+    
+                $total = $request->get("is_total");
+                
                 $query = Task::select(TBL_TASK.".*",TBL_PROJECT.".title as project_name",TBL_USERS.".name as user_name")
                 ->join(TBL_USERS,TBL_TASK.".user_id","=",TBL_USERS.".id")
                 ->join(TBL_PROJECT,TBL_TASK.".project_id","=",TBL_PROJECT.".id");
@@ -120,7 +120,7 @@ class TasksController extends Controller
                     $records[] = [$i,$row->user_name,$row->project_name,$row->title,$task_date,$row->total_time,$sts,$row->ref_link];
                 $i++;
                 }
-				$records[] = array("total","","","","",$total,"","");
+                $records[] = array("total","","","","",$total,"","");
                 $file_name = 'TasksDetails';
                 header("Content-type: text/csv; charset=utf-8");
                 header("Content-Disposition: attachment; filename=".$file_name.".csv");
@@ -135,19 +135,19 @@ class TasksController extends Controller
                 $path = public_path().'/'.$file_name.'.csv';
                 exit;
             }
-			if (!empty($is_download_xls) && $is_download_xls == 1) {
-            
+            if (!empty($is_download_xls) && $is_download_xls == 1) {
+                $xls_client_id = $request->get('search_client');
                 $query = Task::select(TBL_TASK.".*",TBL_PROJECT.".title as project_name",TBL_USERS.".name as user_name")
                 ->join(TBL_USERS,TBL_TASK.".user_id","=",TBL_USERS.".id")
                 ->join(TBL_PROJECT,TBL_TASK.".project_id","=",TBL_PROJECT.".id");
                 $query = Task::listFilter($query);
-				$query = $query->orderBy('task_date');
+                $query = $query->orderBy('task_date');
                 $rows = $query->get();
 
                 $userWiseTasks= [];
                 
                  if(count($rows) > 0 ) {
-                    $xls_sheet = Excel::create('TasksDetails', function($excel) use ($rows) {
+                    $xls_sheet = Excel::create('TasksDetails', function($excel) use ($rows,$xls_client_id) {
                          
                     $i = 1;
                    
@@ -252,16 +252,73 @@ class TasksController extends Controller
                             $sheet->fromArray($bill_totals, null, 'A2', false, false);
                         });    
 
+                        //Client fix task sheet
+                    if(!empty($xls_client_id))
+                    {
+                        $k = 1;
+                        $fixTasks = \App\Models\FixTask::getFixTasksList($xls_client_id);
+                        $merg3 = count($fixTasks); $merg3 = $merg3 + 2;
+
+                        if(!empty($fixTasks))
+                        {
+                            $fix_totals = 0;
+                            $clientTask = [];
+                            foreach ($fixTasks as $fixTask)
+                            {
+                                $fix_task_date = date("j M, Y",strtotime($fixTask->task_date));
+                                
+                                $task_hrs = doubleval($fixTask->hour);
+                                $task_fix = doubleval($fixTask->fix);
+                                $task_rate = doubleval($fixTask->rate);
+                                $row_total = ($task_hrs * $task_rate) + $task_fix;
+                                if(empty($task_hrs)) $task_hrs = 0;
+                                if(empty($task_fix)) $task_fix = 0;
+                                if(empty($task_rate)) $task_rate = 0;
+
+                                $clientTask[] = [$k,$fixTask->title,$fix_task_date,$fixTask->ref_link,$fixTask->assigned_by,$task_hrs,$task_fix,$task_rate,$row_total];
+                                $fix_totals += $row_total;
+                                $k++;
+                            }
+                            $fix_total[] = array('Total','','','','','','','',doubleval($fix_totals));
+
+                            $excel->sheet('Fix Tasks', function($sheet) use ($clientTask,$merg3,$fix_total){
+                                $sheet->setAutoSize(true);
+                                $sheet->row(1, array('Sr. No.','Tasks','Date','Ref. Link','Assigned by','Hours','Fixed','Rate','Total'));
+                                $sheet->mergeCells('A'.$merg3.':H'.$merg3);
+                                $sheet->setBorder('A1:I'.$merg3, 'thin');
+                                $sheet->cell('A1:I1', function($cell) {
+                                    $cell->setBackground('#aebbc2');
+                                    $cell->setAlignment('center');
+                                    $cell->setFont(array('family'=>'Calibri','size'=>'12','bold'=>true));
+                                });
+                                $sheet->cell('A'.$merg3.':H'.$merg3, function($cell) {
+                                    $cell->setAlignment('center');
+                                    $cell->setFont(array('family'=>'Calibri','size'=>'14','bold'=>true));
+                                });
+                                $sheet->cell('I'.$merg3, function($cell) {
+                                    $cell->setFont(array('family'=>'Calibri','size'=>'14','bold'=>true));
+                                });
+                                $sheet->setColumnFormat(array(
+                                    'F' => '#,##0.00',
+                                    'G' => '#,##0.00',
+                                    'H' => '#,##0.00',
+                                    'I' => '#,##0.00',
+                                ));
+                                $sheet->fromArray($clientTask, null, 'A2', true, false);
+                                $sheet->fromArray($fix_total, null, 'A2', true, false);
+                            });
+                        }
+                    }
                     });
                     $xls_sheet->download('xlsx');
                 }
             }
-			
+            
             $viewName = $this->moduleViewName.".index";
         }
-		else if($auth_id == CLIENT_USER){
+        else if($auth_id == CLIENT_USER){
             $client_type = 0;
-			$client_id = \Auth::guard('admins')->user()->client_user_id;
+            $client_id = \Auth::guard('admins')->user()->client_user_id;
             $client_user = ClientUser::find($client_id);
             if(!empty($client_user))
             {
@@ -325,7 +382,7 @@ class TasksController extends Controller
         $status = 1;
         $msg = $this->addMsg;
         $data = array();
-		
+        
         $message = ['task_date.*'=>'Task date must be less than equal to today.'];
         $validator = Validator::make($request->all(), [
             'project_id.*' => 'required|exists:'.TBL_PROJECT.',id',
@@ -335,7 +392,7 @@ class TasksController extends Controller
             'hour.*' => ['required', Rule::in([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24])],
             'min.*' => ['required', Rule::in([0.00,0.25,0.50,0.75])],
             'status.*' => ['required', Rule::in([0,1])],
-			'task_date.*'=>'before:tomorrow'
+            'task_date.*'=>'before:tomorrow'
         ],$message);
         if ($validator->fails())         
         {
@@ -494,7 +551,7 @@ class TasksController extends Controller
         {
             abort(404);
         }   
-		$auth_user = \Auth::guard('admins')->user();
+        $auth_user = \Auth::guard('admins')->user();
         $created_at = date('Y-m-d',strtotime($formObj->task_date));
         $today = date('Y-m-d');
 
@@ -512,7 +569,7 @@ class TasksController extends Controller
         $data['formObj'] = $formObj;
         $data['page_title'] = "Edit ".$this->module;
         $data['buttonText'] = "Update";
-	
+    
         $data['action_url'] = $this->moduleRouteText.".update";
         $data['action_params'] = $formObj->id;
         $data['method'] = "PUT";
@@ -547,7 +604,7 @@ class TasksController extends Controller
         $status = 1;
         $msg = $this->updateMsg;
         $data = array();        
-		$auth_user = \Auth::guard('admins')->user();
+        $auth_user = \Auth::guard('admins')->user();
         $created_at = date('Y-m-d',strtotime($model->task_date));
         $today = date('Y-m-d');
 
@@ -568,7 +625,7 @@ class TasksController extends Controller
             'hour.*' => ['required', Rule::in([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24])],
             'min.*' => ['required', Rule::in([0.00,0.25,0.50,0.75])],
             'status.*' => ['required', Rule::in([0,1])],
-			'task_date.*'=>'before:tomorrow'
+            'task_date.*'=>'before:tomorrow'
         ],$message);
         
         // check validations
@@ -728,8 +785,8 @@ class TasksController extends Controller
         $model = Task::select(TBL_TASK.".*",TBL_PROJECT.".title as project_name",TBL_USERS.".name as user_name")
                 ->join(TBL_USERS,TBL_TASK.".user_id","=",TBL_USERS.".id")
                 ->join(TBL_PROJECT,TBL_TASK.".project_id","=",TBL_PROJECT.".id");
-		
-		$hours_query = Task::select(TBL_TASK.".*",TBL_PROJECT.".title as project_name",TBL_USERS.".name as user_name")
+        
+        $hours_query = Task::select(TBL_TASK.".*",TBL_PROJECT.".title as project_name",TBL_USERS.".name as user_name")
                 ->join(TBL_USERS,TBL_TASK.".user_id","=",TBL_USERS.".id")
                 ->join(TBL_PROJECT,TBL_TASK.".project_id","=",TBL_PROJECT.".id");
 
@@ -786,9 +843,9 @@ class TasksController extends Controller
             {                              
                 $query = Task::listFilter($query);                  
             });
-		$data = $data->with('hours',$totalHours);
+        $data = $data->with('hours',$totalHours);
         $data = $data->make(true);
-		return $data;
+        return $data;
     }
 
     public function viewData(Request $request)
@@ -829,12 +886,12 @@ class TasksController extends Controller
                 ->join(TBL_PROJECT,TBL_TASK.".project_id","=",TBL_PROJECT.".id")
                 ->where(TBL_TASK.".user_id",$auth_id);
 
-		$hours_query = Task::select(TBL_TASK.".*",TBL_PROJECT.".title as project_name",TBL_USERS.".name as user_name")
+        $hours_query = Task::select(TBL_TASK.".*",TBL_PROJECT.".title as project_name",TBL_USERS.".name as user_name")
                 ->join(TBL_USERS,TBL_TASK.".user_id","=",TBL_USERS.".id")
                 ->join(TBL_PROJECT,TBL_TASK.".project_id","=",TBL_PROJECT.".id")
                 ->where(TBL_TASK.".user_id",$auth_id);
 
-	    $hours_query = Task::listFilter($hours_query);        
+        $hours_query = Task::listFilter($hours_query);        
         $totalHours = $hours_query->sum("total_time");
         $totalHours = number_format($totalHours,2);
 
@@ -864,7 +921,7 @@ class TasksController extends Controller
                         'currentRoute' => $this->moduleRouteText,
                         'row' => $row, 
                         'isEdit' => \App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_TASKS),                                                  
-                        'isDelete' => \App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_TASKS),                                                  					'isView' =>\App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_TASKS),
+                        'isDelete' => \App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_TASKS),                                                                    'isView' =>\App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_TASKS),
                     ]
                 )->render();
             })
@@ -892,11 +949,11 @@ class TasksController extends Controller
             {                              
                 $query = Task::listFilter($query);                  
             });
-			$data = $data->with('hours',$totalHours);
+            $data = $data->with('hours',$totalHours);
             $data = $data->make(true);
             return $data;
     }
-	public function clientData(Request $request)
+    public function clientData(Request $request)
     {
         $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$LIST_TASKS);
         
@@ -986,10 +1043,10 @@ class TasksController extends Controller
 
             return $data;        
     }
-	
-	public function getMonthlyReport(Request $request)
+    
+    public function getMonthlyReport(Request $request)
     {
-		$checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$DOWNLOAD_MONTHLY_REPORT);
+        $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$DOWNLOAD_MONTHLY_REPORT);
         
         if($checkrights) 
         {

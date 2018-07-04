@@ -116,4 +116,16 @@ $url = url('/invoice-expense?').'search_invoice_id='.$row->id;
     <i class="fa fa-eye" aria-hidden="true"></i>
 </a>          
 @endif
+
+@if(isset($isMapStatus) && $isMapStatus)
+	@if($row->invoice_status == 1)
+		<a class="btn btn-xs btn-warning" title="Change Status To Unmap Invoice" href="{{ url('fix-tasks?changeStatus=0&changeID='.$row->id)}}" onclick="return confirm('Are you sure ?');">
+		    <i class="fa fa-check-circle-o"></i>
+		</a>
+	@else
+		<a class="btn btn-xs btn-success" title="Change Status To Map Invoice" href="{{ url('fix-tasks?changeStatus=1&changeID='.$row->id)}}" onclick="return confirm('Are you sure ?');">
+		    <i class="fa fa-check-circle-o"></i>
+		</a>
+	@endif	   
+@endif
 </div>

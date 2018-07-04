@@ -142,6 +142,9 @@ Route::get('clear-cache', function () {
 	Route::any('task-report/data', 'admin\UserTaskReportsController@data')->name('task-report.data');
     Route::resource('task-report', 'admin\UserTaskReportsController');
 
+    Route::any('fix-tasks/data', 'admin\FixTasksController@data')->name('fix-tasks.data');
+    Route::resource('fix-tasks', 'admin\FixTasksController');
+    
 //Masters
 	Route::any('admin-actions/data', 'admin\AdminActionController@data')->name('admin-actions.data');
 	Route::resource('admin-actions', 'admin\AdminActionController');

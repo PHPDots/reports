@@ -150,6 +150,11 @@ class Admin extends Authenticatable
 	
 	public static $LIST_INVOICE_EXPENSE = 110;
     public static $DOWNLOAD_INVOICE_EXPENSE = 111;
+
+    public static $LIST_FIX_TASK = 112;
+    public static $ADD_FIX_TASK = 113;
+    public static $EDIT_FIX_TASK = 114;
+    public static $DELETE_FIX_TASK = 115;
  
     /**
      * check page acces permissions
