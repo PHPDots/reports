@@ -22,7 +22,6 @@ $monday = date('D');
 <div class="page-content">
     <div class="container">
         <div class="page-content-inner">
-             
             <div class="row">
             @if(Auth::guard('admins')->user()->user_type_id == 1)
                 @if(!empty($pending_leave))
@@ -125,103 +124,86 @@ $monday = date('D');
                     @endif
                 @endif
 				@if($monday != 'Mon' && $yesterday_holiday == 0)
-                <div class="col-md-12">
-                    <div class="portlet light" style="margin-bottom: 0px;padding: 0px; height: auto">
-                        <div class="portlet-title tabbable-line">
-                            <div class="caption">
-                                <i class="icon-globe font-dark hide"></i>
-                                <span class="caption-subject font-green-steel bold uppercase">Yesterday Tasks</span>
-                            </div>
-                            <ul class="nav nav-tabs">
-                                <li class="active">
-                                    <a href="#tab_1_1" class="active" data-toggle="tab"> Not Added  </a>
-                                </li>
-                                <li>
-                                    <a href="#tab_1_2" data-toggle="tab"> Below 9 hrs </a>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="portlet-body">
-                            <!--BEGIN TABS-->
-                            <div class="tab-content">
-                                <div class="tab-pane active" id="tab_1_1">
-                                    <div class="scroller" style="height: auto;" data-always-visible="1" data-rail-visible="0">
-                                        @if(count($daily_tasks)>0)
-                                            <ul class="feeds">
+                 
+                <div class="portlet">
+                    <div class="portlet-title">
+                        <div class="caption">
+                            <i class="fa fa-bell-o"></i>YESTERDAY TASKS </div>
+                    </div>
+                    <div class="portlet-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="col-md-6">
+                                    <span><h4><b>Not Added</b></h4></span>
+                                    <div class="table-scrollable">
+                                        <table class="table table-striped table-bordered table-advance table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th width="20%"> ID </th>
+                                                    <th width="80%"> User </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @if(count($daily_tasks)>10)
+                                                <?php $i=1; ?>
                                                 @foreach($daily_tasks as $daily_task)
-                                                    <li>
-                                                        <div class="col1">
-                                                            <div class="cont">
-                                                                <div class="cont-col1">
-                                                                    <div class="label label-sm btn btn-success">
-                                                                        <i class="fa fa-user"></i>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="cont-col2">
-                                                                    <div class="desc"> {{ $daily_task->name}}.</div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </li>
+                                                <tr>
+                                                    <td>{{ $i }}</td>
+                                                    <td>{{ $daily_task->name}}</td>
+                                                </tr>
+                                                <?php $i++; ?>
                                                 @endforeach
-                                        @else
-                                            <div class="cont-col2">
-                                                <div class="desc">
-                                                    No record found.
-                                                </div>
-                                            </div>
-                                            </ul>
-                                        @endif
-                                    </div>
+                                                @else
+                                                <tr><td colspan="2"><center>No Record Found</center></td></tr>
+                                                @endif
+                                            </tbody>
+                                        </table>
+                                    </div>    
                                 </div>
-                                <div class="tab-pane" id="tab_1_2">
-                                    <div class="scroller" style="height: auto;" data-always-visible="1" data-rail-visible1="1">
-                                        @if(count($daily_tasks_hours)>0)
-                                            <ul class="feeds">
+                                <div class="col-md-6">
+                                    <span><h4><b>Below 9 Hours</b></h4></span>
+                                    <div class="table-scrollable">
+                                        <table class="table table-striped table-bordered table-advance table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th width="20%"> ID </th>
+                                                    <th width="80%"> User </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @if(count($daily_tasks_hours)>10)
+                                                <?php $i=1;?>
                                                 @foreach($daily_tasks_hours as $daily_tasks_hour => $hour)
-                                                <li>
-                                                    <div class="col1">
-                                                        <div class="cont">
-                                                            <div class="cont-col1">
-                                                                <div class="label label-sm btn btn-success">
-                                                                    <i class="fa fa-user"></i>
-                                                                </div>
-                                                            </div>
-                                                            <div class="cont-col2">
-                                                            @php
-                                                            $date = date("Y-m-d",strtotime($hour['date']));
-															$user = $hour['user_id'];
-                                                            @endphp
-                                                                <div class="desc">
-                                                                    <a href='{{ asset("/tasks?search_start_date=$date&search_end_date=$date&search_id=&search_project=&search_title=&search_hour_op=%3D&search_hour=&search_min_op=%3D&search_min=&search_status=all&search_user=$user&search_client=") }}'>
-                                                                {{ $hour['name'] }}
-                                                                [<span style="color: blue">
-                                                                    {{ $hour['total'] }} Hr ]
+                                                <tr>
+                                                    <td>{{ $i }}</td>
+                                                    <td>
+                                                    @php
+                                                    $date = date("Y-m-d",strtotime($hour['date']));
+                                                    $user = $hour['user_id'];
+                                                    @endphp
+                                                        <a href='{{ asset("/tasks?search_start_date=$date&search_end_date=$date&search_status=all&search_user=$user") }}' target="_blank">
+                                                        {{ $hour['name'] }}
+                                                        [<span style="color: blue">
+                                                            {{ $hour['total'] }} Hr ]
                                                                 @if($hour['below'] == 4)
                                                                     [ Half ]
                                                                 @endif
-                                                                </span>
-                                                                 </a>
-                                                                </div>
-                                                            </div>
+                                                        </span>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                                <?php $i++; ?>
                                                 @endforeach
                                                 @else
-                                                    <div class="cont-col2">
-                                                        <div class="desc">
-                                                            No record found.
-                                                        </div>
-                                                    </div>
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                            </ul>
-                                        @endif
-                                    </div>
+                                                <tr><td colspan="2"><center>Record Not Found</center></td></tr>
+                                                @endif
+                                            </tbody>
+                                        </table>
+                                    </div>    
                                 </div>
                             </div>
-                            <hr/>
                         </div>
-                    </div>                        
+                    </div>
                 </div>
 				@endif
                 @if(!empty($userOnLeaves))
@@ -246,7 +228,7 @@ $monday = date('D');
                     </div>    
                 </div>
                 @endif
-            @endif	 
+            @endif
             </div>
         </div>
     </div>
