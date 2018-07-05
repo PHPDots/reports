@@ -27,7 +27,7 @@
                     <select name="search_payment_status" class="form-control">
                         <option value="">All</option>
                         <option value="1" {!! \Request::get("search_payment_status") == "1" ? 'selected="selected"':'' !!}>Full</option>
-                        <option value="0" {!! \Request::get("search_payment_status") == "0" ? 'selected="selected"':'' !!}>Half</option>                        
+                        <option value="0" {!! \Request::get("search_payment_status") == "0" ? 'selected="selected"':'' !!}>Partials</option>                        
                     </select>
                 </div>  
             </div>

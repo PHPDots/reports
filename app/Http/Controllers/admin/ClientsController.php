@@ -12,6 +12,7 @@ use App\Models\ClientUser;
 use App\Models\ClientEmployee;
 use App\Models\User;
 use Illuminate\Validation\Rule;
+use App\Models\SendMailUser;
 
 class ClientsController extends Controller
 {
@@ -81,9 +82,11 @@ class ClientsController extends Controller
         $data['action_params'] = 0;
         $data['buttonText'] = "Save";
         $data["method"] = "POST";
-		$data['users'] = \DB::table(TBL_USERS)->orderBy("name","ASC")->get();
+		$data['users'] = \DB::table(TBL_USERS)->orderBy("name","ASC")->where('status',1)->get();
 		$data["currency"] = ['in_rs'=>'In Rs.','in_usd'=>'In USD'];
         $data['list_tags'] = [];
+        $data['sendMailUsers'] = \DB::table(TBL_USERS)->orderBy("name","ASC")->where('status',1)->whereNull('client_user_id')->get();
+        $data['list_sendMailUsers'] = [];
 
         return view($this->moduleViewName.'.add', $data);
     }
@@ -115,6 +118,8 @@ class ClientsController extends Controller
 			'address' => 'min:2',
 			'gstn_no' => 'min:2',
             'cient_currency' => Rule::in(['in_rs','in_usd']),
+            'send_email_type' => Rule::in([1,0]),
+            'sendMailUsers' => 'exists:'.TBL_USERS.',id',
         ]);
         
         // check validations
@@ -134,10 +139,11 @@ class ClientsController extends Controller
         {
             $input = $request->all();
             $input['send_email'] = isset($input['send_email']) ? 1:0;
+            $input['send_email_type'] = isset($input['send_email_type']) ? 1:0;
             $obj = $this->modelObj->create($input);
             $id = $obj->id; 
 			
-			 $users = $request->get('users');
+			$users = $request->get('users');
 
             if(is_array($users))
             {
@@ -148,6 +154,23 @@ class ClientsController extends Controller
                         $employee->user_id = $user;
                         $employee->save();
                 }   
+            }
+            $send_email = isset($input['send_email']) ? 1:0;
+            $send_email_type = $request->get('send_mail_type');
+            $sendMailUsers = $request->get('sendMailUsers');
+            
+            if($send_email_type == 0 && $send_email == 1)
+            {
+                if(is_array($sendMailUsers))
+                {
+                    foreach ($sendMailUsers as $user)
+                    {
+                        $employee = new SendMailUser();
+                        $employee->client_id = $id;
+                        $employee->user_id = $user;
+                        $employee->save();
+                    }
+                }
             } 
 
             //store logs detail
@@ -204,14 +227,14 @@ class ClientsController extends Controller
         $data['formObj'] = $formObj;
         $data['page_title'] = "Edit ".$this->module;
         $data['buttonText'] = "Update";
-
         $data['action_url'] = $this->moduleRouteText.".update";
         $data['action_params'] = $formObj->id;
         $data['method'] = "PUT";
 		$data['list_tags'] = $formObj->getClients(1);
         $data['users'] = \DB::table(TBL_USERS)->orderBy("name","ASC")->get();
 		$data["currency"] = ['in_rs'=>'In Rs.','in_usd'=>'In USD'];
-        
+        $data['sendMailUsers'] = \DB::table(TBL_USERS)->orderBy("name","ASC")->whereNull('client_user_id')->get();
+        $data['list_sendMailUsers'] = $formObj->getSendMailUsers(1);
         return view($this->moduleViewName.'.add', $data);
     }
 
@@ -247,6 +270,8 @@ class ClientsController extends Controller
 			'address' => 'min:2',
 			'gstn_no' => 'min:2',
             'client_currency' => Rule::in(['in_rs','in_usd']),
+            'send_email_type' => Rule::in([1,0]),
+            'sendMailUsers' => 'exists:'.TBL_USERS.',id',
             ]);
         
         // check validations
@@ -271,10 +296,12 @@ class ClientsController extends Controller
         {
             $input = $request->all();
             $input['send_email'] = isset($input['send_email']) ? 1:0;
+            $input['send_email_type'] = isset($input['send_email_type']) ? 1:0;
             $model->update($input);
 			
 			// delete old records
-            \DB::table(TBL_CLIENT_EMPLOYEE)->where('client_id',$id)->delete();             
+            \DB::table(TBL_CLIENT_EMPLOYEE)->where('client_id',$id)->delete();
+            \DB::table(TBL_SEND_MAIL_USERS)->where('client_id',$id)->delete();             
 
             if($request->has('users'))
             {
@@ -289,6 +316,23 @@ class ClientsController extends Controller
                         $employee->save();
                     }
                 }  
+            }
+            $send_email = isset($input['send_email']) ? 1:0;
+            $send_email_type = $request->get('send_mail_type');
+            $sendMailUsers = $request->get('sendMailUsers');
+
+            if($send_email_type == 0 && $send_email == 1)
+            {
+                if(is_array($sendMailUsers))
+                {
+                    foreach ($sendMailUsers as $user)
+                    {
+                        $employee = new SendMailUser();
+                        $employee->client_id = $id;
+                        $employee->user_id = $user;
+                        $employee->save();
+                    }
+                }
             }
 
             //store logs detail

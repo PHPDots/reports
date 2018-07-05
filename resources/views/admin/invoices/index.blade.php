@@ -33,9 +33,9 @@
                                <th width="20%">Invoice</th>
                                <th width="15%">CLient Name</th>
                                <th width="5%">Amount</th>
-								<th width="5%">GST</th>
+                               <th width="5%">GST</th>
                                <th width="5%">Total Amount</th>
-							   <th width="10%">Invoice Date</th>
+							                 <th width="10%">Invoice Date</th>
                                <th width="5%">Status</th>
                                <th width="10%">Created At</th>
                                <th width="20%" data-orderable="false">Action</th>
@@ -82,7 +82,12 @@
             {!! Form::open(['route'=>['invoices.change_paymet_status'],'method' => 'POST','id'=>'payment_form'])!!}
 
               <label class="control-label">Payment Status:<span class="required">*</span></label>
-              {!! Form::select('payment_status',[1=>'Full',0=>'Half'],null,['class'=>'form-group form-control','data-required' => true])!!}
+              {!! Form::select('payment_status',[1=>'Full',0=>'Patials'],null,['class'=>'form-group form-control','data-required' => true,'id'=>'payment_status_id'])!!}
+
+              <div id="partial_amt_div" style="display: none;">
+              <label class="control-label">Patials Amount:<span class="required">*</span></label>
+              {!! Form::text('partial_amount',null,['placeholder'=>'Enter Patials Amount','class'=>'form-group form-control']) !!}
+              </div>
 
               <label class="control-label">Amount:<span class="required">*</span></label>
               {!! Form::text('amount',null,['placeholder'=>'Enter Amount','class'=>'form-group form-control','required'=>'required']) !!}
@@ -152,7 +157,14 @@ function openPaymentModel($id)
   $("#payment_form input[name='invoice_id']").val($id);
 }
     $(document).ready(function(){
-		
+      $('#payment_status_id').on('change',function(){
+        var status_val = $('#payment_status_id').val();
+          if(status_val == 1)
+            $('#partial_amt_div').hide();
+          else
+            $('#partial_amt_div').show();
+      });
+
 		$('#payment_form').submit(function () {
           $('#AjaxLoaderDiv').fadeIn('slow');
           $('#payment_submit').attr('disabled',true);

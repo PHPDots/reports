@@ -63,14 +63,17 @@ class InvoicesController extends Controller
     	$dates = \DB::table(TBL_INVOICE)->select(\DB::raw("MIN(invoice_date)as mindate,MAX(invoice_date) as maxdate"))->get();
          
         foreach ($dates as $date) {
-            $mindate = date_create($date->mindate);
-            $maxdate = date_create($date->maxdate);
+            $mindate = $date->mindate;
+            $maxdate = $date->maxdate;
         } 
-        $maxdate->modify('last day of this month');
+        $start_date = $mindate;
+        $end_date = date('Y-m-d h:m:s');
 
-        $data['months'] = [];
-        for ($i=$mindate; $i <= $maxdate; $i->modify('+1 month')) {            
-            $data['months'][$i->format('Y-m')] = $i->format('M-Y');          
+        while (strtotime($start_date) <= strtotime($end_date))
+        {
+            $start_date = date('Y-M',strtotime($start_date));
+            $data['months'][date('Y-m',strtotime($start_date))] = $start_date; 
+            $start_date = date ("Y-M", strtotime("+1 month", strtotime($start_date)));
         }
 		
 		$data['clients'] = Client::pluck("name","id")->all();
@@ -906,6 +909,7 @@ class InvoicesController extends Controller
             'payment_status' => ['required',Rule::in([1,0])],
             'amount' => 'required|min:0',
             'payment_date' => 'required',
+            'partial_amount' => 'min:0',
         ]);
         if ($validator->fails()) 
         {
@@ -924,6 +928,9 @@ class InvoicesController extends Controller
             $payment_status = $request->get('payment_status');
             $amount = $request->get('amount');
             $payment_date = $request->get('payment_date');
+            $partial_amount = $request->get('partial_amount');
+            if($payment_status == 1)
+                $partial_amount = 0;
             
             $invoice = Invoice::find($invoice_id);
             if($invoice)
@@ -931,6 +938,7 @@ class InvoicesController extends Controller
                 $exp = new InvoiceExpense();       
                 $exp->invoice_id = $invoice_id;
                 $exp->payment_status = $payment_status;
+                $exp->partial_amount = $partial_amount;
                 $exp->amount = $amount;
                 $exp->payment_date = $payment_date;
                 $exp->save();

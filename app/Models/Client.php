@@ -57,8 +57,7 @@ class Client extends Model
         else
         {
             return $query;        
-        }             
-        
+        }
     }
 
 }

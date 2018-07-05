@@ -76,7 +76,7 @@ class InvoiceExpenseController extends Controller
                 if($row->payment_status == 1)
                     $html = '<a class="btn btn-primary btn-xs">Full</a>';
                 else
-                    $html = '<a class="btn btn-danger btn-xs">Half</a>';
+                    $html = '<a class="btn btn-danger btn-xs">Partials</a>';
                 return $html;
             })
             ->rawColumns(['created_at','payment_status'])

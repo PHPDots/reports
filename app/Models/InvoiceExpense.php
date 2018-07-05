@@ -9,7 +9,7 @@ class InvoiceExpense extends Model
     public $timestamps = true;
     protected $table = TBL_INVOICE_EXPENSE;
      
-    protected $fillable = ['invoice_id', 'payment_status', 'amount', 'payment_date'];
+    protected $fillable = ['invoice_id', 'payment_status', 'amount', 'payment_date','partial_amount'];
 
     public static function listFilter($query)
     {
