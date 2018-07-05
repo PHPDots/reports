@@ -51,7 +51,7 @@ class FixTasksController extends Controller
         $data = array();        
         $data['page_title'] = "Manage Fixed Tasks";
         $data['add_url'] = route($this->moduleRouteText.'.create');
-        $data['btnAdd'] = \App\Models\Admin::isAccess(\App\Models\Admin::$ADD_CLIENT_USER);
+        $data['btnAdd'] = \App\Models\Admin::isAccess(\App\Models\Admin::$ADD_FIX_TASK);
         $data['clients'] = Client::pluck("name","id")->all();
 
         if($request->get("changeID") > 0)
@@ -94,7 +94,7 @@ class FixTasksController extends Controller
      */
     public function create()
     {
-        $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$ADD_CLIENT_USER);
+        $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$ADD_FIX_TASK);
         
         if($checkrights) 
         {
@@ -121,7 +121,7 @@ class FixTasksController extends Controller
      */
     public function store(Request $request)
     {
-        $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$ADD_CLIENT_USER);
+        $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$ADD_FIX_TASK);
         
         if($checkrights) 
         {
@@ -176,7 +176,7 @@ class FixTasksController extends Controller
     }
     public function storess(Request $request)
     {
-        $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$ADD_CLIENT_USER);
+        $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$ADD_FIX_TASK);
         
         if($checkrights) 
         {
@@ -434,20 +434,20 @@ class FixTasksController extends Controller
         $model = FixTask::select(TBL_FIX_TASKS.".*",TBL_CLIENT.".name as client")
                 ->join(TBL_CLIENT,TBL_CLIENT.".id","=",TBL_FIX_TASKS.".client_id");
 
-        return \Datatables::eloquent($model)        
+        return \Datatables::eloquent($model)
                
             ->addColumn('action', function(FixTask $row) {
                 return view("admin.partials.action",
                     [
                         'currentRoute' => $this->moduleRouteText,
-                        'row' => $row,                                 
-                        'isEdit' =>\App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_CLIENT_USER),
-                        'isDelete' => \App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_CLIENT_USER),
-                        'isMapStatus' => \App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_CLIENT_USER),
+                        'row' => $row,
+                        'isEdit' =>\App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_FIX_TASK),
+                        'isDelete' => \App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_FIX_TASK),
+                        'isMapStatus' => \App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_FIX_TASK),
                     ]
                 )->render();
             })
-             ->editColumn('invoice_status', function ($row) { 
+            ->editColumn('invoice_status', function ($row) { 
                 if ($row->invoice_status == 1){
                     $html = "<a class='btn btn-xs btn-success'>Map</a><br/>";
                 }
@@ -456,33 +456,26 @@ class FixTasksController extends Controller
                 }
                     return $html;
             })
+            ->editColumn('hour', function ($row) { 
+                    $html = "# ".$row->hour.'<br/> # '.$row->fix.'<br/># '.$row->rate;
+                    return $html;
+            })
+            ->editColumn('total', function ($row) { 
+                    $row_total = ($row->hour * $row->rate) + $row->fix;
+                    return $row_total;
+            })
             ->editColumn('created_at', function($row){
                 
                 if(!empty($row->created_at))
                     return date("j M, Y",strtotime($row->created_at));
                 else
                     return '-';    
-            })
-            ->editColumn('hour', function($row){
-                $html = '# '.$row->hour.'<br/># '.$row->fix.'<br/># '.$row->rate;
-                return $html;    
-            })
-            ->editColumn('total', function($row){
-                $row_total = ($row->hour * $row->rate) + $row->fix;
-                return $row_total;
-            })
-            ->editColumn('task_date', function($row){
-                
-                if(!empty($row->task_date))
-                    return date("j M, Y",strtotime($row->task_date));
-                else
-                    return '-';    
-            })->rawColumns(['action','invoice_status','hour'])             
+            })->rawColumns(['action','invoice_status','hour'])
             
             ->filter(function ($query) 
-            {                              
+            {
                 $query = FixTask::listFilter($query);
             })
-            ->make(true);        
+            ->make(true);
     }
 }

@@ -124,7 +124,6 @@ $monday = date('D');
                     @endif
                 @endif
 				@if($monday != 'Mon' && $yesterday_holiday == 0)
-                 
                 <div class="portlet">
                     <div class="portlet-title">
                         <div class="caption">
@@ -144,7 +143,7 @@ $monday = date('D');
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @if(count($daily_tasks)>10)
+                                                @if(count($daily_tasks)>0)
                                                 <?php $i=1; ?>
                                                 @foreach($daily_tasks as $daily_task)
                                                 <tr>
@@ -171,7 +170,7 @@ $monday = date('D');
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @if(count($daily_tasks_hours)>10)
+                                                @if(count($daily_tasks_hours)>0)
                                                 <?php $i=1;?>
                                                 @foreach($daily_tasks_hours as $daily_tasks_hour => $hour)
                                                 <tr>

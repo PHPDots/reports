@@ -85,7 +85,7 @@ class ClientsController extends Controller
 		$data['users'] = \DB::table(TBL_USERS)->orderBy("name","ASC")->where('status',1)->get();
 		$data["currency"] = ['in_rs'=>'In Rs.','in_usd'=>'In USD'];
         $data['list_tags'] = [];
-        $data['sendMailUsers'] = \DB::table(TBL_USERS)->orderBy("name","ASC")->where('status',1)->whereNull('client_user_id')->get();
+        $data['sendMailUsers'] = \DB::table(TBL_USERS)->orderBy("name","ASC")->where('status',1)->whereNull('client_user_id')->where('id','!=',1)->get();
         $data['list_sendMailUsers'] = [];
 
         return view($this->moduleViewName.'.add', $data);
@@ -118,7 +118,7 @@ class ClientsController extends Controller
 			'address' => 'min:2',
 			'gstn_no' => 'min:2',
             'cient_currency' => Rule::in(['in_rs','in_usd']),
-            'send_email_type' => Rule::in([1,0]),
+            'send_mail_type' => Rule::in([1,0]),
             'sendMailUsers' => 'exists:'.TBL_USERS.',id',
         ]);
         
@@ -137,9 +137,17 @@ class ClientsController extends Controller
         }         
         else
         {
+            $send_email_type = $request->get('send_mail_type');
+            $sendMailUsers = $request->get('sendMailUsers');
+            if($send_email_type == 0 && empty($sendMailUsers))
+            {
+                $status = 0;
+                $msg = 'Please Select atleast one user';
+                return ['status' => $status, 'msg' => $msg, 'data' => $data];        
+            } 
             $input = $request->all();
             $input['send_email'] = isset($input['send_email']) ? 1:0;
-            $input['send_email_type'] = isset($input['send_email_type']) ? 1:0;
+            //$input['send_email_type'] = isset($input['send_email_type']) ? 1:0;
             $obj = $this->modelObj->create($input);
             $id = $obj->id; 
 			
@@ -177,7 +185,7 @@ class ClientsController extends Controller
             $params=array();    
                                     
             $params['adminuserid']  = \Auth::guard('admins')->id();
-            $params['actionid']     = $this->adminAction->ADD_CLIENT ;
+            $params['actionid']     = $this->adminAction->ADD_CLIENT;
             $params['actionvalue']  = $id;
             $params['remark']       = "Add Client ::".$id;
                                     
@@ -233,7 +241,7 @@ class ClientsController extends Controller
 		$data['list_tags'] = $formObj->getClients(1);
         $data['users'] = \DB::table(TBL_USERS)->orderBy("name","ASC")->get();
 		$data["currency"] = ['in_rs'=>'In Rs.','in_usd'=>'In USD'];
-        $data['sendMailUsers'] = \DB::table(TBL_USERS)->orderBy("name","ASC")->whereNull('client_user_id')->get();
+        $data['sendMailUsers'] = \DB::table(TBL_USERS)->orderBy("name","ASC")->whereNull('client_user_id')->where('id','!=',1)->get();
         $data['list_sendMailUsers'] = $formObj->getSendMailUsers(1);
         return view($this->moduleViewName.'.add', $data);
     }
@@ -270,7 +278,7 @@ class ClientsController extends Controller
 			'address' => 'min:2',
 			'gstn_no' => 'min:2',
             'client_currency' => Rule::in(['in_rs','in_usd']),
-            'send_email_type' => Rule::in([1,0]),
+            'send_mail_type' => Rule::in([1,0]),
             'sendMailUsers' => 'exists:'.TBL_USERS.',id',
             ]);
         
@@ -294,9 +302,17 @@ class ClientsController extends Controller
         }         
         else
         {
+            $send_email_type = $request->get('send_mail_type');
+            $sendMailUsers = $request->get('sendMailUsers');
+            if($send_email_type == 0 && empty($sendMailUsers))
+            {
+                $status = 0;
+                $msg = 'Please Select atleast one user';
+                return ['status' => $status, 'msg' => $msg, 'data' => $data];        
+            }
             $input = $request->all();
             $input['send_email'] = isset($input['send_email']) ? 1:0;
-            $input['send_email_type'] = isset($input['send_email_type']) ? 1:0;
+            //$input['send_email_type'] = isset($input['send_mail_type']) ? 1:0;
             $model->update($input);
 			
 			// delete old records
@@ -418,7 +434,7 @@ class ClientsController extends Controller
                 if(!empty($row->created_at))          
                     return date("j M, Y h:i:s A",strtotime($row->created_at));
                 else
-                    return '-';    
+                    return '-';
             })
 			->editColumn('client_type' , function ($row)
             {

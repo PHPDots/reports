@@ -101,7 +101,7 @@
                 { data: 'total', name: 'fix' },
                 { data: 'invoice_status', name: 'invoice_status' },
                 { data: 'created_at', name: 'created_at' },
-                { data: 'action', orderable: false, searchable: false}           
+                { data: 'action', orderable: false, searchable: false},
             ]
         });
     });

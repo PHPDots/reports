@@ -253,62 +253,62 @@ class TasksController extends Controller
                         });    
 
                         //Client fix task sheet
-                    if(!empty($xls_client_id))
-                    {
-                        $k = 1;
-                        $fixTasks = \App\Models\FixTask::getFixTasksList($xls_client_id);
-                        $merg3 = count($fixTasks); $merg3 = $merg3 + 2;
-
-                        if(!empty($fixTasks))
+                        if(!empty($xls_client_id))
                         {
-                            $fix_totals = 0;
-                            $clientTask = [];
-                            foreach ($fixTasks as $fixTask)
+                            $k = 1;
+                            $fixTasks = \App\Models\FixTask::getFixTasksList($xls_client_id);
+                            $merg3 = count($fixTasks); $merg3 = $merg3 + 2;
+
+                            if(!empty($fixTasks))
                             {
-                                $fix_task_date = date("j M, Y",strtotime($fixTask->task_date));
-                                
-                                $task_hrs = doubleval($fixTask->hour);
-                                $task_fix = doubleval($fixTask->fix);
-                                $task_rate = doubleval($fixTask->rate);
-                                $row_total = ($task_hrs * $task_rate) + $task_fix;
-                                if(empty($task_hrs)) $task_hrs = 0;
-                                if(empty($task_fix)) $task_fix = 0;
-                                if(empty($task_rate)) $task_rate = 0;
+                                $fix_totals = 0;
+                                $clientTask = [];
+                                foreach ($fixTasks as $fixTask)
+                                {
+                                    $fix_task_date = date("j M, Y",strtotime($fixTask->task_date));
+                                    
+                                    $task_hrs = doubleval($fixTask->hour);
+                                    $task_fix = doubleval($fixTask->fix);
+                                    $task_rate = doubleval($fixTask->rate);
+                                    $row_total = ($task_hrs * $task_rate) + $task_fix;
+                                    if(empty($task_hrs)) $task_hrs = 0;
+                                    if(empty($task_fix)) $task_fix = 0;
+                                    if(empty($task_rate)) $task_rate = 0;
 
-                                $clientTask[] = [$k,$fixTask->title,$fix_task_date,$fixTask->ref_link,$fixTask->assigned_by,$task_hrs,$task_fix,$task_rate,$row_total];
-                                $fix_totals += $row_total;
-                                $k++;
+                                    $clientTask[] = [$k,$fixTask->title,$fix_task_date,$fixTask->ref_link,$fixTask->assigned_by,$task_hrs,$task_fix,$task_rate,$row_total];
+                                    $fix_totals += $row_total;
+                                    $k++;
+                                }
+                                $fix_total[] = array('Total','','','','','','','',doubleval($fix_totals));
+
+                                $excel->sheet('Fix Tasks', function($sheet) use ($clientTask,$merg3,$fix_total){
+                                    $sheet->setAutoSize(true);
+                                    $sheet->row(1, array('Sr. No.','Tasks','Date','Ref. Link','Assigned by','Hours','Fixed','Rate','Total'));
+                                    $sheet->mergeCells('A'.$merg3.':H'.$merg3);
+                                    $sheet->setBorder('A1:I'.$merg3, 'thin');
+                                    $sheet->cell('A1:I1', function($cell) {
+                                        $cell->setBackground('#aebbc2');
+                                        $cell->setAlignment('center');
+                                        $cell->setFont(array('family'=>'Calibri','size'=>'12','bold'=>true));
+                                    });
+                                    $sheet->cell('A'.$merg3.':H'.$merg3, function($cell) {
+                                        $cell->setAlignment('center');
+                                        $cell->setFont(array('family'=>'Calibri','size'=>'14','bold'=>true));
+                                    });
+                                    $sheet->cell('I'.$merg3, function($cell) {
+                                        $cell->setFont(array('family'=>'Calibri','size'=>'14','bold'=>true));
+                                    });
+                                    $sheet->setColumnFormat(array(
+                                        'F' => '#,##0.00',
+                                        'G' => '#,##0.00',
+                                        'H' => '#,##0.00',
+                                        'I' => '#,##0.00',
+                                    ));
+                                    $sheet->fromArray($clientTask, null, 'A2', true, false);
+                                    $sheet->fromArray($fix_total, null, 'A2', true, false);
+                                });
                             }
-                            $fix_total[] = array('Total','','','','','','','',doubleval($fix_totals));
-
-                            $excel->sheet('Fix Tasks', function($sheet) use ($clientTask,$merg3,$fix_total){
-                                $sheet->setAutoSize(true);
-                                $sheet->row(1, array('Sr. No.','Tasks','Date','Ref. Link','Assigned by','Hours','Fixed','Rate','Total'));
-                                $sheet->mergeCells('A'.$merg3.':H'.$merg3);
-                                $sheet->setBorder('A1:I'.$merg3, 'thin');
-                                $sheet->cell('A1:I1', function($cell) {
-                                    $cell->setBackground('#aebbc2');
-                                    $cell->setAlignment('center');
-                                    $cell->setFont(array('family'=>'Calibri','size'=>'12','bold'=>true));
-                                });
-                                $sheet->cell('A'.$merg3.':H'.$merg3, function($cell) {
-                                    $cell->setAlignment('center');
-                                    $cell->setFont(array('family'=>'Calibri','size'=>'14','bold'=>true));
-                                });
-                                $sheet->cell('I'.$merg3, function($cell) {
-                                    $cell->setFont(array('family'=>'Calibri','size'=>'14','bold'=>true));
-                                });
-                                $sheet->setColumnFormat(array(
-                                    'F' => '#,##0.00',
-                                    'G' => '#,##0.00',
-                                    'H' => '#,##0.00',
-                                    'I' => '#,##0.00',
-                                ));
-                                $sheet->fromArray($clientTask, null, 'A2', true, false);
-                                $sheet->fromArray($fix_total, null, 'A2', true, false);
-                            });
                         }
-                    }
                     });
                     $xls_sheet->download('xlsx');
                 }

@@ -630,7 +630,7 @@ class DailyReportController extends Controller
 
         // Get Tasks
   		$sql = '
-              SELECT  tasks.*,users.firstname,users.lastname,users.email as user_email,projects.title as project_name,projects.client_id 
+              SELECT  tasks.*,users.firstname,users.lastname,users.email as user_email,projects.title as project_name,projects.client_id,clients.send_mail_type 
               FROM tasks
               JOIN users ON users.id = tasks.user_id
               JOIN projects ON tasks.project_id = projects.id
@@ -641,7 +641,6 @@ class DailyReportController extends Controller
             ';
 
       $rows = \DB::select($sql);
-
       // Get Admin Emails
       $admin_emails = User::getAdminEmails();
 
@@ -649,13 +648,15 @@ class DailyReportController extends Controller
       $user_id = 0;
 	  $client_id = 0;
       $clients = array();
+      $selectedUsers = array();
+
 	  if(count($rows) > 0 ) {
 		  
-		$updateSQL = "UPDATE tasks SET report_sent = 1, report_sent_date = NOW();";  
-		\DB::update($updateSQL);  
+		//$updateSQL = "UPDATE tasks SET report_sent = 1, report_sent_date = NOW();";  
+		//\DB::update($updateSQL);  
 		  
         foreach ($rows as $task_detail) {
-          # code...
+            
           if(!empty($client_id) && !empty($user_id) && ($user_id!=$task_detail->user_id || $client_id!=$task_detail->client_id))
           {
 
@@ -673,15 +674,22 @@ class DailyReportController extends Controller
         // echo "<pre>";print_r($report_data);
 
         foreach ($report_data as $user_id => $user_report) 
-        {                   
+        {
 
           $i = 1;
 
-
-          
-
           foreach ($user_report as $client_id => $user_client_reportRow) 
           {
+            if($task_detail->send_mail_type == 0)
+            {
+                $selectedUsers = \DB::table(TBL_SEND_MAIL_USERS)
+                          ->where("client_id",$client_id)
+                          ->pluck("user_id")
+                          ->toArray();
+            }
+            echo '<pre/>';
+            echo 'Users List';
+            print_r($selectedUsers);
 
             $user_client_reportRow = json_decode(json_encode($user_client_reportRow),1);
 
@@ -703,6 +711,7 @@ class DailyReportController extends Controller
 
             foreach($user_client_reportRow as $user_client_report )
             {
+              $from_user_id = $user_client_report['user_id'];
               $from_email = $user_client_report['user_email'];
               $empName = ucfirst($user_client_report['firstname'])." ".ucfirst($user_client_report['lastname']);
               $status = $user_client_report['status'] == 1 ? "DONE":"In Progress";
@@ -730,15 +739,12 @@ class DailyReportController extends Controller
                           ->pluck("email")
                           ->toArray();
 
-          $toEmails = array_merge($clientUsers,$admin_emails);                
-          echo "Send Emails To:<br />";
-          echo "<pre>";
-          print_r($toEmails);
-          echo "<pre>";
-          echo "HTML";
-
-
-
+            $toEmails = array_merge($clientUsers,$admin_emails);                
+            echo "Send Emails To:<br/>";
+            echo "<pre>";
+            //print_r($toEmails);
+            echo "<pre>";
+            echo "HTML";
 
             $table .= "<p>Thanks & Regards,<br />".$empName."</p>";
             $subject = "Daily Report - (Hr-".$totalHours.") - ".date("j M, Y");
@@ -763,10 +769,21 @@ class DailyReportController extends Controller
             $params["body"] = "<html><body>".$table."</body></html>";
             
             // if($from_email != 'mayur.devmurari@phpdots.com')
-            sendHtmlMail($params);
+            if(!empty($selectedUsers) && is_array($selectedUsers))
+            {
+                if(in_array($from_user_id, $selectedUsers))
+                {
+                    //sendHtmlMail($params);
+                    echo $table;
+                }
 
+            }else
+            {
+                echo $table;
+                //sendHtmlMail($params);
+            }
 
-            echo $table;          
+            //echo $table;
           }          
 
 

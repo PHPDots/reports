@@ -48,7 +48,7 @@
                                                 {!! Form::text('assigned_by',null,['class' => 'form-control','placeholder' => 'Enter Assigned by']) !!}
                                             </div>
                                             <div class="col-md-3">
-                                                {!! Form::text('task_date',date('Y-m-d'),['class' => 'input-group form-control form-control-inline date date-picker task_date','data-required'=>true,'placeholder'=>'Task Date']) !!}
+                                                {!! Form::text('task_date',null,['class' => 'input-group form-control form-control-inline date date-picker task_date','data-required'=>true,'placeholder'=>'Task Date']) !!}
                                             </div>
                                         </div>
                                         <div class="clearfix">&nbsp;</div>
@@ -60,7 +60,7 @@
                                         <div class="clearfix">&nbsp;</div>
                                     </div>
                                     <div class="clearfix">&nbsp;</div>
-                                    <input type="submit" value="{{ $buttonText }}" class="btn btn-success pull-right" />
+                                    <input type="submit" value="{{ $buttonText }}" class="btn btn-success pull-right" id="submit_btn" />
                                 </div>
                             {!! Form::close() !!}
                             </div>
@@ -101,6 +101,7 @@
             
             if ($(this).parsley('isValid'))
             {
+                $('#submit_btn').attr('disabled',true);
                 $('#AjaxLoaderDiv').fadeIn('slow');
                 $.ajax({
                     type: "POST",
@@ -114,15 +115,18 @@
                         $('#AjaxLoaderDiv').fadeOut('slow');
                         if (result.status == 1)
                         {
+                            $('#submit_btn').attr('disabled',false);
                             $.bootstrapGrowl(result.msg, {type: 'success', delay: 4000});
                             window.location = '{{ $list_url }}';    
                         }
                         else
                         {
+                            $('#submit_btn').attr('disabled',false);
                             $.bootstrapGrowl(result.msg, {type: 'danger', delay: 4000});
                         }
                     },
                     error: function (error) {
+                        $('#submit_btn').attr('disabled',false);
                         $('#AjaxLoaderDiv').fadeOut('slow');
                         $.bootstrapGrowl("Internal server error !", {type: 'danger', delay: 4000});
                     }

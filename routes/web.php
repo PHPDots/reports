@@ -15,6 +15,7 @@ Route::get('cron-below-hrs-task', 'admin\DailyReportController@cronBelowEightFou
 Route::get('/cron-leave-calculate', 'admin\DailyReportController@cronLeaveCalculate');
 Route::get('cron-task-notifications', 'admin\DailyReportController@cronTaskNotification');
 Route::get('cron-general-daily-report', 'admin\DailyReportController@cronGeneral');
+//Daily cron for client 
 Route::get('cron-daily-report', 'admin\DailyReportController@cron');
 Route::get('cron-user-leaves', 'admin\DailyReportController@cronLeaveEntitlement');
 
