@@ -71,7 +71,14 @@
 			<div class="col-md-5 name"> Phone no: </div>
 			<div class="col-md-7 value"> +91 9825096687 </div>
 		</div>
-
+		<div class="row static-info">
+			<div class="col-md-5 name"> Pan no: </div>
+			<div class="col-md-7 value">  AAUFP4850D </div>
+		</div>
+		<div class="row static-info">
+			<div class="col-md-5 name"> GST no: </div>
+			<div class="col-md-7 value">  24AAUFP4850D1Z3 </div>
+		</div>
 	</div>
 </div>
 
