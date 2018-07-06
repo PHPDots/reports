@@ -224,6 +224,8 @@ class TasksController extends Controller
                     }
                     $merg = count($bill_detail); $merg = $merg+2;  
                     $border = count($bill_detail); $border = $border+2;  
+                    //billing without fix tasks
+                    if(empty($xls_client_id)){
                     $bill_totals[] = array('Total','','','',$bill_total);
                     $excel->sheet('Bill Detail', function($sheet) use ($bill_detail,$bill_totals,$merg,$border) {
                             $sheet->setSize(array(
@@ -250,19 +252,23 @@ class TasksController extends Controller
                             });
                             $sheet->fromArray($bill_detail, null, 'A2', false, false);
                             $sheet->fromArray($bill_totals, null, 'A2', false, false);
-                        });    
-
+                        });
+                    }
                         //Client fix task sheet
                         if(!empty($xls_client_id))
                         {
                             $k = 1;
+                            $billId = 1;
                             $fixTasks = \App\Models\FixTask::getFixTasksList($xls_client_id);
                             $merg3 = count($fixTasks); $merg3 = $merg3 + 2;
 
                             if(!empty($fixTasks))
                             {
+
                                 $fix_totals = 0;
                                 $clientTask = [];
+                                $clientTotalHr = 0;
+                                $clientTotalRate = 0;
                                 foreach ($fixTasks as $fixTask)
                                 {
                                     $fix_task_date = date("j M, Y",strtotime($fixTask->task_date));
@@ -277,10 +283,47 @@ class TasksController extends Controller
 
                                     $clientTask[] = [$k,$fixTask->title,$fix_task_date,$fixTask->ref_link,$fixTask->assigned_by,$task_hrs,$task_fix,$task_rate,$row_total];
                                     $fix_totals += $row_total;
+                                    $clientTotalHr += $task_hrs;
+                                    $clientTotalRate += $task_rate;
                                     $k++;
                                 }
-                                $fix_total[] = array('Total','','','','','','','',doubleval($fix_totals));
+                                $bill_total += $fix_totals;
+                                $billId = count($bill_detail) + 1;
+                                $bill_totals[] = array($billId,'Fix Tasks',$clientTotalHr,$clientTotalRate,$fix_totals);
+                                $bill_totals[] = array('Total','','','',$bill_total);
+                                //Billing when Fix tasks
+                                $excel->sheet('Bill Detail', function($sheet) use ($bill_detail,$bill_totals,$merg,$border) {
+                                    $merg +=1;
+                                    $border +=1; 
+                                    $sheet->setSize(array(
+                                        'A1' => array('width'=> 10,'height'=> 15),
+                                        'B1' => array('width'=> 30,'height' => 15),
+                                        'C1' => array('width'=> 10,'height' => 15),
+                                        'D1' => array('width'=> 10,'height' => 15),
+                                        'E1' => array('width'=> 20,'height' => 15),
+                                    ));
+                                    $sheet->row(1, array('No','Name','Hours','Rate','Total'));
+                                    $sheet->mergeCells('A'.$merg.':D'.$merg);
+                                    $sheet->setBorder('A1:E'.$border, 'thin');
+                                    $sheet->cell('A1:E1', function($cell) {
+                                        $cell->setBackground('#aebbc2');
+                                        $cell->setAlignment('center');
+                                        $cell->setFont(array('family'=>'Calibri','size'=>'12','bold'=>true));
+                                    });
+                                    $sheet->cell('A'.$merg.':D'.$merg, function($cell) {
+                                        $cell->setAlignment('center');
+                                        $cell->setFont(array('family'=>'Calibri','size'=>'14','bold'=>true));
+                                    });
+                                    $sheet->cell('E'.$merg, function($cell) {
+                                        $cell->setFont(array('family'=>'Calibri','size'=>'14','bold'=>true));
+                                    });
+                                    $sheet->fromArray($bill_detail, null, 'A2', true, false);
+                                    $sheet->fromArray($bill_totals, null, 'A2', true, false);
+                                });
 
+                                //client fix tasks
+                                $fix_total[] = array('Total','','','','','','','',doubleval($fix_totals));
+                                
                                 $excel->sheet('Fix Tasks', function($sheet) use ($clientTask,$merg3,$fix_total){
                                     $sheet->setAutoSize(true);
                                     $sheet->row(1, array('Sr. No.','Tasks','Date','Ref. Link','Assigned by','Hours','Fixed','Rate','Total'));

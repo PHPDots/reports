@@ -8,7 +8,7 @@
 
         <div class="">
             
-            @include($moduleViewName.".search")           
+            @include($moduleViewName.".search")
 
             <div class="clearfix"></div>    
             <div class="portlet box green">
@@ -18,14 +18,34 @@
                     </div>
                   
                     @if($btnAdd)
-                        <a class="btn btn-default pull-right btn-sm mTop5" href="{{ $add_url }}">Add New</a>
-                    @endif                     
+                        <a class="btn btn-default pull-right btn-sm mTop5" href="{{ $add_url }}" style="margin-left: 10px;">Add New</a>
+                        <div class="">
+                            <button class="btn btn-primary pull-right btn-sm mTop5 unmapall">Unmap All</button>
+                            <button class="btn btn-primary pull-right btn-sm mTop5 mapall">Map All</button>
+                        </div>
+                    @endif
 
                 </div>
-                <div class="portlet-body">                    
+                <div class="portlet-body">
+                <form id="check-form" method="post" action="{{ route('fix-tasks.check-status') }}">
+                    {{ csrf_field() }}
                     <table class="table table-bordered table-striped table-condensed flip-content" id="server-side-datatables">
                         <thead>
                             <tr>
+                               <th width="1%">
+                                <div class="form-group form-md-checkboxes" style="padding-bottom: 10px; padding-left: 7px;">
+                                        <div class="md-checkbox-inline">
+                                            <div class="md-checkbox">
+                                                <input type="checkbox" id="allcheck_id" class="md-check" name="allcheck">
+                                                <label for="allcheck_id">
+                                                    <span></span>
+                                                    <span class="check" style="z-index: 1;"></span>
+                                                    <span class="box" ></span>
+                                                    </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </th>
                                <th width="5%">ID</th>
                                <th width="15%">Client Name</th>
                                <th width="20%">Tasks</th>
@@ -43,6 +63,9 @@
                         <tbody>
                         </tbody>
                     </table>
+                <input type="hidden" name="status_type" id="status_type_id">
+                <input type="submit" name="submit" style="display: none;" id="check_submit">
+                </form>
                 </div>
             </div>
         </div>
@@ -58,11 +81,67 @@
     <script type="text/javascript">
 
     $(document).ready(function(){
+        
+        $("#allcheck_id").click(function() {
+            if($(this).is(":checked")) {
+                $( ".sub-check" ).prop( "checked", true );
+            } else {
+                $( ".sub-check" ).prop( "checked", false );
+            }
+        });
+        $('.unmapall').on('click',function(){
+            var text = 'Are you sure you want to unmap all tasks?';
+            if(confirm(text))
+            {
+                $('#status_type_id').val(0);
+                $('#check-form').submit();
+            }
+            return false;
+        });
+        $('.mapall').on('click',function(){
+            var text = 'Are you sure you want to map all tasks?';
+            if(confirm(text))
+            {
+                $('#status_type_id').val(1);
+                $('#check-form').submit();
+            }
+            return false;
+        });
 
+        $('#check-form').submit(function () {
+            $('#AjaxLoaderDiv').fadeIn('slow');
+            $.ajax({
+                type: "POST",
+                url: "{{route('fix-tasks.check-status')}}",
+                data: new FormData(this),
+                contentType: false,
+                processData: false,
+                enctype: 'multipart/form-data',
+                success: function (result)
+                {
+                    if (result.status == 1)
+                    {
+                        $.bootstrapGrowl(result.msg, {type: 'success', delay: 4000});
+                        window.location = '{{ $list_url }}';    
+                        $('#AjaxLoaderDiv').fadeOut('slow');
+                    }
+                    else
+                    {
+                        $.bootstrapGrowl(result.msg, {type: 'danger', delay: 4000});
+                        $('#AjaxLoaderDiv').fadeOut('slow');
+                    }
+                },
+                error: function (error) {
+                    $.bootstrapGrowl("Internal server error !", {type: 'danger', delay: 4000});
+                    $('#AjaxLoaderDiv').fadeOut('slow');
+                }
+            });
+        });
         $("#search-frm").submit(function(){
             oTableCustom.draw();
             return false;
         });
+
 		$("#client_id").select2({
                 placeholder: "Search Client Name",
                 allowClear: true,
@@ -90,8 +169,9 @@
                 [25,50,100,150,200],
                 [25,50,100,150,200]
               ],
-            "order": [[ '0', "desc" ]],    
+            "order": [[ '1', "desc" ]],
             columns: [
+                { data: 'check_clm', orderable: false, searchable: false},
                 { data: 'id', name: 'id' },
                 { data: 'client', name: '{{ TBL_CLIENT }}.name' },
                 { data: 'title', name: 'title' },

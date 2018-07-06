@@ -204,7 +204,7 @@
             columns: [
                 { data: 'id', name: 'id' },                                             
                 { data: 'username', name: '{{TBL_USERS}}.name' },
-                { data: 'from_date', name: 'from_date' },                                             
+                { data: 'from_date', name: 'from_date' },
                 { data: 'to_date', name: 'to_date' },                                             
                 { data: 'days', name: 'to_date' },                                             
                 { data: 'description', name: 'description' },

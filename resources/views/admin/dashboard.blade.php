@@ -281,7 +281,7 @@ $monday = date('D');
                     url: leave_url,
                     data:{leave_id:id, status:status, reason:reason},
                     success: function (result)
-                {
+                    {
                     if (result.flag == 1)
                         {
                             $.bootstrapGrowl(result.msg, {type: 'success',delay: 4000});
@@ -290,7 +290,7 @@ $monday = date('D');
                                 //window.location.reload();
                             },3000);
                         }
-                }
+                    }
             });
             }
 			return false;

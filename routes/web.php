@@ -143,6 +143,7 @@ Route::get('clear-cache', function () {
 	Route::any('task-report/data', 'admin\UserTaskReportsController@data')->name('task-report.data');
     Route::resource('task-report', 'admin\UserTaskReportsController');
 
+    Route::post('fix-tasks/change-checked-status', 'admin\FixTasksController@change_checked_status')->name('fix-tasks.check-status');
     Route::any('fix-tasks/data', 'admin\FixTasksController@data')->name('fix-tasks.data');
     Route::resource('fix-tasks', 'admin\FixTasksController');
     

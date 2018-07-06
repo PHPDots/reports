@@ -456,9 +456,26 @@ class FixTasksController extends Controller
                 }
                     return $html;
             })
-            ->editColumn('hour', function ($row) { 
+            ->editColumn('hour', function ($row) {
                     $html = "# ".$row->hour.'<br/> # '.$row->fix.'<br/># '.$row->rate;
                     return $html;
+            })
+            ->addColumn('check_clm', function ($row) {
+                    return '<div class="form-group form-md-checkboxes">
+                                <div class="md-checkbox-inline">
+                                    <div class="col-md-3">
+                                    <div class="md-checkbox">
+                                        <input type="checkbox" name="taskIds[]" id="checkbox'.$row->id.'" class="md-check sub-check" value="'.$row->id.'">
+                                        <label for="checkbox'.$row->id.'">
+                                            <span></span>
+                                            <span class="check" style="z-index: 1;"></span>
+                                            <span class="box" ></span>
+                                        </label>
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>';
+
             })
             ->editColumn('total', function ($row) { 
                     $row_total = ($row->hour * $row->rate) + $row->fix;
@@ -470,12 +487,58 @@ class FixTasksController extends Controller
                     return date("j M, Y",strtotime($row->created_at));
                 else
                     return '-';    
-            })->rawColumns(['action','invoice_status','hour'])
+            })->rawColumns(['action','invoice_status','hour','check_clm'])
             
             ->filter(function ($query) 
             {
                 $query = FixTask::listFilter($query);
             })
             ->make(true);
+    }
+
+    public function change_checked_status(Request $request)
+    {
+        $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$EDIT_FIX_TASK);
+        
+        if($checkrights)
+        {
+            return $checkrights;
+        }
+        
+        $status = 1;
+        $msg = 'Status has been changed successfully !';
+        $data = array();
+
+        $rules = ['taskIds.required' => 'Please check atleast one id'];
+        $validator = Validator::make($request->all(), [
+            'taskIds'=>'required|exists:'.TBL_FIX_TASKS.',id',
+            'status_type' => ['required', Rule::in([0,1])],
+        ],$rules);
+        if ($validator->fails())
+        {
+            $messages = $validator->messages();
+            
+            $status = 0;
+            $msg = "";
+            
+            foreach ($messages->all() as $message) 
+            {
+                $msg .= $message . "<br />";
+            }
+        }
+        else
+        {
+            $checkIDs = $request->get('taskIds');
+            $status_type = $request->get('status_type');
+            if(is_array($checkIDs) && !empty($checkIDs))
+            {                
+                \DB::table(TBL_FIX_TASKS)
+                ->whereIn("id",$checkIDs)
+                ->update(['invoice_status' => $status_type]);
+                session()->flash('success_message', $msg);
+            }
+        }
+
+        return ['status' => $status, 'msg' => $msg, 'data' => $data];
     }
 }
