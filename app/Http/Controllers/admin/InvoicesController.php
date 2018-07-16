@@ -586,6 +586,7 @@ class InvoicesController extends Controller
             return redirect($this->list_url);
         }
     }
+
     public function data(Request $request)
     {
 		//Check Admin Type
@@ -606,19 +607,111 @@ class InvoicesController extends Controller
 
         $amount_query1 = Invoice::select(TBL_INVOICE.".*",TBL_CLIENT.".name as client_name")
                 ->join(TBL_CLIENT,TBL_CLIENT.".id","=",TBL_INVOICE.".client_id");
-        $amount_query2 = Invoice::select(TBL_INVOICE.".*",TBL_CLIENT.".name as client_name")
-                ->join(TBL_CLIENT,TBL_CLIENT.".id","=",TBL_INVOICE.".client_id");
+        //$amount_query2 = Invoice::select(TBL_INVOICE.".*",TBL_CLIENT.".name as client_name")
+                //->join(TBL_CLIENT,TBL_CLIENT.".id","=",TBL_INVOICE.".client_id");
+		
+		$amount_query2 = Invoice::select(TBL_INVOICE.".*",TBL_CLIENT.".name as client_name",TBL_INVOICE_EXPENSE.'.partial_amount as unpaid_amount',TBL_INVOICE_EXPENSE.'.amount as paid_amount',TBL_INVOICE_EXPENSE.'.payment_status')
+                ->join(TBL_CLIENT,TBL_CLIENT.".id","=",TBL_INVOICE.".client_id")
+                ->leftJoin(TBL_INVOICE_EXPENSE,TBL_INVOICE.".id","=",TBL_INVOICE_EXPENSE.".invoice_id");
 
         $amount_query1 = Invoice::listFilter($amount_query1);
         $amount_query2 = Invoice::listFilter($amount_query2);
         
         $totalamounts = $amount_query1->where('currency','in_rs')->sum("total_amount");
-        $totalamountsUSD = $amount_query2->where('currency','in_usd')->sum("total_amount");
+        //$totalamountsUSD = $amount_query2->where('currency','in_usd')->sum("total_amount");
+		$totalamountsUSD = $amount_query2->get();
         
+		$invoice_id = 0;
+        $current_amount = 0;
+        $remaining_amount = 0;
+        $total_amount_rs = 0;
+        $current_amount_usd = 0;
         
-        $totalamountsUSD = $totalamountsUSD * CURRENCY_USD;
-        $totalamounts = $totalamounts + $totalamountsUSD; 
-        $totalamounts = number_format($totalamounts,2);
+        $total_paid_amt = 0;
+        $total_unpaid_amt = 0;;
+        $current_amount_usd = 0;
+        $current_amount_inr = 0;
+        $total_amount_rs = 0;
+        $totalamounts   = 0;
+
+        if(!empty($totalamountsUSD))
+        {
+            foreach ($totalamountsUSD as $row)
+            {
+               /* if(!empty($invoice_id)) {
+                    echo " Display Amount ::".$totalamounts;
+                }
+                echo "<br> Total Amount :: ".$row->total_amount."<=Paid $==>".$row->unpaid_amount."<==Paid RS==>".$row->paid_amount."<==Payment Status==>".$row->payment_status."===>";*/
+
+                if($invoice_id != $row->id) {
+
+                    if(!empty($invoice_id)) {
+                        $total_paid_amt += $total_amount_rs;
+                        if(!empty($current_amount_usd)) {
+                            $total_amount_rs += ($current_amount_usd * CURRENCY_USD);
+                            $current_amount_usd = 0;
+                        }
+
+                        if(!empty($current_amount_inr)) {
+                            $total_amount_rs += $current_amount_inr;
+                            $current_amount_inr = 0;
+                        }
+
+                        $totalamounts += $total_amount_rs;
+                    }
+
+                    $total_amount_rs = 0;
+                    $invoice_id = $row->id;
+
+                    if($row->currency == 'in_usd') {
+                        $current_amount_usd = $row->total_amount;
+                    } else {
+                        $current_amount_inr = $row->total_amount;
+                    }
+                }
+
+                if(!empty($row->unpaid_amount) || !empty($row->payment_status)) {
+                    $total_amount_rs += $row->paid_amount;
+                    if($row->currency == 'in_usd') {
+                        if(!empty($row->payment_status)) {
+                            $current_amount_usd = 0;
+                        } else {
+                            $current_amount_usd = $current_amount_usd - $row->unpaid_amount;
+                        }
+                    } else {
+                        if(!empty($row->payment_status)) {
+                            $current_amount_inr = 0;
+                        } else {
+                            $current_amount_inr = $current_amount_inr - $row->unpaid_amount;
+                        }
+                    }
+                }
+            }
+        }
+
+        $total_paid_amt += $total_amount_rs;
+
+        if(!empty($current_amount_usd)) {
+            $total_amount_rs += ($current_amount_usd * CURRENCY_USD);
+        }
+
+        if(!empty($current_amount_inr)) {
+            $total_amount_rs += $current_amount_inr;
+        }
+
+        $totalamounts += $total_amount_rs;
+
+        $total_unpaid_amt = $totalamounts - $total_paid_amt;
+		
+		/*echo "\r\n:: Total Amount :: ".$totalamounts." :: Paid :: ".$total_paid_amt." :: UnPaid :: ".$total_unpaid_amt;
+        die;*/
+		
+		$total_arr['total_paid_amt'] = number_format($total_paid_amt,0);
+        $total_arr['total_unpaid_amt'] = number_format($total_unpaid_amt,0);
+        
+        //$totalamountsUSD = $totalamountsUSD * CURRENCY_USD;
+        //$totalamounts = $totalamounts + $totalamountsUSD; 
+        $totalamounts = number_format($totalamounts,0);
 
         $data = \Datatables::eloquent($model)
             ->editColumn('created_at', function($row){                
@@ -659,7 +752,8 @@ class InvoicesController extends Controller
 				$query = Invoice::listFilter($query);                 
             });
             
-            $data = $data->with('amounts',$totalamounts);
+            $total_arr['amounts'] = $totalamounts;
+            $data = $data->with($total_arr);
 
             $data = $data->make(true);
 
@@ -909,7 +1003,7 @@ class InvoicesController extends Controller
             'payment_status' => ['required',Rule::in([1,0])],
             'amount' => 'required|min:0',
             'payment_date' => 'required',
-            'partial_amount' => 'min:0',
+			'partial_amount' => 'min:0',
         ]);
         if ($validator->fails()) 
         {
@@ -931,14 +1025,14 @@ class InvoicesController extends Controller
             $partial_amount = $request->get('partial_amount');
             if($payment_status == 1)
                 $partial_amount = 0;
-            
+			
             $invoice = Invoice::find($invoice_id);
             if($invoice)
             {
                 $exp = new InvoiceExpense();       
                 $exp->invoice_id = $invoice_id;
                 $exp->payment_status = $payment_status;
-                $exp->partial_amount = $partial_amount;
+				$exp->partial_amount = $partial_amount;
                 $exp->amount = $amount;
                 $exp->payment_date = $payment_date;
                 $exp->save();
