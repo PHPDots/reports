@@ -38,11 +38,12 @@ $monday = date('D');
                                 <table class="table table-bordered table-striped table-condensed flip-content" id="server-side-datatables">
                                     <thead>
                                         <tr>
-                                            <th>UserName</th>
-                                            <th>From Date</th>
-                                            <th>To Date</th>
-											<th>Days</th>
-                                            <th>Status</th>
+                                            <th width="15%">UserName</th>
+                                            <th width="10%">From Date</th>
+                                            <th width="10%">To Date</th>
+                                            <th width="5%">Days</th>
+											<th width="20%">Discription</th>
+                                            <th width="10%">Status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -110,6 +111,7 @@ $monday = date('D');
                                             ?>
                                                 {{$days}}
                                             </th>
+                                            <th>{{ $leave->description }}</th>
                                             <th><a class="accepted btn btn-outline green btn-sm" data="{{$leave->id}}">
                                                     Appove</a>
                                                 <a class="rejected btn btn-outline red btn-sm" data="{{$leave->id}}" id="reject_action">Reject</a></th>
