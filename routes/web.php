@@ -83,8 +83,11 @@ Route::get('clear-cache', function () {
     Route::any('users/data', 'admin\UsersController@data')->name('users.data');
     Route::resource('users', 'admin\UsersController');
 
-	Route::any('user-logs/data', 'admin\AdminUserLogsController@data')->name('user-logs.data');
-	Route::resource('user-logs', 'admin\AdminUserLogsController'); 
+    Route::any('user-logs/data', 'admin\AdminUserLogsController@data')->name('user-logs.data');
+    Route::resource('user-logs', 'admin\AdminUserLogsController');
+	
+    Route::any('users-task-report/data', 'admin\UserTaskHRReportController@data')->name('users-task-report.data');
+    Route::resource('users-task-report', 'admin\UserTaskHRReportController');
 
 //Leaves	
     Route::any('leave-request/userData', 'admin\LeaveRequestController@userData')->name('leave-request.userData');

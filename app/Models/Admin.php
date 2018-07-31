@@ -155,6 +155,8 @@ class Admin extends Authenticatable
     public static $ADD_FIX_TASK = 113;
     public static $EDIT_FIX_TASK = 114;
     public static $DELETE_FIX_TASK = 115;
+
+    public static $USERS_TASK_REPORT = 116;
  
     /**
      * check page acces permissions
