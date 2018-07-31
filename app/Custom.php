@@ -199,7 +199,41 @@ class Custom
 
         return $working_days;
     }
+    public static function countworkingDaysFromJoinigDate($joining_date)
+    {
+        $data = array();
+        $working_days = 0;        
+        $start_date = $joining_date;
+        $end_date = date('Y-m-t',strtotime($start_date));
 
+        $start_ts = strtotime($start_date);
+        $end_ts = strtotime($end_date);
+        $diff = $end_ts - $start_ts;
+        $this_month_days =  round($diff / 86400);
+        $this_month_days = $this_month_days + 1;
+
+        $this_month = date('Y-m',strtotime($start_date)); 
+        $first = date('Y-m-d',strtotime($start_date));
+        $last = date('Y-m-d',strtotime($end_date));
+
+        $begin = new \DateTime($first);
+        $end = new \DateTime($last);
+        $end = $end->modify('+1 day');
+
+        $interval = \DateInterval::createFromDateString('1 day');
+        $period = new \DatePeriod($begin, $interval, $end);
+
+        $sundays = 0;
+        foreach ($period as $d) {
+            $dt = $d->format('D');
+            if ($dt == 'Sun') {
+                $sundays += 1;
+            }
+        }
+        $working_days = \App\Custom::workingDays($this_month,$this_month_days,$sundays);
+
+        return $working_days;
+    }
 }
 
 if (!function_exists('mime_content_type')) {

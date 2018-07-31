@@ -226,11 +226,11 @@ function openPaymentModel($id)
                     data.search_start_date = $("#search-frm input[name='search_start_date']").val();
                     data.search_end_date = $("#search-frm input[name='search_end_date']").val();
                     data.search_invoice_no = $("#search-frm input[name='search_invoice_no']").val();
-					data.search_month = $("#search-frm select[name='search_month']").val();
+					          data.search_month = $("#search-frm select[name='search_month']").val();
                     data.search_client_name = $("#search-frm select[name='search_client_name']").val();
                     data.search_status = $("#search-frm select[name='search_status']").val();
-					data.search_id = $("#search-frm input[name='search_id']").val();
-					data.search_c_type = $("#search-frm select[name='search_c_type']").val();
+					          data.search_id = $("#search-frm input[name='search_id']").val();
+					          data.search_c_type = $("#search-frm select[name='search_c_type']").val();
                 },
             dataSrc: function(response){
                     $("#overall-amounts").html(response.amounts);

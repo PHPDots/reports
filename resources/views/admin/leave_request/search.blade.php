@@ -16,7 +16,7 @@ else
     </div>
     <div class="portlet-body" style="display: none">  
         <form id="search-frm">
-            <div class="row">               
+            <div class="row">
                 <div class="col-md-4">
                     <label class="control-label">Leave Date Range</label>
                     <div class="input-group input-large date-picker input-daterange" data-date="10/11/2012" data-date-format="mm/dd/yyyy">

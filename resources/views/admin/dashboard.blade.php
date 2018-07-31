@@ -420,5 +420,6 @@ $monday = date('D');
                 }
             });
         }
+       
     </script>
 @endsection

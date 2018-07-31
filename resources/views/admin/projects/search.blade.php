@@ -21,7 +21,7 @@
                         <option value="all">All</option>                        
                         <option value="1" {!! \Request::get("search_status") == "1" ? 'selected="selected"':'' !!}>Active</option>                        
                         <option value="0" {!! \Request::get("search_status") == "0" ? 'selected="selected"':'' !!}>Inactive</option>                        
-                    </select>                                                                 
+                    </select>
                 </div>
 				@if(!empty($clients))
                 <div class="col-md-4">

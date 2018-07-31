@@ -151,7 +151,7 @@ class UsersController extends Controller
             'address' => 'required|min:2',            
             'phone' => 'required|max:15',
             'status' => ['required', Rule::in([0,1])],
-			'is_add_task' => ['required', Rule::in([0,1])],
+            'is_add_task' => ['required', Rule::in([0,1])],
             'image' => 'image|max:4000',
             'joining_date' => 'required',
             'blood_group' => ['required', Rule::in(['A+','B+','O+','AB+','AB-','A-','B-','O-'])],
@@ -159,9 +159,10 @@ class UsersController extends Controller
             'account_no' => 'required|numeric',
             'bank_nm' => 'required',
             'ifsc_code' => 'required',
-			'dob' => 'required',
-			'designation' => 'required',
-			'salary' => 'min:0|numeric',
+            'dob' => 'required',
+            'designation' => 'required',
+            'salary' => 'min:0|numeric',
+            'is_salary_generate' => Rule::in([0,1]),
         ]);
         
         // check validations
@@ -199,7 +200,9 @@ class UsersController extends Controller
             $adhar_num = $request->get("adhar_num");
             $designation = $request->get("designation");
 			$is_add_task = $request->get("is_add_task");
-			$salary = $request->get("salary");
+            $salary = $request->get("salary");
+            $is_salary_generate = $request->get("is_salary_generate");
+			$relieving_date = $request->get("relieving_date");
 			
             if($confirm_password == $password)
             {
@@ -238,9 +241,11 @@ class UsersController extends Controller
                 $user->pan_num = $pan_num;
                 $user->adhar_num = $adhar_num;
                 $user->designation = $designation;
-				$user->is_add_task = $is_add_task;
+                $user->is_add_task = $is_add_task;
+				$user->relieving_date = $relieving_date;
                 if(\Auth::guard('admins')->user()->id == SUPER_ADMIN_ID){
-				    $user->salary = $salary;
+                    $user->salary = $salary;
+				    $user->is_salary_generate = $is_salary_generate;
                 }
                 $user->save();   
                 
@@ -284,7 +289,7 @@ class UsersController extends Controller
                             $document->save();
                         }
                     }
-                }   
+                }
                 
                 $id = $user->id;
                 
@@ -311,7 +316,6 @@ class UsersController extends Controller
                 $message['link'] = $Path;
 
                 $returnHTML = view('emails.create_user_temp',$message)->render();
-                //return $returnHTML;exit;                       
             
                 $params["to"]=$email;
                 $params["subject"] = $subject;
@@ -421,6 +425,7 @@ class UsersController extends Controller
 			'dob' => 'required',
 			'balance_paid_leave' => 'required|min:0',
 			'salary' => 'min:0|numeric',
+            'is_salary_generate' => Rule::in([0,1]),
         ]);
         
         // check validations
@@ -463,7 +468,9 @@ class UsersController extends Controller
             $designation = $request->get("designation");
 			$is_add_task = $request->get("is_add_task");
 			$balance_paid_leave = $request->get("balance_paid_leave");
-			$salary = $request->get("salary");
+            $salary = $request->get("salary");
+            $is_salary_generate = $request->get("is_salary_generate");
+			$relieving_date = $request->get("relieving_date");
 			$old_balance_leave = $model->balance_paid_leave;
             
             if($request->get('balance_paid_leave') > 0 && $request->get('balance_paid_leave') != $old_balance_leave)
@@ -526,10 +533,12 @@ class UsersController extends Controller
             $model->pan_num = $pan_num;
             $model->adhar_num = $adhar_num;
             $model->designation = $designation;
-			$model->is_add_task = $is_add_task;
+            $model->is_add_task = $is_add_task;
+			$model->relieving_date = $relieving_date;
             $model->balance_paid_leave = $balance_paid_leave;
             if(\Auth::guard('admins')->user()->id == SUPER_ADMIN_ID){
                 $model->salary = $salary;
+                $model->is_salary_generate = $is_salary_generate;
             }
 			$model->save();
 

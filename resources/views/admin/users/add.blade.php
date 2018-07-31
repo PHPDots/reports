@@ -141,7 +141,7 @@ $user_id =$formObj->id;
                                 <?php } ?>
                                 <div class="clearfix">&nbsp;</div>
                                 <div class="row">
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <label class="control-label">Joining Date:<span class="required">*</span></label>
                                         <div class="input-group input-large date-picker input-daterange" data-date="10/11/2012" data-date-format="mm/dd/yyyy">
                                             {!! Form::text('joining_date',null,['class' => 'form-control', 'data-required' => true,'placeholder' => 'Select Joining Date','id'=>'start_date']) !!}
@@ -150,10 +150,19 @@ $user_id =$formObj->id;
                                             </span>
                                         </div>
                                     </div>
-									<div class="col-md-6">
+									<div class="col-md-4">
                                         <label class="control-label">DOB:<span class="required">*</span></label>
                                         <div class="input-group input-large date-picker input-daterange" data-date="10/11/2012" data-date-format="mm/dd/yyyy">
                                             {!! Form::text('dob',null,['class' => 'form-control', 'data-required' => true,'placeholder' => 'Select DOB','id'=>'dob']) !!}
+                                            <span class="input-group-addon">
+                                                <i class="fa fa-calendar"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="control-label">Relieving Date :</label>
+                                        <div class="input-group input-large date-picker input-daterange" data-date="10/11/2012" data-date-format="mm/dd/yyyy">
+                                            {!! Form::text('relieving_date',null,['class' => 'form-control task_date']) !!}
                                             <span class="input-group-addon">
                                                 <i class="fa fa-calendar"></i>
                                             </span>
@@ -167,7 +176,19 @@ $user_id =$formObj->id;
                                     <div class="col-md-6">
                                         <label class="control-label">Salary</label>  
                                         {!! Form::text('salary',null,['class' => 'form-control','placeholder'=>'Enter User Salary']) !!}
-                                    </div>                           
+                                    </div>  
+                                    <div class="col-md-6">
+                                        <label class="control-label">&nbsp;</label>  
+                                        <div class="md-checkbox">
+                                            {!! Form::checkbox('is_salary_generate',1,null,['class' => 'md-check','id'=>"checkbox1"]) !!}
+                                            <label for="checkbox1">
+                                                <span></span>
+                                                <span class="check" style="z-index: 1;"></span>
+                                                <span class="box" ></span>
+                                                Is add for generate all users salary slip list_url?
+                                                </label>
+                                        </div>
+                                    </div>
                                 </div>
                                 @endif
                                 

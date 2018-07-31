@@ -19,7 +19,7 @@
                     <div class="caption">
                         <i class="fa fa-list"></i>{{ $page_title }}    
                     </div>
-                  
+
                     @if($btnAdd)
                         <a class="btn btn-default pull-right btn-sm mTop5" href="{{ $add_url }}">Add New</a>
 						<a class="btn btn-default btn-sm mTop5 pull-right" style="margin-right: 10px;" href="{{ route('salaryslipForAll') }}">Add For All</a>
@@ -33,16 +33,16 @@
                                <th width="5%">ID</th>                                    
                                <th width="30%">UserName</th>                           
                                <th width="10%">Month</th>
-								<th width="8%">Net Pay</th>
+								               <th width="8%">Net Pay</th>
                                <th width="15%">Created At</th>                           
                                <th width="10%" data-orderable="false">Action</th>
                             </tr>
-                        </thead>                                         
+                        </thead>
                         <tbody>
                         </tbody>
-                    </table>                                              
+                    </table>
                 </div>
-            </div>              
+            </div>
         </div>
     </div>
 </div> 
@@ -140,12 +140,12 @@ function openView($id){
               ],
             "order": [[ '0', "desc" ]],    
             columns: [
-                { data: 'id', name: 'id' },                                             
+                { data: 'id', name: 'id' },
                 { data: 'user_name', name: '{{ TBL_USERS }}.firstname' },
                 { data: 'month', name: 'month' },
-				{ data: 'net_pay', name: 'net_pay' },
+				        { data: 'net_pay', name: 'net_pay' },
                 { data: 'created_at', name: 'created_at' },
-                { data: 'action', orderable: false, searchable: false}             
+                { data: 'action', orderable: false, searchable: false}
             ]
         });        
     });

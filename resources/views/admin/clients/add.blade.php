@@ -50,17 +50,17 @@
                                         <span class="input-group-addon">
                                                 <i class="fa fa-phone"></i>
                                         </span>
-                                        </div>                                            
+                                        </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="control-label">Country: </label>                            
+                                        <label class="control-label">Country: </label>
                                         {!! Form::text('country',null,['class' => 'form-control','placeholder' => 'Enter Country']) !!}
                                     </div>
                                 </div>
                                 <div class="clearfix">&nbsp;</div>
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <label class="control-label">State: </label>                            
+                                        <label class="control-label">State: </label>
                                         {!! Form::text('state',null,['class' => 'form-control','placeholder' => 'Enter State']) !!}
                                     </div>
                                     <div class="col-md-6">

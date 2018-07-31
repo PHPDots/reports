@@ -128,61 +128,43 @@ class SalarySlipController extends Controller
         }
         $data =array();
         $user_id = $request->get('user_id');
-        $userSetail = User::find($user_id);
-		if(!empty($userSetail)){
-			$data['account_no'] = $userSetail->account_no;
-			$data['name'] = $userSetail->name;
-			$data['bank_nm'] = $userSetail->bank_nm;
-			$data['joining_date'] = $userSetail->joining_date;
-			$data['pan_num'] = $userSetail->pan_num;
-			$data['designation'] = $userSetail->designation;
-		}
-		$month = $request->get('month');
-        $year = $request->get('year');
-        $month_year = $year.'-'.$month;
+        $joining_date = '';
         $workingDays = 0;
-        
-        $start_date = $month_year;
-        $end_date = date('Y-m-t',strtotime($start_date));
-        
-        $this_month = date('Y-m',strtotime($start_date)); 
-        $this_month_days = date("t",strtotime($start_date));
-
-        $first = date('Y-m-d',strtotime($start_date));
-        $last = date('Y-m-d',strtotime($end_date));
-
-        $begin = new \DateTime($first);
-        $end = new \DateTime($last);
-        $end = $end->modify('+1 day');
-
-        $interval = \DateInterval::createFromDateString('1 day');
-        $period = new \DatePeriod($begin, $interval, $end);
-
-        $sundays = 0;
-        foreach ($period as $d) {
-            $dt = $d->format('D');
-            if ($dt == 'Sun') {
-                $sundays += 1;
-            }
-        }
-
-        $data['working_days'] = Custom::workingDays($this_month,$this_month_days,$sundays);
-        //$data['leave_taken'] = Custom::userleavetaken($user_id,$this_month);
-        $month_leave = \App\Models\LeaveMonthlyLog::where('user_id',$user_id)
-                                                ->where('month',$request->get('month'))
-                                                ->where('year',$request->get('year'))
-                                               ->first();
         $leave_taken = 0;
         $balance_leave = 0;
-        if(!empty($month_leave))
-        {
-            $leave_taken = $month_leave->leave_taken;
-            $balance_leave = $month_leave->balance_leave;
+
+        $userSetail = User::find($user_id);
+        if(!empty($userSetail)){
+            $data['account_no'] = $userSetail->account_no;
+            $data['name'] = $userSetail->name;
+            $data['bank_nm'] = $userSetail->bank_nm;
+            $data['joining_date'] = $userSetail->joining_date;
+            $data['pan_num'] = $userSetail->pan_num;
+            $data['designation'] = $userSetail->designation;
+            $joining_date = $userSetail->joining_date;
         }
+        $month = $request->get('month');
+        $year = $request->get('year');
+        $month_year = $year.'-'.$month;
+        
+        $working_days = \App\Custom::countworkingDays($month_year);
+
+        //Calculate Joining date wise working days
+        $joining_month = date('Y-m',strtotime($joining_date));
+        $current_month = date('Y-m');
+        if($joining_month == $current_month)
+        {
+            $working_days = \App\Custom::countworkingDaysFromJoinigDate($joining_date);
+        }
+        //Get user monthly leave
+        $user_leave_days =  \App\Custom::getUserMonthlyLeaveTaken($user_id,$month,$year);
+        $leave_taken = $user_leave_days['leave_taken'];
+        $balance_leave = $user_leave_days['balance_leave'];
+
+        $data['working_days'] = $working_days;
         $data['leave_taken'] = $leave_taken;
         $data['balance_leave'] = $balance_leave;
 		return $data; 
-
     }
     /**
      * Store a newly created resource in storage.
@@ -742,7 +724,7 @@ class SalarySlipController extends Controller
         }
 
         $data = array();
-        $data['users'] = User::where('status',1)->orderBy('firstname')->whereNull('client_user_id')->where('id','!=',1)->get();
+        $data['users'] = User::where('status',1)->orderBy('firstname')->whereNull('client_user_id')->where('id','!=',1)->where('is_salary_generate',1)->get();
         return view($this->moduleViewName.'.addForAll', $data);
     }
 	public function salaryslip_for_all_data(Request $request)
@@ -814,7 +796,7 @@ class SalarySlipController extends Controller
                     return ['status' => $status, 'msg' => $msg];       
                 }
                 //Get Working Days
-                $working_days = \App\Custom::countworkingDays($month_year);          
+                $working_days = \App\Custom::countworkingDays($month_year);
             }
             if(is_array($users) && !empty($users))
             {
@@ -854,6 +836,14 @@ class SalarySlipController extends Controller
                                 $leave_taken = $user_leave_days['leave_taken'];
                                 $balance_leave = $user_leave_days['balance_leave'];
                                 
+                                $joining_month = date('Y-m',strtotime($user_data->joining_date));
+                                $current_month = date('Y-m');
+                                if($joining_month == $current_month)
+                                {
+                                    $joining_date = $user_data->joining_date;
+                                    $working_days = \App\Custom::countworkingDaysFromJoinigDate($joining_date);
+                                }
+
                                 //Calculate Leave Deduction
                                 $leaves = $leave_taken - $balance_leave; 
                                 if($leaves > 0)
@@ -862,7 +852,6 @@ class SalarySlipController extends Controller
 
                                     $leave_deduction = round(($user_salary * ($working_days-$user_month_days))/$working_days);
                                 }
-
                                 //Left Total 
                                 $left_top_total = round($basic_salary) + round($hra) + round($conveyance_allowance) + round($telephone_allowance) + round($medical_allowance) + round($uniform_allowance);
                             
@@ -935,16 +924,16 @@ class SalarySlipController extends Controller
                                 $params["from"] = 'reports.phpdots@gmail.com';
                                 $params["from_name"] = 'Reports PHPdots';  
                                 $params["body"] = $returnHTML;
-                                sendHtmlMail($params);
+                                //sendHtmlMail($params);
                                 
                                 //store logs detail
-                                $params=array();    
+                                $params=array();
 
                                 $params['adminuserid']  = \Auth::guard('admins')->id();
                                 $params['actionid']     = $this->adminAction->ADD_SALARY_SLIP;
                                 $params['actionvalue']  = $salary_id;
                                 $params['remark']       = "Add Salary Slip::".$salary_id;
-                                \App\Models\AdminLog::writeadminlog($params);
+                                //\App\Models\AdminLog::writeadminlog($params);
             
                                 $i++;
                             }
