@@ -46,7 +46,7 @@ define("TBL_SMS_SENT_LOG","sms_sent_logs");
 define("TBL_MEMBER_LOG","bopal_member_logs");
 
 //variables
-define("SUPER_ADMIN_ID","10");
+define("SUPER_ADMIN_ID","1");
 define("ACTIVE_USER","1");
 define("CURRENCY_USD","60");
 
@@ -59,6 +59,7 @@ define("OFFER_LETTER_ID",6);
 
 define("TBL_FIX_TASKS","fix_tasks");
 define("TBL_SEND_MAIL_USERS","send_mail_users");
+define("TBL_CLIENT_USERS_RATES","client_users_rates");
 
 
 

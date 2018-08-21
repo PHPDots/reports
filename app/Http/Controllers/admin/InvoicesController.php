@@ -91,7 +91,7 @@ class InvoicesController extends Controller
 			}
 			if($request->get("changeID") > 0)
             {
-            $invoice_id = $request->get("changeID");   
+            $invoice_id = $request->get("changeID");
             $payment = $request->get("changeStatus");
 
             $request = Invoice::find($invoice_id);
@@ -122,26 +122,26 @@ class InvoicesController extends Controller
         
             $viewName = $this->moduleViewName.".index";
         }
-        return view($viewName, $data);        
+        return view($viewName, $data);
     }
     /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
 		//Check Admin Type
         $auth_id = \Auth::guard("admins")->user()->id;
         $auth_user =  superAdmin($auth_id);
-        if($auth_user == 0) 
+        if($auth_user == 0)
         {
             return Redirect('/dashboard');
         }
 		
         $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$ADD_INVOICE);
-        
-        if($checkrights) 
+
+        if($checkrights)
         {
             return $checkrights;
         }
@@ -165,10 +165,54 @@ class InvoicesController extends Controller
                 $invoice_no = 'PD/'.$this_year.'-'.$next_year.'/1';
             }
         $data['invoice_no'] = $invoice_no;
-        //$data['address'] = '103, Pragtya Residency, NR: Sarthi bungalow, NR: BAPS swaminarayan Temple, Bopal, Ahmedabad';
 		$data['address'] = \Config('app.phpdots_address');
 		$data['clients'] = Client::pluck("name","id")->all();
-        
+        $copytocreate = $request->get('copytocreate');
+        if(!empty($copytocreate))
+        {
+            $invoice = Invoice::find($copytocreate);
+            if($invoice)
+            {
+                $data["currency"] = ['in_rs'=>'In Rs.','in_usd'=>'In USD'];
+                $client = Client::find($invoice->client_id);
+                if($client)
+                {
+                    $client_type = $client->client_type;
+                    if($client_type == 1)
+                    {
+                        $last_invoice = Invoice::select('invoice_no','id')->where('invoice_no','NOT LIKE','%exp-%')->orderBy('created_at','DES')->first();
+                        $this_year = date('Y');
+                        $next_year = $this_year + 1;
+                        if(!empty($last_invoice))
+                        {
+                            $last_invoice = str_replace("exp-","",$last_invoice->invoice_no);
+                            $last_no =  explode("/",$last_invoice);
+                            $no = $last_no[2] + 1;
+                            $invoice_no = 'PD/'.$this_year.'-'.$next_year.'/'.$no; 
+                        }
+                    }
+                    if ($client_type == 2)
+                    {
+                        $last_invoice = Invoice::select('invoice_no','id')->where('invoice_no','LIKE','%exp-%')->orderBy('created_at','DES')->first();
+
+                        $this_year = date('Y');
+                        $next_year = $this_year + 1;
+                        if(!empty($last_invoice))
+                        {
+                            $last_invoice = str_replace("exp-","",$last_invoice->invoice_no);
+                            $last_no =  explode("/",$last_invoice);
+                            $no = $last_no[2] + 1;
+                            $invoice_no = 'exp-PD/'.$this_year.'-'.$next_year.'/'.$no;
+                        }
+                    }
+                    $data['invoice_detail'] = InvoiceDetail::where('invoice_id',$copytocreate)->get();
+                    $data['invoice_no'] = $invoice_no;
+                    $data['formObj'] = $invoice;
+                }
+                return view($this->moduleViewName.'.copyAdd', $data);
+            }
+            return redirect()->back();
+        } 
         return view($this->moduleViewName.'.add', $data);
     }
 
@@ -386,7 +430,6 @@ class InvoicesController extends Controller
         $data['formObj'] = $formObj;
         $data['page_title'] = "Edit ".$this->module;
         $data['buttonText'] = "Update";
-
         $data['action_url'] = $this->moduleRouteText.".update";
         $data['action_params'] = $formObj->id;
         $data['method'] = "PUT";
@@ -638,11 +681,6 @@ class InvoicesController extends Controller
         {
             foreach ($totalamountsUSD as $row)
             {
-               /* if(!empty($invoice_id)) {
-                    echo " Display Amount ::".$totalamounts;
-                }
-                echo "<br> Total Amount :: ".$row->total_amount."<=Paid $==>".$row->unpaid_amount."<==Paid RS==>".$row->paid_amount."<==Payment Status==>".$row->payment_status."===>";*/
-
                 if($invoice_id != $row->id) {
 
                     if(!empty($invoice_id)) {
@@ -745,6 +783,7 @@ class InvoicesController extends Controller
                         'isView' => \App\Models\Admin::isAccess(\App\Models\Admin::$LIST_INVOICE), 
 						'payment' => \App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_INVOICE),
 						'viewExpe' => \App\Models\Admin::isAccess(\App\Models\Admin::$LIST_INVOICE_EXPENSE),
+                        'copyInvoice' => \App\Models\Admin::isAccess(\App\Models\Admin::$ADD_INVOICE)
                     ]
                 )->render();
             })->rawColumns(['action','created_at','payment','invoice_date'])

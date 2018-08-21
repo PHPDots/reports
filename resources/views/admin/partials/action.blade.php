@@ -29,13 +29,13 @@
 @if(isset($isView) && $isView)
 <a data-id="{{ $row->id }}" class="btn btn-xs btn-success" onclick="openView({{$row->id}})" title="view">
     <i class="fa fa-eye"></i>
-</a>          
+</a>
 @endif
 	
 @if(isset($isPDF) && $isPDF)
 <a href="{{ url('salary_slip/download?slip_id='.$row->id) }}" class="btn btn-xs btn-warning" title="Download PDF">
     <i class="fa fa-arrow-down" aria-hidden="true"></i>
-</a>          
+</a>
 @endif
 
 @if(isset($inPDF) && $inPDF)
@@ -48,7 +48,7 @@
 @if($row->status == 0)
 <a data="{{ $row->id }}" class="btn btn-xs btn-success accepted" title="Active">
     <i class="fa fa-check"></i>
-</a>          
+</a>
 @endif
 @endif 
 
@@ -88,12 +88,12 @@
 		<a class="btn btn-xs btn-danger accepted" title="Change Status To Active" href="{{ url('members?changeStatus=1&changeID='.$row->id)}}" onclick="return confirm('Are you sure ?');">
 		    <i class="fa fa-check-circle-o"></i>
 		</a>
-	@endif	   
+	@endif
 @endif
 
 @if(isset($viewTask) && $viewTask)
 <?php
-$url = url('/tasks?').'search_start_date=&search_end_date=&search_task_date='.date('Y-m').'&search_project=&search_title=&search_hour_op=%3D&search_hour=&search_min_op=%3D&search_min=&search_status=all&search_user='.$row->id.'&search_client=&isDownload=&isDownloadXls=&is_total=';
+$url = url('/tasks?').'search_task_date='.date('Y-m').'&search_status=all&search_user='.$row->id;
 ?>
 <a href="{{ $url }}" class="btn btn-xs btn-warning" title="View This Month Tasks" target="_blank">
     <i class="fa fa-eye" aria-hidden="true"></i>
@@ -102,7 +102,7 @@ $url = url('/tasks?').'search_start_date=&search_end_date=&search_task_date='.da
 
 @if(isset($viewInvoice) && $viewInvoice)
 <?php
-$url = url('/invoices?').'search_start_date=&search_end_date=&search_invoice_no=&search_month=&search_client_name='.$row->id.'&search_status=&search_id=&search_c_type=';
+$url = url('/invoices?').'search_client_name='.$row->id;
 ?>
 <a href="{{ $url }}" class="btn btn-xs btn-warning" title="View Invoices" target="_blank">
     <i class="fa fa-eye" aria-hidden="true"></i>
@@ -126,6 +126,11 @@ $url = url('/invoice-expense?').'search_invoice_id='.$row->id;
 		<a class="btn btn-xs btn-success" title="Change Status To Map Invoice" href="{{ url('fix-tasks?changeStatus=1&changeID='.$row->id)}}" onclick="return confirm('Are you sure ?');">
 		    <i class="fa fa-check-circle-o"></i>
 		</a>
-	@endif	   
+	@endif
+@endif
+@if(isset($copyInvoice) && $copyInvoice)
+	<a class="btn btn-xs btn-default yellow" title="Click To Copy & Create" href="{{ url('invoices/create?copytocreate='.$row->id) }}">
+	    <i class="fa fa-clipboard" aria-hidden="true"></i>
+	</a>
 @endif
 </div>

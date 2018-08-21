@@ -30,22 +30,22 @@
                         <thead>
                             <tr>
                                <th width="5%">ID</th>
-                               <th width="20%">Invoice</th>
-                               <th width="15%">CLient Name</th>
+                               <th width="15%">Invoice</th>
+                               <th width="10%">CLient Name</th>
                                <th width="5%">Amount</th>
                                <th width="5%">GST</th>
                                <th width="5%">Total Amount</th>
-							                 <th width="10%">Invoice Date</th>
+							                 <th width="5%">Invoice Date</th>
                                <th width="5%">Status</th>
-                               <th width="10%">Created At</th>
-                               <th width="20%" data-orderable="false">Action</th>
+                               <th width="5%">Created At</th>
+                               <th width="25%" data-orderable="false">Action</th>
                             </tr>
                         </thead>
                         <tbody>
                         </tbody>
-                    </table>                                              
+                    </table>
                 </div>
-            </div>              
+            </div>
         </div>
     </div>
 </div>
@@ -216,8 +216,8 @@ function openPaymentModel($id)
             searching: false,
             lengthMenu:
               [
-                [50,100,150,200,250],
-                [50,100,150,200,250]
+                [100,150,200,250,300],
+                [100,150,200,250,300]
               ],
             ajax: {
                 "url": "{!! route($moduleRouteText.'.data') !!}",
