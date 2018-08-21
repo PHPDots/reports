@@ -13,6 +13,7 @@ use App\Models\Task;
 use App\Models\User;
 use App\Models\Client;
 use App\Models\ClientUser;
+use App\Models\ClientUsersRate;
 use Excel;
 
 class TasksController extends Controller
@@ -49,12 +50,12 @@ class TasksController extends Controller
     {
         $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$LIST_TASKS);
         
-        if($checkrights) 
+        if($checkrights)
         {
             return $checkrights;
         }
 
-        $data = array();        
+        $data = array();
         $data['page_title'] = "Manage Tasks";
 
         $data['add_url'] = route($this->moduleRouteText.'.create');
@@ -66,7 +67,6 @@ class TasksController extends Controller
             $start_date = $date->mindate;
             $mindate = date_create($date->mindate);
             $maxdate = date_create($date->maxdate);
-        
         } 
         
         //$maxdate->modify('+1 month');
@@ -89,7 +89,7 @@ class TasksController extends Controller
         
         $auth_id = \Auth::guard('admins')->user()->user_type_id;
 
-        if($auth_id == NORMAL_USER){
+        if($auth_id == NORMAL_USER || $auth_id == TRAINEE_USER){
             $data['users']='';
             $data['clients']='';
             $viewName = $this->moduleViewName.".userIndex";
@@ -182,6 +182,8 @@ class TasksController extends Controller
                             //$userWiseTasks[$k]['count'] = $task_count;
                         //Bill Details 
                         $bill_detail[] = ['',$userWiseTasks[$k]['name'],$total_time,1,$total_time];
+                        $bill_detail_rates[] = [$k,$userWiseTasks[$k]['name'],$total_time,1,$total_time];
+                        
                         $j =1;
                         $bill_total = 0;
                         foreach ($bill_detail as $key =>$v) {
@@ -189,9 +191,7 @@ class TasksController extends Controller
                             $j++;
                             $bill_total += $bill_detail[$key][4];
                         
-                        }                          
-                        //echo "<pre/>"; print_r($userWiseTasks);exit;
-
+                        }
                         $excel->sheet($userWiseTasks[$k]['name'], function($sheet) use ($userWiseTasks,$k,$task_title,$time,$task_count) {
                             $sheet->setSize(array(
                                 'A1' => array('width'=> 7,'height'=> 15),
@@ -220,12 +220,13 @@ class TasksController extends Controller
                             $sheet->fromArray($task_title, null, 'A1', false, false);
                             $sheet->fromArray($userWiseTasks[$k]['tasks'], null, 'A1', false, false);
                             $sheet->fromArray($time[$k], null, 'A1', true, false);
-                        });                        
+                        });
                     }
                     $merg = count($bill_detail); $merg = $merg+2;  
                     $border = count($bill_detail); $border = $border+2;  
                     //billing without fix tasks
-                    if(empty($xls_client_id)){
+                    $fixTasks = \App\Models\FixTask::getFixTasksList($xls_client_id);
+                    if(empty($xls_client_id) || count($fixTasks) == 0){
                     $bill_totals[] = array('Total','','','',$bill_total);
                     $excel->sheet('Bill Detail', function($sheet) use ($bill_detail,$bill_totals,$merg,$border) {
                             $sheet->setSize(array(
@@ -262,9 +263,8 @@ class TasksController extends Controller
                             $fixTasks = \App\Models\FixTask::getFixTasksList($xls_client_id);
                             $merg3 = count($fixTasks); $merg3 = $merg3 + 2;
 
-                            if(!empty($fixTasks))
+                            if(!empty($fixTasks) && count($fixTasks) > 0)
                             {
-
                                 $fix_totals = 0;
                                 $clientTask = [];
                                 $clientTotalHr = 0;
@@ -287,12 +287,37 @@ class TasksController extends Controller
                                     $clientTotalRate += $task_rate;
                                     $k++;
                                 }
-                                $bill_total += $fix_totals;
+                                
+                                //calculation of clients users rates
+                                $p = 1;
+                                $bill_total_fix = 0;
+                                foreach ($bill_detail_rates as $key =>$v) {
+                                    echo $p;
+                                   $user_id = $bill_detail_rates[$key][0];
+                                   
+                                    $rate_value = \App\Models\ClientUsersRate::where('user_id',$user_id)
+                                                    ->where('client_id',$xls_client_id)
+                                                    ->first();
+                                    if($rate_value)
+                                    {
+                                        $bill_detail_rates[$key][3] = $rate_value->rate;
+                                        $bill_detail_rates[$key][4] = $bill_detail_rates[$key][2] * $rate_value->rate; 
+                                    }else{
+                                        $bill_detail_rates[$key][3] = 1;
+                                    }
+                                    $bill_detail_rates[$key][0] = $p;
+                                    $bill_total_fix += $bill_detail_rates[$key][4];
+                                    $p++;
+                                }
+                                $bill_total_fix += $fix_totals;
+                                
                                 $billId = count($bill_detail) + 1;
                                 $bill_totals[] = array($billId,'Fix Tasks',$clientTotalHr,$clientTotalRate,$fix_totals);
-                                $bill_totals[] = array('Total','','','',$bill_total);
+                                $bill_totals[] = array('Total','','','',$bill_total_fix);
+                                dd($bill_detail_rates);
                                 //Billing when Fix tasks
-                                $excel->sheet('Bill Detail', function($sheet) use ($bill_detail,$bill_totals,$merg,$border) {
+                                $excel->sheet('Bill Detail', function($sheet) use ($bill_detail_rates,$bill_totals,$merg,$border) {
+                                    dd($bill_detail_rates);
                                     $merg +=1;
                                     $border +=1; 
                                     $sheet->setSize(array(
@@ -317,7 +342,7 @@ class TasksController extends Controller
                                     $sheet->cell('E'.$merg, function($cell) {
                                         $cell->setFont(array('family'=>'Calibri','size'=>'14','bold'=>true));
                                     });
-                                    $sheet->fromArray($bill_detail, null, 'A2', true, false);
+                                    $sheet->fromArray($bill_detail_rates, null, 'A2', true, false);
                                     $sheet->fromArray($bill_totals, null, 'A2', true, false);
                                 });
 
@@ -352,8 +377,10 @@ class TasksController extends Controller
                                 });
                             }
                         }
+                    $activeSheet = count($userWiseTasks);
+                    $excel->setActiveSheetIndex($activeSheet);
                     });
-                    $xls_sheet->download('xlsx');
+                   // $xls_sheet->download('xlsx');
                 }
             }
             
@@ -373,7 +400,7 @@ class TasksController extends Controller
             $viewName = $this->moduleViewName.".clientIndex";
         }
 
-       return view($viewName, $data);  
+       return view($viewName, $data);
     }
 
     /**
@@ -845,10 +872,9 @@ class TasksController extends Controller
                     [
                         'currentRoute' => $this->moduleRouteText,
                         'row' => $row, 
-                        'isEdit' => \App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_TASKS),                                                  
+                        'isEdit' => \App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_TASKS),
                         'isDelete' => \App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_TASKS),
                         'isView' =>\App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_TASKS),
-                                                  
                     ]
                 )->render();
             })
@@ -879,11 +905,11 @@ class TasksController extends Controller
                   $html = "<a href='".$row->ref_link."' target='_blank'>".$label."</a>";  
                 }
                 return $html;  
-            })            
+            })
             ->rawColumns(['status','action','ref_link','description','task_date'])             
           
             ->filter(function ($query) 
-            {                              
+            {
                 $query = Task::listFilter($query);                  
             });
         $data = $data->with('hours',$totalHours);
