@@ -196,12 +196,12 @@ function openView($id){
                     data.search_status = $("#search-frm select[name='search_status']").val();
                  
                 },
-				dataSrc: function(response){
-                    $("#overall-hours").html(response.hours);
-					$("#is_total").val(response.hours);
+				    dataSrc: function(response){
+                      $("#overall-hours").html(response.hours);
+					            $("#is_total").val(response.hours);
                     return response.data;
                 }
-            },            
+            },
             "order": [[ '0', "desc" ]],    
             columns: [
                 { data: 'id', name: 'id' },

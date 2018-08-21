@@ -56,6 +56,7 @@ define("ADMIN_USER_TYPE","1");
 define("CLIENT_USER","4");
 define("OTP_COUNTER",3);
 define("OFFER_LETTER_ID",6);
+define("TRAINEE_USER",'5');
 
 define("TBL_FIX_TASKS","fix_tasks");
 define("TBL_SEND_MAIL_USERS","send_mail_users");

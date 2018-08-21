@@ -11,7 +11,7 @@ $bred_crumb_array = array(
 <div class="page-content">
     <div class="container">
         <div class="page-content-inner">
-            @if(Auth::guard('admins')->user()->user_type_id == NORMAL_USER)
+            @if(Auth::guard('admins')->user()->user_type_id == NORMAL_USER || Auth::guard('admins')->user()->user_type_id == TRAINEE_USER)
             <div class="row">                
                 <a href="{{route('leave-request.create')}}">
                     <div class="col-md-3">
@@ -88,7 +88,7 @@ $bred_crumb_array = array(
             @endif
             <div class="row">
              
-            @if(Auth::guard('admins')->user()->user_type_id == NORMAL_USER)
+            @if(Auth::guard('admins')->user()->user_type_id == NORMAL_USER || Auth::guard('admins')->user()->user_type_id == TRAINEE_USER)
                 @if($userOnHoliday)
                     <div class="col-md-12">
                         <div class="portlet" style="margin-bottom: 0px">
@@ -115,7 +115,7 @@ $bred_crumb_array = array(
         </div>
     </div>
     @endsection
-    @section('styles')      
+    @section('styles')
     @endsection
     @section('scripts') 
 

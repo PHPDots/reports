@@ -136,7 +136,7 @@ class AdminController extends Controller
 
         $viewName = "dashboard";
         }
-        if($auth_id == NORMAL_USER)
+        if($auth_id == NORMAL_USER || $auth_id == TRAINEE_USER)
         {
         //User Leave
             $data['auth_user_leave'] = Custom::usertotalleave($auth_user);        

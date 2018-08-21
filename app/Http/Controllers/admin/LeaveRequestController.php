@@ -55,7 +55,7 @@ class LeaveRequestController extends Controller {
 
         $auth_id = \Auth::guard('admins')->user()->user_type_id;
 
-        if ($auth_id == NORMAL_USER) {
+        if ($auth_id == NORMAL_USER || $auth_id == TRAINEE_USER) {
             $data['users'] = '';
             $data['add_url'] = route($this->moduleRouteText . '.userCreate');
         } else {
@@ -66,7 +66,7 @@ class LeaveRequestController extends Controller {
 
         $data['btnAdd'] = \App\Models\Admin::isAccess(\App\Models\Admin::$ADD_LEAVE_REPORT);
 
-        if ($auth_id == NORMAL_USER) {
+        if ($auth_id == NORMAL_USER || $auth_id == TRAINEE_USER) {
             $viewName = $this->moduleViewName . ".userIndex";
         } else {
 
@@ -122,7 +122,7 @@ class LeaveRequestController extends Controller {
 
         $auth_id = \Auth::guard('admins')->user()->user_type_id;
 
-        if ($auth_id == NORMAL_USER) {
+        if ($auth_id == NORMAL_USER || $auth_id == TRAINEE_USER) {
             return redirect('leave-request/leave-create');
         }
 
@@ -844,7 +844,8 @@ class LeaveRequestController extends Controller {
                         ->make(true);
     }
 
-    public function userCreate() {
+    public function userCreate()
+    {
         $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$ADD_LEAVE_REPORT);
 
         if ($checkrights) {
@@ -862,7 +863,8 @@ class LeaveRequestController extends Controller {
         return view($this->moduleViewName . '.userAdd', $data);
     }
 
-    public function userStore(Request $request) {
+    public function userStore(Request $request)
+    {
         $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$ADD_LEAVE_REPORT);
 
         if ($checkrights) {
@@ -874,10 +876,10 @@ class LeaveRequestController extends Controller {
         $data = array();
 
         $validator = Validator::make($request->all(), [
-                    'from_date' => 'required',
-                    'from_date_leave' => ['required', Rule::in([1, 0])],
-                    'to_date_leave' => Rule::in([1, 0]),
-                    'description' => 'required|min:5',
+            'from_date' => 'required',
+            'from_date_leave' => ['required', Rule::in([1, 0])],
+            'to_date_leave' => Rule::in([1, 0]),
+            'description' => 'required|min:5',
         ]);
         if ($validator->fails()) {
             $messages = $validator->messages();
