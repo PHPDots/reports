@@ -27,7 +27,7 @@ $auth = Auth::guard('admins')->user()->user_type_id;
                                         {!! Form::text('title',null,['class' => 'form-control', 'data-required' => true,'placeholder' => 'Enter Project Title']) !!}
                                     </div>                                                 
                                 </div>
-							 @if($auth == ADMIN_USER_TYPE)
+							@if($auth == ADMIN_USER_TYPE)
                                 <div class="clearfix">&nbsp;</div>
                                 <div class="row">
                                     <div class="col-md-6">
@@ -38,8 +38,23 @@ $auth = Auth::guard('admins')->user()->user_type_id;
                                         <label class="control-label">Status: <span class="required">*</span></label>                            
                                         {!! Form::select('status',['1'=>'Active','0'=>'Inactive'],null,['class' => 'form-control', 'data-required' => true]) !!}
                                     </div>
-									 @endif
                                 </div>
+                                <div class="clearfix">&nbsp;</div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label class="control-label">&nbsp;</label>  
+                                        <div class="md-checkbox">
+                                            {{ Form::checkbox('send_email', 1, null, ['class' => 'md-check','id'=>'checkbox1']) }}
+                                            <label for="checkbox1">
+                                                <span></span>
+                                                <span class="check" style="z-index: 1;"></span>
+                                                <span class="box" ></span>
+                                                Send Email Report
+                                                </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
                                 <div class="clearfix">&nbsp;</div>
                                 <div class="row">
                                     <div class="col-md-12">

@@ -12,7 +12,7 @@ class Project extends Model
     /**
      * @var array
      */
-    protected $fillable = ['id','title', 'status','client_id'];
+    protected $fillable = ['id','title', 'status','client_id','send_email'];
 
     public function Client()
     {

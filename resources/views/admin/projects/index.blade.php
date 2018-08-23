@@ -29,7 +29,8 @@
                                <th width="5%">ID</th>                                    
                                <th width="30%">Client</th>
                                <th width="30%">Project Name</th>
-                               <th width="10%">Status</th>                           
+                               <th width="10%">Status
+                                            <br/><span style="font-size: 10px;">[ Send Report ]</span></th>
                                <th width="20%">Created At</th>                           
                                <th width="5%" data-orderable="false">Action</th>
                             </tr>

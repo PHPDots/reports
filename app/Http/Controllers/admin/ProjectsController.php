@@ -120,6 +120,7 @@ class ProjectsController extends Controller
             'title' => 'required|min:2|unique:'.TBL_PROJECT.',title',
             'status' => ['required', Rule::in([0,1])],
             'client_id' => 'required|exists:'.TBL_CLIENT.',id',
+            'send_email' => ['required', Rule::in([0,1])],
         ]);
         if ($validator->fails())         
         {
@@ -290,6 +291,7 @@ class ProjectsController extends Controller
             'title' => 'required|min:2|unique:'.TBL_PROJECT.',title,'.$id,
             'status' => ['required', Rule::in([0,1])],
             'client_id' => 'required|exists:'.TBL_CLIENT.',id',
+            'send_email' => ['required', Rule::in([0,1])],
         ]);
         
         // check validations
@@ -403,15 +405,21 @@ class ProjectsController extends Controller
                 )->render();
             })
             ->editColumn('status', function ($row) {
-                    if ($row->status == 1)
-                        return "<a class='btn btn-xs btn-success'>Active</a>";
-                    else
-                        return '<a class="btn btn-xs btn-danger">Inactive</a>';
+                $html = '';
+                    if ($row->status == 1){
+                        $html .=  "<a class='btn btn-xs btn-success'>Active</a>";
+                        if($row->send_email == 1)
+                        $html .=  '<i class="fa fa-check" style="font-size:20px;color:blue;"></i>';
+                    }
+                    else{
+                        $html .= '<a class="btn btn-xs btn-danger">Inactive</a>';
+                    }
+                return $html;
             })
             ->editColumn('created_at', function($row){
                 
-                if(!empty($row->created_at))          
-                    return date("j M, Y h:i:s A",strtotime($row->created_at));
+                if(!empty($row->created_at))
+                    return date("j M, Y",strtotime($row->created_at));
                 else
                     return '-';    
             })->rawColumns(['status','action'])             

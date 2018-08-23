@@ -483,7 +483,7 @@ class DailyReportController extends Controller
         }
 		}
     }
-
+    //daily users report
 	public function cronGeneral(Request $request )
 	{
 		/*$params["to"]= "kishan.lashkari@phpdots.com";
@@ -618,6 +618,7 @@ class DailyReportController extends Controller
       exit;
 
 	}
+    //client reports
     public function cron(Request $request){
 		
 		if($request->get('fromcron') == 1){
@@ -635,7 +636,7 @@ class DailyReportController extends Controller
               JOIN users ON users.id = tasks.user_id
               JOIN projects ON tasks.project_id = projects.id
               JOIN clients ON clients.id = projects.client_id
-              WHERE tasks.report_sent = 0 AND clients.send_email = 1
+              WHERE tasks.report_sent = 0 AND clients.send_email = 1 AND projects.send_email = 1
               AND tasks.task_date >= ( CURDATE() - INTERVAL 2 DAY )
               ORDER BY users.firstname, projects.client_id
             ';
@@ -643,7 +644,6 @@ class DailyReportController extends Controller
       $rows = \DB::select($sql);
       // Get Admin Emails
       $admin_emails = User::getAdminEmails();
-
 
       $user_id = 0;
 	  $client_id = 0;
@@ -687,9 +687,6 @@ class DailyReportController extends Controller
                           ->pluck("user_id")
                           ->toArray();
             }
-            echo '<pre/>';
-            echo 'Users List';
-            print_r($selectedUsers);
 
             $user_client_reportRow = json_decode(json_encode($user_client_reportRow),1);
 
@@ -742,9 +739,7 @@ class DailyReportController extends Controller
             $toEmails = array_merge($clientUsers,$admin_emails);                
             echo "Send Emails To:<br/>";
             echo "<pre>";
-            //print_r($toEmails);
-            echo "<pre>";
-            echo "HTML";
+            print_r($toEmails);
 
             $table .= "<p>Thanks & Regards,<br />".$empName."</p>";
             $subject = "Daily Report - (Hr-".$totalHours.") - ".date("j M, Y");
