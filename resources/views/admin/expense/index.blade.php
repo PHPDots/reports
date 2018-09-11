@@ -12,8 +12,8 @@
             <div class="clearfix"></div>
             <a class="btn btn-default pull-right">
               Total Amount: <span id="overall-amount"> 0 </span>
-            </a>   
-             
+            </a>
+
             <div class="clearfix">&nbsp;</div>
             <div class="portlet box green">
                 <div class="portlet-title">
@@ -26,27 +26,27 @@
                     @endif                     
 
                 </div>
-                <div class="portlet-body">                    
+                <div class="portlet-body">
                     <table class="table table-striped table-bordered table-hover table-checkable order-column" id="server-side-datatables">
                         <thead>
                             <tr>
-                               <th width="5%">ID</th>                                    
-                               <th width="20%">Title</th>                                    
+                               <th width="5%">ID</th>
+                               <th width="20%">Title</th>
                                <th width="10%">Expense Date</th>
                                <th width="10%">Amount</th>
                                <th width="20%">CreatedAt</i></th>
                                <th width="5%" data-orderable="false">Action</th>
                             </tr>
-                        </thead>                                         
+                        </thead>
                         <tbody>
                         </tbody>
                     </table>                                              
                 </div>
-            </div>              
+            </div>
         </div>
     </div>
 </div>
-</div>
+
 <div class="modal fade bs-modal-lg" id="expense_view" role="dialog" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <!-- Modal content-->
@@ -109,7 +109,6 @@ function openView($id){
             return false;
         });
 
-
         $.fn.dataTableExt.sErrMode = 'throw';
 
         var oTableCustom = $('#server-side-datatables').DataTable({
@@ -117,6 +116,8 @@ function openView($id){
             processing: true,
             serverSide: true,
             searching: false,
+            pageLength: '{{ $length }}',
+            displayStart: '{{ $start }}',
             ajax: {
                 "url": "{!! route($moduleRouteText.'.data') !!}",
                 "data": function ( data ) 
@@ -125,7 +126,6 @@ function openView($id){
                   data.search_end_date = $("#search-frm input[name='search_end_date']").val();
                   data.search_title = $("#search-frm input[name='search_title']").val();
                   data.search_amount = $("#search-frm input[name='search_amount']").val();
-                
             },
             dataSrc: function(response){
                     $("#overall-amount").html(response.amount);
@@ -133,16 +133,16 @@ function openView($id){
                     return response.data;
                 }
               },            
-            "order": [[ '0', "desc" ]],    
+            "order": [[ "{{ $orderClm }}", "{{ $orderDir }}" ]],
             columns: [
                 { data: 'id', name: 'id' },
-                { data: 'title', name: 'title' },                                              
-                { data: 'date', name: 'date' },                                              
+                { data: 'title', name: 'title' },
+                { data: 'date', name: 'date' },
                 { data: 'amount', name: 'amount' }, 
                 { data: 'created_at', name: 'created_at' },
-                { data: 'action', orderable: false, searchable: false}             
+                { data: 'action', orderable: false, searchable: false}
             ]
-        });        
+        });
     });
     </script>
 @endsection

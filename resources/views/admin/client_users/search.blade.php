@@ -28,7 +28,7 @@
                 <div class="col-md-4">
                     <label class="control-label">Status</label>
                     <select name="search_status" class="form-control">
-                        <option value="all">All</option>                        
+                        <option value="all" {!! \Request::get("search_status") == "all" ? 'selected="selected"':'' !!}>All</option>                        
                         <option value="1" {!! \Request::get("search_status") == "1" ? 'selected="selected"':'' !!}>Active</option>                        
                         <option value="0" {!! \Request::get("search_status") == "0" ? 'selected="selected"':'' !!}>Inactive</option>                        
                     </select>                                                                 

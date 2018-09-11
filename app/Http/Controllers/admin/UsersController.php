@@ -22,9 +22,9 @@ class UsersController extends Controller
         $this->list_url = route($this->moduleRouteText.".index");
 
         $module = "List Users";
-        $this->module = $module;  
+        $this->module = $module;
 
-        $this->adminAction= new AdminAction; 
+        $this->adminAction= new AdminAction;
         
         $this->modelObj = new User();  
 
@@ -55,11 +55,12 @@ class UsersController extends Controller
 
         if($request->get("changeID") > 0)
         {
+            $goto = session()->get($this->moduleRouteText.'_goto');
+            if(empty($goto)){  $goto = $this->list_url;  }
             $user_id = $request->get("changeID");   
             $status = $request->get("changeStatus");
 
             $request = \App\Models\User::find($user_id);
-            //dd($request);
                 if($request)
                 {
                     $status = $request->status;
@@ -68,13 +69,12 @@ class UsersController extends Controller
                         $status = 1;
                     else
                         $status = 0;
-                    
 
                     $request->status = $status;
-                    $request->save();            
+                    $request->save();
 
                         session()->flash('success_message', "Status has been changed successfully.");
-                        return redirect($this->list_url);
+                        return redirect($goto);
                 }
                 else
                 {
@@ -90,9 +90,9 @@ class UsersController extends Controller
 
         $data['add_url'] = route($this->moduleRouteText.'.create');
         $data['btnAdd'] = \App\Models\Admin::isAccess(\App\Models\Admin::$ADD_USERS);
-
         $data["types"] = \App\Models\UserType::pluck('title','id')->all();
-        
+        $data = customSession($this->moduleRouteText,$data);
+
         return view($this->moduleViewName.".index", $data); 
     }
 
@@ -120,6 +120,7 @@ class UsersController extends Controller
         $data["show_image"] =''; 
         $data['blood_groups'] = ['A+'=>'A+','B+'=>'B+','O+'=>'O+','AB+'=>'AB+','AB-'=>'AB-','A-'=>'A-','B-'=>'B-','O-'=>'O-'];
         $data["users_type"] = \App\Models\UserType::pluck('title','id')->all();
+        $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
         return view($this->moduleViewName.'.add', $data);
     }
 
@@ -137,10 +138,11 @@ class UsersController extends Controller
         {
             return $checkrights;
         }
+        $data = array();
         $status = 1;
         $msg = "User has been created successfully.";
-        $data = array();
-        
+        $goto = $this->list_url;
+
         $validator = Validator::make($request->all(), [
             'firstname' => 'required|min:2',
             'lastname' => 'required|min:2',
@@ -331,7 +333,7 @@ class UsersController extends Controller
             }
         }
         
-        return ['status' => $status, 'msg' => $msg, 'data' => $data];       
+        return ['status' => $status, 'msg' => $msg, 'data' => $data, 'goto' => $goto];       
     }
 
     /**
@@ -376,7 +378,7 @@ class UsersController extends Controller
         $data["show_image"] ='1'; 
         $data['blood_groups'] = ['A+'=>'A+','B+'=>'B+','O+'=>'O+','AB+'=>'AB+','AB-'=>'AB-','A-'=>'A-','B-'=>'B-','O-'=>'O-'];
         $data["users_type"] = \App\Models\UserType::pluck('title','id')->all();
-
+        $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
         return view($this->moduleViewName.'.add', $data);   
     }
 
@@ -402,10 +404,12 @@ class UsersController extends Controller
 
         // $model = $this->modelObj->find($id);
 
+        $data = array();        
         $status = 1;
         $msg = $this->updateMsg;
-        $data = array();        
-        
+        $goto = session()->get($this->moduleRouteText.'_goto');
+        if(empty($goto)){  $goto = $this->list_url;  }
+
         $validator = Validator::make($request->all(), [
             'firstname' => 'required|min:2',
             'lastname' => 'required|min:2',
@@ -448,7 +452,6 @@ class UsersController extends Controller
         }         
         else
         {
-
             $user_type_id = $request->get("user_type_id");
             $email = $request->get("email");
             $firstname = $request->get("firstname");
@@ -555,7 +558,7 @@ class UsersController extends Controller
                 $logs=\App\Models\AdminLog::writeadminlog($params);         
         }
         
-        return ['status' => $status,'msg' => $msg, 'data' => $data];               
+        return ['status' => $status,'msg' => $msg, 'data' => $data, 'goto' => $goto];               
     }
 
     /**
@@ -581,6 +584,8 @@ class UsersController extends Controller
             try 
             {             
                 $backUrl = $request->server('HTTP_REFERER');
+                $goto = session()->get($this->moduleRouteText.'_goto');
+                if(empty($goto)){  $goto = $this->list_url;  }
                 $url = public_path().'/uploads/users/'.$id.'/'.$modelObj->image;
                 if (is_file($url)) {
                     unlink($url);
@@ -589,7 +594,7 @@ class UsersController extends Controller
                 $modelObj->delete();
                 session()->flash('success_message', $this->deleteMsg); 
 
-                //store logs detail
+                    //store logs detail
                     $params=array();
                     
                     $params['adminuserid']  = \Auth::guard('admins')->id();
@@ -599,7 +604,7 @@ class UsersController extends Controller
 
                     $logs=\App\Models\AdminLog::writeadminlog($params);    
 
-                return redirect($backUrl);
+                return redirect($goto);
             } 
             catch (Exception $e) 
             {
@@ -629,13 +634,13 @@ class UsersController extends Controller
 
 
         return Datatables::eloquent($model)
-               
-            ->addColumn('action', function(User $row) {                
+
+            ->addColumn('action', function(User $row) {
 
                 return view("admin.partials.action",
                     [
                         'currentRoute' => $this->moduleRouteText,
-                        'row' => $row,                                 
+                        'row' => $row,
                         'isEdit' => \App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_USERS),
                         'isDelete' => \App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_USERS),
                         'user_status_link' => \App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_USERS),
@@ -650,16 +655,19 @@ class UsersController extends Controller
                         return '<a class="btn btn-xs btn-danger">Inactive</a>';
             })->rawColumns(['status','action'])
                             
-            ->filter(function ($query) 
+            ->filter(function ($query)
             {
                 $search_start_date = request()->get("search_start_date");
                 $search_end_date = request()->get("search_end_date");
                 $search_id = request()->get("search_id");                                         
                 $search_fnm = request()->get("search_fnm");                                         
                 $search_lnm = request()->get("search_lnm");                                         
-                $search_email = request()->get("search_email");                                         
-                $search_type = request()->get("search_type");                                         
-                $search_status = request()->get("search_status");          
+                $search_email = request()->get("search_email");
+                $search_type = request()->get("search_type");
+                $search_status = request()->get("search_status");
+
+                $searchData = array();
+                customDatatble($this->moduleRouteText);
 
                 if (!empty($search_start_date)){
 
@@ -667,6 +675,7 @@ class UsersController extends Controller
                     $convertFromDate= $from_date;
 
                     $query = $query->where(TBL_USERS.".created_at",">=",addslashes($convertFromDate));
+                    $searchData['search_start_date'] = $search_start_date;
                 }
                 if (!empty($search_end_date)){
 
@@ -674,6 +683,7 @@ class UsersController extends Controller
                     $convertToDate= $to_date;
 
                     $query = $query->where(TBL_USERS.".created_at","<=",addslashes($convertToDate));
+                    $searchData['search_end_date'] = $search_end_date;
                 }
 
                 if(!empty($search_id))
@@ -683,28 +693,36 @@ class UsersController extends Controller
                     if(count($idArr)>0)
                     {
                         $query = $query->whereIn(TBL_USERS.".id",$idArr);
-                    } 
+                    }
+                    $searchData['search_id'] = $search_id;
                 } 
                 if(!empty($search_fnm))
                 {
                     $query = $query->where(TBL_USERS.".firstname", 'LIKE', '%'.$search_fnm.'%');
+                    $searchData['search_fnm'] = $search_fnm;
                 }
                 if(!empty($search_lnm))
                 {
                     $query = $query->where(TBL_USERS.".lastname", 'LIKE', '%'.$search_lnm.'%');
+                    $searchData['search_lnm'] = $search_lnm;
                 }
                 if(!empty($search_email))
                 {
                     $query = $query->where(TBL_USERS.".email", 'LIKE', '%'.$search_email.'%');
+                    $searchData['search_email'] = $search_email;
                 }
                 if(!empty($search_type))
                 {
                     $query = $query->where(TBL_USERS.".user_type_id",$search_type);
+                    $searchData['search_type'] = $search_type;
                 }
                 if($search_status == "1" || $search_status == "0" )
                 {
                     $query = $query->where(TBL_USERS.".status", $search_status);
+                    $searchData['search_status'] = $search_status;
                 }
+                $goto = \URL::route($this->moduleRouteText.'.index', $searchData);
+                \session()->put($this->moduleRouteText.'_goto',$goto);
             })
             ->make(true);        
 	}

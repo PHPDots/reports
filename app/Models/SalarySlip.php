@@ -19,18 +19,28 @@ class SalarySlip extends Model
 		$search_name = request()->get("search_name");
         $search_month = request()->get("search_month");
         $search_year = request()->get("search_year");
+
+        $searchData = array();
+        customDatatble('salary_slip');
+
         if(!empty($search_name))
         {
             $query = $query->where(TBL_SALARY_SLIP.".user_id", $search_name);
+            $searchData['search_name'] = $search_name;
         }
         if(!empty($search_month))
         {
             $query = $query->where(TBL_SALARY_SLIP.".month", $search_month);
+            $searchData['search_month'] = $search_month;
         }
         if(!empty($search_year))
         {
             $query = $query->where(TBL_SALARY_SLIP.".year", $search_year);
+            $searchData['search_year'] = $search_year;
         }
+            $goto = \URL::route('salary_slip.index', $searchData);
+            \session()->put('salary_slip_goto',$goto);
+
         return $query;        
     }
 }

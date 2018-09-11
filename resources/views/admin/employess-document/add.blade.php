@@ -13,7 +13,7 @@
                             <i class="fa fa-user"></i>
                            {{ $page_title }}
                         </div>
-                        <a class="btn btn-default pull-right btn-sm mTop5" href="{{ $list_url }}">Back</a>
+                        <a class="btn btn-default pull-right btn-sm mTop5" href="{{ $back_url }}">Back</a>
                     </div>
                     <div class="portlet-body">
                         <div class="form-body">
@@ -30,13 +30,13 @@
                                     <div class="clearfix">&nbsp;</div>
 
                                     <div class="row">
-                                                                      
+
                                         <div class="col-md-12"> 
                                             <label class="control-label">Select Document: <span class="required">*</span></label>
                                             <input type="file" name="filename" />
                                         </div>
                                         
-                                    </div>                                    
+                                    </div>
                                 </div>
                                 <div class="clearfix">&nbsp;</div>
                                                                                            
@@ -90,7 +90,7 @@
                         if (result.status == 1)
                         {
                             $.bootstrapGrowl(result.msg, {type: 'success', delay: 4000});
-                            window.location = '{{ $list_url }}';    
+                            window.location = result.goto;
                         }
                         else
                         {

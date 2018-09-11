@@ -15,17 +15,16 @@ $auth = Auth::guard('admins')->user()->user_type_id;
                             <i class="fa fa-file-text-o"></i>
                            {{ $page_title }}
                         </div>
-                        <a class="btn btn-default pull-right btn-sm mTop5" href="{{ $list_url }}">Back</a>
+                        <a class="btn btn-default pull-right btn-sm mTop5" href="{{ $back_url }}">Back</a>
                     </div>
                     <div class="portlet-body">
                         <div class="form-body">
                            {!! Form::model($formObj,['method' => $method,'files' => true, 'route' => [$action_url,$action_params],'class' => 'sky-form form form-group', 'id' => 'main-frm1']) !!} 
-                           
                                 <div class="row">                                
                                     <div class="col-md-12">
                                         <label class="control-label">Title: <span class="required">*</span></label>                                        
                                         {!! Form::text('title',null,['class' => 'form-control', 'data-required' => true,'placeholder' => 'Enter Project Title']) !!}
-                                    </div>                                                 
+                                    </div>
                                 </div>
 							@if($auth == ADMIN_USER_TYPE)
                                 <div class="clearfix">&nbsp;</div>
@@ -100,7 +99,7 @@ $auth = Auth::guard('admins')->user()->user_type_id;
                         if (result.status == 1)
                         {
                             $.bootstrapGrowl(result.msg, {type: 'success', delay: 4000});
-                            window.location = '{{ $list_url }}';    
+                            window.location = result.goto;    
                         }
                         else
                         {

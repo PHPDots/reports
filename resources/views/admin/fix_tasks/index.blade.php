@@ -122,7 +122,7 @@
                     if (result.status == 1)
                     {
                         $.bootstrapGrowl(result.msg, {type: 'success', delay: 4000});
-                        window.location = '{{ $list_url }}';    
+                        window.location = result.goto;    
                         $('#AjaxLoaderDiv').fadeOut('slow');
                     }
                     else
@@ -154,6 +154,8 @@
             processing: true,
             serverSide: true,
             searching: false,
+            pageLength: '{{ $length }}',
+            displayStart: '{{ $start }}',
             ajax: {
                 "url": "{!! route($moduleRouteText.'.data') !!}",
                 "data": function ( data ) 

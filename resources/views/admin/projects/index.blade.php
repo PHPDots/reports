@@ -10,7 +10,7 @@
             
             @include($moduleViewName.".search")           
 
-            <div class="clearfix"></div>    
+            <div class="clearfix"></div>
             <div class="portlet box green">
                 <div class="portlet-title">
                     <div class="caption">
@@ -26,24 +26,24 @@
                     <table class="table table-bordered table-striped table-condensed flip-content" id="server-side-datatables">
                         <thead>
                             <tr>
-                               <th width="5%">ID</th>                                    
+                               <th width="5%">ID</th>
                                <th width="30%">Client</th>
                                <th width="30%">Project Name</th>
                                <th width="10%">Status
                                             <br/><span style="font-size: 10px;">[ Send Report ]</span></th>
-                               <th width="20%">Created At</th>                           
+                               <th width="20%">Created At</th>
                                <th width="5%" data-orderable="false">Action</th>
                             </tr>
-                        </thead>                                         
+                        </thead>
                         <tbody>
                         </tbody>
-                    </table>                                              
+                    </table>
                 </div>
-            </div>              
+            </div>
         </div>
     </div>
 </div>
-</div>            
+       
 @endsection
 
 @section('styles')
@@ -67,13 +67,14 @@
             return false;
         });
 
-
         $.fn.dataTableExt.sErrMode = 'throw';
 
         var oTableCustom = $('#server-side-datatables').DataTable({
             processing: true,
             serverSide: true,
             searching: false,
+            pageLength: '{{ $length }}',
+            displayStart: '{{ $start }}',
             ajax: {
                 "url": "{!! route($moduleRouteText.'.data') !!}",
                 "data": function ( data ) 
@@ -81,24 +82,23 @@
                     data.search_title = $("#search-frm input[name='search_title']").val();
                     data.search_status = $("#search-frm select[name='search_status']").val();
                     data.search_client = $("#search-frm select[name='search_client']").val();
-                 
                 }
-            },  
+            },
 			lengthMenu:
               [
                 [25,50,100,150,200],
                 [25,50,100,150,200]
               ],
-            "order": [[ '0', "desc" ]],    
+            "order": [[ "{{ $orderClm }}", "{{ $orderDir }}" ]],
             columns: [
                 { data: 'id', name: 'id' },
                 { data: 'client_name', name: '{{ TBL_CLIENT }}.name' },
                 { data: 'title', name: 'title' },
                 { data: 'status', name: 'status' },
                 { data: 'created_at', name: 'created_at' },
-                { data: 'action', orderable: false, searchable: false}             
+                { data: 'action', orderable: false, searchable: false}
             ]
-        });        
+        });
     });
     </script>
 @endsection

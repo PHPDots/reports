@@ -3,8 +3,7 @@
 @endsection
 
 <?php
-    if(!empty($formObj->invoice_date) && isset($formObj->invoice_date))
-        $today =date("d-M-y",strtotime($formObj->invoice_date));
+        $today =date("d-M-y");
 ?>
 @section('content')
 <div class="page-content">
@@ -17,7 +16,7 @@
                     <i class="fa fa-picture"></i>{{ $page_title }}
                     </div>
                     <a href="javascript:;" class="reload" onclick="invoice_cal()" id="reload_id"> </a>
-                    <a class="btn btn-default pull-right btn-sm mTop5" href="{{ $list_url }}">Back</a>
+                    <a class="btn btn-default pull-right btn-sm mTop5" href="{{ $back_url }}">Back</a>
                 </div>
                 <div class="portlet-body">
                     <div class="table">
@@ -337,7 +336,7 @@
                         if (result.status == 1)
                         {
                             $.bootstrapGrowl(result.msg, {type: 'success', delay: 4000});
-                            window.location = '{{ $list_url }}';    
+                            window.location = result.goto;    
                         }
                         else
                         {

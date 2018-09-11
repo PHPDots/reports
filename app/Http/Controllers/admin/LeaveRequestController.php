@@ -63,7 +63,6 @@ class LeaveRequestController extends Controller {
 			$data['months'] = ['2017-10'=>'Oct - 2017','2017-11'=>'Nov - 2017','2017-12'=>'Dec - 2017','2018-01'=>'Jan - 2018','2018-02'=>'Feb - 2018','2018-03'=>'Mar - 2018','2018-04'=>'Apr - 2018','2018-05'=>'May - 2018','2018-06'=>'Jun - 2018','2018-07'=>'Jul - 2018','2018-08'=>'Aug - 2018','2018-09'=>'Sep - 2018','2018-10'=>'Oct - 2018','2018-11'=>'Nov - 2018','2018-12'=>'Dec - 2018',];
             $data['add_url'] = route($this->moduleRouteText . '.create');
         }
-
         $data['btnAdd'] = \App\Models\Admin::isAccess(\App\Models\Admin::$ADD_LEAVE_REPORT);
 
         if ($auth_id == NORMAL_USER || $auth_id == TRAINEE_USER) {
@@ -84,7 +83,7 @@ class LeaveRequestController extends Controller {
                     'search_end_date' => $request->get('search_end_date')
                 );
                 $rows = LeaveRequest::getLeaveList($list_params);
-                //dd($rows);
+                
                 unset($list_params['is_download']);
 
                 $records[] = array("ID", "UserName", "FromDate", "ToDate", "Description", "Status", "CreatedAt");
@@ -105,6 +104,7 @@ class LeaveRequestController extends Controller {
             $viewName = $this->moduleViewName . ".index";
         }
 
+        $data = customSession($this->moduleRouteText,$data, 100);
         return view($viewName, $data);
     }
 
@@ -137,7 +137,7 @@ class LeaveRequestController extends Controller {
         $data["is_half_first"] = null;
         $data["is_half_last"] = null;
         $data["leave_sataus"] = 1;
-
+        $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
         return view($this->moduleViewName . '.add', $data);
     }
 
@@ -154,9 +154,10 @@ class LeaveRequestController extends Controller {
             return $checkrights;
         }
 
+        $data = array();
         $status = 1;
         $msg = $this->addMsg;
-        $data = array();
+        $goto = $this->list_url;
 
         $validator = Validator::make($request->all(), [
             'user_id' => 'required|exists:' . TBL_USERS . ',id',
@@ -190,7 +191,7 @@ class LeaveRequestController extends Controller {
             if ($from_date > $to_date) {
                 $status = 0;
                 $msg = "Please enater valid date";
-                return ['status' => $status, 'msg' => $msg, 'data' => $data];
+                return ['status' => $status, 'msg' => $msg, 'data' => $data, 'goto' => $goto];
             }
 
             $begin = new \DateTime($from_date);
@@ -301,7 +302,7 @@ class LeaveRequestController extends Controller {
             session()->flash('success_message', $msg);
         }
 
-        return ['status' => $status, 'msg' => $msg, 'data' => $data];
+        return ['status' => $status, 'msg' => $msg, 'data' => $data, 'goto' => $goto];
     }
 
     /**
@@ -348,6 +349,7 @@ class LeaveRequestController extends Controller {
 
         $last = count($leave_detail) - 1;
         $data["is_half_last"] = $leave_detail[$last]->is_half;
+        $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
 
         return view($this->moduleViewName . '.add', $data);
     }
@@ -371,14 +373,16 @@ class LeaveRequestController extends Controller {
         $status = 1;
         $msg = $this->updateMsg;
         $data = array();
+        $goto = session()->get($this->moduleRouteText.'_goto');
+        if(empty($goto)){  $goto = $this->list_url;  }
 
         $validator = Validator::make($request->all(), [
-                    'user_id' => 'required|exists:' . TBL_USERS . ',id',
-                    'status' => ['required', Rule::in([0, 1, 2])],
-                    'from_date' => 'required',
-                    'from_date_leave' => ['required', Rule::in([1, 0])],
-                    'to_date_leave' => Rule::in([1, 0]),
-                    'description' => 'required|min:5',
+            'user_id' => 'required|exists:' . TBL_USERS . ',id',
+            'status' => ['required', Rule::in([0, 1, 2])],
+            'from_date' => 'required',
+            'from_date_leave' => ['required', Rule::in([1, 0])],
+            'to_date_leave' => Rule::in([1, 0]),
+            'description' => 'required|min:5',
         ]);
 
         // check validations
@@ -405,7 +409,7 @@ class LeaveRequestController extends Controller {
             if ($from_date > $to_date) {
                 $status = 0;
                 $msg = "Please enater valid date";
-                return ['status' => $status, 'msg' => $msg, 'data' => $data];
+                return ['status' => $status, 'msg' => $msg, 'data' => $data, 'goto' => $goto];
             }
 
             $from_date = date("Y-m-d", strtotime($from_date));
@@ -473,7 +477,7 @@ class LeaveRequestController extends Controller {
             $logs = \App\Models\AdminLog::writeadminlog($params);
         }
 
-        return ['status' => $status, 'msg' => $msg, 'data' => $data];
+        return ['status' => $status, 'msg' => $msg, 'data' => $data, 'goto' => $goto];
     }
 
     /**
@@ -494,6 +498,8 @@ class LeaveRequestController extends Controller {
             try {
                 $leaveData = LeaveDetail::where('leave_id', $id);
                 $leaveData->delete();
+                $goto = session()->get($this->moduleRouteText.'_goto');
+                if(empty($goto)){  $goto = $this->list_url;  }
                 $backUrl = $request->server('HTTP_REFERER');
                 $modelObj->delete();
                 session()->flash('success_message', $this->deleteMsg);
@@ -508,7 +514,7 @@ class LeaveRequestController extends Controller {
 
                 $logs = \App\Models\AdminLog::writeadminlog($params);
 
-                return redirect($backUrl);
+                return redirect($goto);
             } catch (Exception $e) {
                 session()->flash('error_message', $this->deleteErrorMsg);
                 return redirect($this->list_url);
@@ -528,7 +534,6 @@ class LeaveRequestController extends Controller {
 
         $model = LeaveRequest::select(TBL_LEAVE_REQUEST . ".*", TBL_USERS . ".name as username")
                 ->join(TBL_USERS, TBL_USERS . ".id", "=", TBL_LEAVE_REQUEST . ".user_id");
-
 
         return \Datatables::eloquent($model)
             ->addColumn('action', function(LeaveRequest $row) {
@@ -634,51 +639,65 @@ class LeaveRequestController extends Controller {
                 $search_id = request()->get("search_id");
 				$search_month = request()->get("search_month");
 
-                    if (!empty($search_start_date)) {
+                $searchData = array();
+                customDatatble($this->moduleRouteText);
 
-                        $from_date = $search_start_date . ' 00:00:00';
-                        $convertFromDate = $from_date;
+                $searchData['search_month'] = $search_month;
 
-                        $query = $query->where(TBL_LEAVE_REQUEST . ".created_at", ">=", addslashes($convertFromDate));
-                    }
-                    if (!empty($search_end_date)) {
+                if (!empty($search_start_date)) {
 
-                        $to_date = $search_end_date . ' 23:59:59';
-                        $convertToDate = $to_date;
+                    $from_date = $search_start_date . ' 00:00:00';
+                    $convertFromDate = $from_date;
 
-                        $query = $query->where(TBL_LEAVE_REQUEST . ".created_at", "<=", addslashes($convertToDate));
-                    }
-                    if (!empty($search_user)) {
-                        $query = $query->where(TBL_LEAVE_REQUEST . ".user_id", $search_user);
-                    }
-                    if ($search_status == "1" || $search_status == "0" || $search_status == "2") {
-                        $query = $query->where(TBL_LEAVE_REQUEST . ".status", $search_status);
-                    }
-                    if (!empty($search_start_leave) || !empty($search_end_leave)) {
-                        $query = $query->whereBetween(TBL_LEAVE_REQUEST . '.from_date', [$search_start_leave, $search_end_leave])
-                                ->whereBetween(TBL_LEAVE_REQUEST . '.to_date', [$search_start_leave, $search_end_leave]);
-                    }
-					if (!empty($search_month)) {
-                        $query = $query->where(TBL_LEAVE_REQUEST . ".from_date",'LIKE','%'.$search_month.'%');
-                    }
-                    if(!empty($search_id))
+                    $query = $query->where(TBL_LEAVE_REQUEST . ".created_at", ">=", addslashes($convertFromDate));
+                    $searchData['search_start_date'] = $search_start_date;
+                }
+                if (!empty($search_end_date)) {
+
+                    $to_date = $search_end_date . ' 23:59:59';
+                    $convertToDate = $to_date;
+
+                    $query = $query->where(TBL_LEAVE_REQUEST . ".created_at", "<=", addslashes($convertToDate));
+                    $searchData['search_end_date'] = $search_end_date;
+                }
+                if (!empty($search_user)) {
+                    $query = $query->where(TBL_LEAVE_REQUEST . ".user_id", $search_user);
+                    $searchData['search_user'] = $search_user;
+                }
+                if ($search_status == "1" || $search_status == "0" || $search_status == "2") {
+                    $query = $query->where(TBL_LEAVE_REQUEST . ".status", $search_status);
+                    $searchData['search_status'] = $search_status;
+                }
+                if (!empty($search_start_leave) || !empty($search_end_leave)) {
+                    $query = $query->whereBetween(TBL_LEAVE_REQUEST . '.from_date', [$search_start_leave, $search_end_leave])
+                            ->whereBetween(TBL_LEAVE_REQUEST . '.to_date', [$search_start_leave, $search_end_leave]);
+                    $searchData['search_start_leave'] = $search_start_leave;
+                }
+				if (!empty($search_month)) {
+                    $query = $query->where(TBL_LEAVE_REQUEST . ".from_date",'LIKE','%'.$search_month.'%');
+                }
+                if(!empty($search_id))
+                {
+                    $idArr = explode(',', $search_id);
+                    $idArr = array_filter($idArr);                
+                    if(count($idArr)>0)
                     {
-                        $idArr = explode(',', $search_id);
-                        $idArr = array_filter($idArr);                
-                        if(count($idArr)>0)
-                        {
-                            $query = $query->whereIn(TBL_LEAVE_REQUEST.".id",$idArr);
-                        } 
-                    }
-                })
-                ->make(true);
+                        $query = $query->whereIn(TBL_LEAVE_REQUEST.".id",$idArr);
+                        $searchData['search_id'] = $search_id;
+                    } 
+                }
+                $goto = \URL::route($this->moduleRouteText.'.index', $searchData);
+                \session()->put($this->moduleRouteText.'_goto',$goto);
+            })
+            ->make(true);
     }
 
     public function changeStatus(Request $request)
     {
-        
         $flag = 1;
         $msg = "Status Updated Successfully";
+        $goto = session()->get($this->moduleRouteText.'_goto');
+        if(empty($goto)){  $goto = $this->list_url;  }
 
         $id = $request->get('leave_id');   
         $reason = $request->get('reason');   
@@ -690,18 +709,15 @@ class LeaveRequestController extends Controller {
                 $LeaveRequest->reject_reason = $reason;
             }
                 $LeaveRequest->status = $status;
-                $LeaveRequest->save();
-
-             
+                $LeaveRequest->save();             
 			
             $Path = url('/')."leave-request?search_start_leave=&search_end_leave=&search_status=all&search_start_date=&search_end_date=&search_user=&search_id=".$id."&isDownload=";
 
-            $message = array();             
+            $message = array();
             $user_detail = LeaveRequest::select(TBL_LEAVE_REQUEST.".*",TBL_USERS.".firstname as firstname",TBL_USERS.".lastname as lastname",TBL_USERS.".email as email",TBL_LEAVE_REQUEST.'.from_date as from_date',TBL_LEAVE_REQUEST.'.to_date as to_date',TBL_LEAVE_REQUEST.'.description as description',TBL_LEAVE_REQUEST.'.reject_reason as reject_reason')
                 ->join(TBL_USERS,TBL_USERS.".id","=",TBL_LEAVE_REQUEST.".user_id")
                 ->where(TBL_LEAVE_REQUEST.'.id',$id)
                 ->first();
-                
 
             $message['firstname'] = $user_detail->firstname;
             $message['lastname'] = $user_detail->lastname;
@@ -726,7 +742,7 @@ class LeaveRequestController extends Controller {
                 $params["body"] = $returnHTML;
                 sendHtmlMail($params);    
         }
-        return ['flag' => $flag,'msg'=>$msg];
+        return ['flag' => $flag, 'msg' => $msg, 'goto' => $goto];
     }
 
     public function userData(Request $request) {

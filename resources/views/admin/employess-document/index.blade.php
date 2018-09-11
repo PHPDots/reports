@@ -26,7 +26,7 @@
                         <thead>
                             <tr>
                                <th width="5%">ID</th>
-                               <th width="25%">Employess Name</th>                                   
+                               <th width="25%">Employess Name</th>
                                <th width="25%">Document Type</th>
                                <th width="20%">File name</th>
                                <th width="20%">Created At</th>
@@ -74,6 +74,8 @@
             processing: true,
             serverSide: true,
             searching: false,
+            pageLength: '{{ $length }}',
+            displayStart: '{{ $start }}',
             ajax: {
                 "url": "{!! route($moduleRouteText.'.data') !!}",
                 "data": function ( data ) 
@@ -83,7 +85,6 @@
                     data.search_id = $("#search-frm input[name='search_id']").val();
                     data.search_emp_nm = $("#search-frm select[name='search_emp_nm']").val();
                     data.search_type = $("#search-frm select[name='search_type']").val();
-                    
                 }
             },
 			lengthMenu:
@@ -91,16 +92,16 @@
                 [25,50,100,150,200],
                 [25,50,100,150,200]
               ],
-            "order": [[ '0', "desc" ]],    
+            "order": [[ "{{ $orderClm }}", "{{ $orderDir }}" ]],
             columns: [
                 { data: 'id', name: 'id' },
                 { data: 'user_name', name: 'user_id' },
                 { data: 'title', name: 'doc_type_id' },
-                { data: 'filename', name: 'filename' },               
-                { data: 'created_at', name: 'created_at' }, 
-                { data: 'action', orderable: false, searchable: false}             
+                { data: 'filename', name: 'filename' },
+                { data: 'created_at', name: 'created_at' },
+                { data: 'action', orderable: false, searchable: false}
             ]
-        });        
+        });
     });
     </script>
 @endsection

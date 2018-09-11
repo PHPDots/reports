@@ -56,6 +56,8 @@ class FixTasksController extends Controller
 
         if($request->get("changeID") > 0)
         {
+            $goto = session()->get($this->moduleRouteText.'_goto');
+            if(empty($goto)){  $goto = $this->list_url;  }
             $task_id = $request->get("changeID");   
             $invoice_status = $request->get("changeStatus");
 
@@ -70,21 +72,21 @@ class FixTasksController extends Controller
                         $invoice_status = 0;
 
                     $request->invoice_status = $invoice_status;
-                    $request->save();            
+                    $request->save();
 
                         session()->flash('success_message', "Status has been changed successfully.");
-                        return redirect($this->list_url);
+                        return redirect($goto);
                 }
                 else
                 {
                     session()->flash('success_message', "Status not changed, Please try again");
-                    return redirect($this->list_url);
+                    return redirect($goto);
                 }
-
             return redirect($this->list_url);
         }
 
-       return view($this->moduleViewName.".index", $data);
+        $data = customSession($this->moduleRouteText,$data);
+        return view($this->moduleViewName.".index", $data);
     }
 
     /**
@@ -109,7 +111,8 @@ class FixTasksController extends Controller
         $data['buttonText'] = "Save";
         $data["method"] = "POST"; 
         $data["clients"] = \App\Models\Client::pluck('name','id')->all();
-        
+        $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
+
         return view($this->moduleViewName.'.edit', $data);
     }
 
@@ -128,9 +131,10 @@ class FixTasksController extends Controller
             return $checkrights;
         }
 
+        $data = array();
         $status = 1;
         $msg = $this->addMsg;
-        $data = array();
+        $goto = $this->list_url;
         
         $validator = Validator::make($request->all(), [
             'client_id'=>'required|exists:'.TBL_CLIENT.',id',
@@ -154,10 +158,9 @@ class FixTasksController extends Controller
             {
                 $msg .= $message . "<br />";
             }
-        }         
+        }
         else
         {
-             
             $input = $request->all();
             $obj = $this->modelObj->create($input);
             $id = $obj->id;
@@ -172,7 +175,7 @@ class FixTasksController extends Controller
             session()->flash('success_message', $msg);
         }
         
-        return ['status' => $status, 'msg' => $msg, 'data' => $data];              
+        return ['status' => $status, 'msg' => $msg, 'data' => $data, 'goto' => $goto];              
     }
     public function storess(Request $request)
     {
@@ -298,6 +301,7 @@ class FixTasksController extends Controller
         $data['action_params'] = $formObj->id;
         $data['method'] = "PUT";
         $data["clients"] = \App\Models\Client::pluck('name','id')->all();
+        $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
 
         return view($this->moduleViewName.'.edit', $data);
     }
@@ -320,10 +324,12 @@ class FixTasksController extends Controller
 
         $model = $this->modelObj->find($id);
 
+        $data = array();
         $status = 1;
         $msg = $this->updateMsg;
-        $data = array();
-        
+        $goto = session()->get($this->moduleRouteText.'_goto');
+        if(empty($goto)){  $goto = $this->list_url;  }
+
         $validator = Validator::make($request->all(), [
             'client_id'=>'required|exists:'.TBL_CLIENT.',id',
             'title' => 'required|min:2',
@@ -370,7 +376,7 @@ class FixTasksController extends Controller
             $logs=\App\Models\AdminLog::writeadminlog($params);         
         }
         
-        return ['status' => $status,'msg' => $msg, 'data' => $data];               
+        return ['status' => $status,'msg' => $msg, 'data' => $data, 'goto' => $goto];               
     }
 
     /**
@@ -380,7 +386,7 @@ class FixTasksController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function destroy($id,Request $request)
-    {     
+    {
         $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$DELETE_FIX_TASK);
         
         if($checkrights) 
@@ -394,6 +400,8 @@ class FixTasksController extends Controller
             try 
             {
                 $backUrl = $request->server('HTTP_REFERER');
+                $goto = session()->get($this->moduleRouteText.'_goto');
+                if(empty($goto)){  $goto = $this->list_url;  }
                 $modelObj->delete();
                 session()->flash('success_message', $this->deleteMsg); 
 
@@ -407,7 +415,7 @@ class FixTasksController extends Controller
                 
                 $logs=\App\Models\AdminLog::writeadminlog($params);  
 
-                return redirect($backUrl);
+                return redirect($goto);
             } 
             catch (Exception $e) 
             {
@@ -475,7 +483,6 @@ class FixTasksController extends Controller
                                     </div>
                                 </div>
                             </div>';
-
             })
             ->editColumn('total', function ($row) { 
                     $row_total = ($row->hour * $row->rate) + $row->fix;
@@ -505,9 +512,11 @@ class FixTasksController extends Controller
             return $checkrights;
         }
         
+        $data = array();
         $status = 1;
         $msg = 'Status has been changed successfully !';
-        $data = array();
+        $goto = session()->get($this->moduleRouteText.'_goto');
+        if(empty($goto)){  $goto = $this->list_url;  }
 
         $rules = ['taskIds.required' => 'Please check atleast one id'];
         $validator = Validator::make($request->all(), [
@@ -539,6 +548,6 @@ class FixTasksController extends Controller
             }
         }
 
-        return ['status' => $status, 'msg' => $msg, 'data' => $data];
+        return ['status' => $status, 'msg' => $msg, 'data' => $data, 'goto' => $goto];
     }
 }

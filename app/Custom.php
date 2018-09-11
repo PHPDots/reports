@@ -17,6 +17,10 @@ class Custom
 		$leave = 0;
         $user_leave = User::where('id',$auth_user)->where('status',1)->first();
         $leave = $user_leave->balance_paid_leave;
+        $next_three_month = date("Y-m-d h:m:s", strtotime("$user_leave->joining_date +3 Month -1 Day"));
+        $now = date('Y-m-d h:m:s');
+        if($now > $next_three_month)
+            $leave = $leave + 1;
         $annual = $leave - $user_month_leave;
         if($annual <0){$annual = 0;}
 		if(($leave - $user_month_leave)  == 0.5){$annual = $leave - $user_month_leave;}

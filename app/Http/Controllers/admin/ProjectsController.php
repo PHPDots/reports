@@ -54,7 +54,7 @@ class ProjectsController extends Controller
 
         $data['add_url'] = route($this->moduleRouteText.'.create');
         $data['btnAdd'] = \App\Models\Admin::isAccess(\App\Models\Admin::$ADD_PROJECT);
-		
+
 		$auth_id = \Auth::guard('admins')->user()->user_type_id;
         if($auth_id == CLIENT_USER){
             $data['clients']='';
@@ -63,7 +63,8 @@ class ProjectsController extends Controller
             $data['clients'] = Client::pluck("name","id")->all();
             $viewName = $this->moduleViewName.".index";
         }
-       return view($viewName, $data);  
+        $data = customSession($this->moduleRouteText,$data);
+        return view($viewName, $data);  
     }
 
     /**
@@ -95,6 +96,7 @@ class ProjectsController extends Controller
         else
             $data['action_url'] = $this->moduleRouteText.".store";
 
+        $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
         return view($this->moduleViewName.'.add', $data);
     }
 
@@ -112,17 +114,18 @@ class ProjectsController extends Controller
         {
             return $checkrights;
         }
+        $data = array();
         $status = 1;
         $msg = $this->addMsg;
-        $data = array();
-        
+        $goto = $this->list_url;
+
         $validator = Validator::make($request->all(), [
             'title' => 'required|min:2|unique:'.TBL_PROJECT.',title',
             'status' => ['required', Rule::in([0,1])],
             'client_id' => 'required|exists:'.TBL_CLIENT.',id',
-            'send_email' => ['required', Rule::in([0,1])],
+            //'send_email' => ['required', Rule::in([0,1])],
         ]);
-        if ($validator->fails())         
+        if ($validator->fails())
         {
             $messages = $validator->messages();
             
@@ -133,10 +136,11 @@ class ProjectsController extends Controller
             {
                 $msg .= $message . "<br />";
             }
-        }         
+        }
         else
         {
             $input = $request->all();
+            $input['send_email'] = isset($input['send_email']) ? 1:0;
             $obj = $this->modelObj->create($input);
             $id = $obj->id;
  
@@ -147,13 +151,13 @@ class ProjectsController extends Controller
             $params['actionid']     = $this->adminAction->ADD_PROJECT ;
             $params['actionvalue']  = $id;
             $params['remark']       = "Add Project::".$id;
-                                    
+
             $logs= \App\Models\AdminLog::writeadminlog($params);
             
             session()->flash('success_message', $msg);                    
         }
         
-        return ['status' => $status, 'msg' => $msg, 'data' => $data];              
+        return ['status' => $status, 'msg' => $msg, 'data' => $data, 'goto' => $goto];              
     }
 	public function clientStore(Request $request)
     {
@@ -261,6 +265,7 @@ class ProjectsController extends Controller
         $data['action_params'] = $formObj->id;
         $data['method'] = "PUT";
         $data['clients'] = Client::pluck("name","id")->all();
+        $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
 
         return view($this->moduleViewName.'.add', $data);
     }
@@ -283,15 +288,17 @@ class ProjectsController extends Controller
 
         $model = $this->modelObj->find($id);
 
+        $data = array();
         $status = 1;
         $msg = $this->updateMsg;
-        $data = array();        
-        
+        $goto = session()->get($this->moduleRouteText.'_goto');
+        if(empty($goto)){  $goto = $this->list_url;  }
+
         $validator = Validator::make($request->all(), [
             'title' => 'required|min:2|unique:'.TBL_PROJECT.',title,'.$id,
             'status' => ['required', Rule::in([0,1])],
             'client_id' => 'required|exists:'.TBL_CLIENT.',id',
-            'send_email' => ['required', Rule::in([0,1])],
+            //'send_email' => ['required', Rule::in([0,1])],
         ]);
         
         // check validations
@@ -311,10 +318,11 @@ class ProjectsController extends Controller
             {
                 $msg .= $message . "<br />";
             }
-        }         
+        }
         else
         {
             $input = $request->all();
+            $input['send_email'] = isset($input['send_email']) ? 1:0;
             $model->update($input); 
 
             //store logs detail
@@ -328,7 +336,7 @@ class ProjectsController extends Controller
                 $logs=\App\Models\AdminLog::writeadminlog($params);         
         }
         
-        return ['status' => $status,'msg' => $msg, 'data' => $data];               
+        return ['status' => $status,'msg' => $msg, 'data' => $data, 'goto' => $goto];               
     }
 
     /**
@@ -350,8 +358,10 @@ class ProjectsController extends Controller
         if($modelObj) 
         {
             try 
-            {             
+            {
                 $backUrl = $request->server('HTTP_REFERER');
+                $goto = session()->get($this->moduleRouteText.'_goto');
+                if(empty($goto)){  $goto = $this->list_url;  }
                 $modelObj->delete();
                 session()->flash('success_message', $this->deleteMsg); 
 
@@ -363,9 +373,9 @@ class ProjectsController extends Controller
                     $params['actionvalue']  = $id;
                     $params['remark']       = "Delete Project::".$id;
 
-                    $logs=\App\Models\AdminLog::writeadminlog($params);    
+                    $logs=\App\Models\AdminLog::writeadminlog($params);
 
-                return redirect($backUrl);
+                return redirect($goto);
             } 
             catch (Exception $e) 
             {
@@ -398,9 +408,9 @@ class ProjectsController extends Controller
                 return view("admin.partials.action",
                     [
                         'currentRoute' => $this->moduleRouteText,
-                        'row' => $row,                                 
+                        'row' => $row,
                         'isEdit' =>\App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_PROJECT),
-                        'isDelete' => \App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_PROJECT),                                           
+                        'isDelete' => \App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_PROJECT),
                     ]
                 )->render();
             })
@@ -426,12 +436,17 @@ class ProjectsController extends Controller
             
             ->filter(function ($query) 
             {                              
-                $search_title = request()->get("search_title");                                
-                $search_status = request()->get("search_status");                                         
-                $search_client = request()->get("search_client");                                         
+                $search_title = request()->get("search_title");
+                $search_status = request()->get("search_status");
+                $search_client = request()->get("search_client");
+
+                $searchData = array();
+                customDatatble($this->moduleRouteText);
+
                 if(!empty($search_title))
                 {
                     $query = $query->where(TBL_PROJECT.".title", 'LIKE', '%'.$search_title.'%');
+                    $searchData['search_title'] = $search_title;
                 }
                 if($search_status == "1" || $search_status == "0")
                 {
@@ -440,9 +455,13 @@ class ProjectsController extends Controller
                 if(!empty($search_client))
                 {
                     $query = $query->where(TBL_PROJECT.".client_id", $search_client);
+                    $searchData['search_client'] = $search_client;
                 }                   
+                    $searchData['search_status'] = $search_status;
+                    $goto = \URL::route($this->moduleRouteText.'.index', $searchData);
+                    \session()->put($this->moduleRouteText.'_goto',$goto);
             })
-            ->make(true);        
+            ->make(true);
     }
 	public function clientData(Request $request)
     {

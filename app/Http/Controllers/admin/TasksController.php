@@ -62,7 +62,7 @@ class TasksController extends Controller
         $data['btnAdd'] = \App\Models\Admin::isAccess(\App\Models\Admin::$ADD_TASKS);
         $data['projects'] = \App\Models\Project::getList();
         $dates = \DB::table(TBL_TASK)->select(\DB::raw("MIN(task_date)as mindate,MAX(task_date) as maxdate"))->get();
-        foreach ($dates as $date) 
+        foreach ($dates as $date)
         {
             $start_date = $date->mindate;
             $mindate = date_create($date->mindate);
@@ -111,13 +111,13 @@ class TasksController extends Controller
                 $rows = Task::listFilter($query);
                 
 
-                $records[] = array("No","User Name","Project","Task","Date","Hours","Status","Reference Link");
+                $records[] = array("No","User Name","Project","Task","Date","Hours","Status","Reference Link","Description");
                 $i = 1;
                 foreach($rows as $row)
                 {
                     if($row->status == 1) $sts = "Completed"; else $sts = "In Progress";
                     $task_date = date("j M, Y",strtotime($row->task_date));
-                    $records[] = [$i,$row->user_name,$row->project_name,$row->title,$task_date,$row->total_time,$sts,$row->ref_link];
+                    $records[] = [$i,$row->user_name,$row->project_name,$row->title,$task_date,$row->total_time,$sts,$row->ref_link,$row->description];
                 $i++;
                 }
                 $records[] = array("total","","","","",$total,"","");
@@ -161,12 +161,12 @@ class TasksController extends Controller
                     $userWiseTasks[$row->user_id]['time'][] = $row->total_time;
 
                     $time_total = (float)$row->total_time;
-                    $userWiseTasks[$row->user_id]['tasks'][] = [$i,$row->project_name,$row->title,$task_date,$time_total,$sts,$row->ref_link];
+                    $userWiseTasks[$row->user_id]['tasks'][] = [$i,$row->project_name,$row->title,$task_date,$time_total,$sts,$row->ref_link,$row->description];
 
                     $i++;
                     }
                    
-                    $task_title[] = array("No","Project","Task","Date","Hours","Status","Reference Link");
+                    $task_title[] = array("No","Project","Task","Date","Hours","Status","Reference Link","Description");
 
                     foreach($userWiseTasks as $k => $v)
                     {
@@ -193,7 +193,7 @@ class TasksController extends Controller
                         
                         }
                         $excel->sheet($userWiseTasks[$k]['name'], function($sheet) use ($userWiseTasks,$k,$task_title,$time,$task_count) {
-                            $sheet->setSize(array(
+                            /*$sheet->setSize(array(
                                 'A1' => array('width'=> 7,'height'=> 15),
                                 'B1' => array('width'=> 25,'height' => 15),
                                 'C1' => array('width'=> 50,'height' => 15),
@@ -201,13 +201,15 @@ class TasksController extends Controller
                                 'E1' => array('width'=> 10,'height' => 15),
                                 'F1' => array('width'=> 13,'height' => 15),
                                 'G1' => array('width'=> 60,'height' => 15),
-                            ));
-                            $sheet->cell('A1:G1', function($cell) {
+                                'H1' => array('width'=> 60,'height' => 15),
+                            ));*/
+                            $sheet->setAutoSize(true);
+                            $sheet->cell('A1:H1', function($cell) {
                                 $cell->setAlignment('center');
                                 $cell->setBackground('#aebbc2');
                                 $cell->setFont(array('family'=> 'Calibri','size'=>'12','bold'=>true));
                             });
-                            $sheet->setBorder('A1:G'.$task_count, 'thin');
+                            $sheet->setBorder('A1:H'.$task_count, 'thin');
                             $sheet->mergeCells('A'.$task_count.':D'.$task_count);
                             $sheet->cell('A'.$task_count.':D'.$task_count, function($cell) {
                                 $cell->setAlignment('center');
@@ -229,13 +231,14 @@ class TasksController extends Controller
                     if(empty($xls_client_id) || count($fixTasks) == 0){
                     $bill_totals[] = array('Total','','','',$bill_total);
                     $excel->sheet('Bill Detail', function($sheet) use ($bill_detail,$bill_totals,$merg,$border) {
-                            $sheet->setSize(array(
+                            /*$sheet->setSize(array(
                                 'A1' => array('width'=> 10,'height'=> 15),
                                 'B1' => array('width'=> 30,'height' => 15),
                                 'C1' => array('width'=> 10,'height' => 15),
                                 'D1' => array('width'=> 10,'height' => 15),
                                 'E1' => array('width'=> 20,'height' => 15),
-                            ));
+                            ));*/
+                            $sheet->setAutoSize(true);
                             $sheet->row(1, array('No','Name','Hours','Rate','Total'));
                             $sheet->mergeCells('A'.$merg.':D'.$merg);
                             $sheet->setBorder('A1:E'.$border, 'thin');
@@ -312,12 +315,12 @@ class TasksController extends Controller
                                 $bill_total_fix += $fix_totals;
                                 
                                 $billId = count($bill_detail) + 1;
-                                $bill_totals[] = array($billId,'Fix Tasks',$clientTotalHr,$clientTotalRate,$fix_totals);
+                                $bill_totals[] = array($billId,'Fix Tasks',$clientTotalHr,0,$fix_totals);
                                 $bill_totals[] = array('Total','','','',$bill_total_fix);
-                                dd($bill_detail_rates);
+                                //dd($bill_detail_rates);
                                 //Billing when Fix tasks
                                 $excel->sheet('Bill Detail', function($sheet) use ($bill_detail_rates,$bill_totals,$merg,$border) {
-                                    dd($bill_detail_rates);
+                                    //dd($bill_detail_rates);
                                     $merg +=1;
                                     $border +=1; 
                                     $sheet->setSize(array(
@@ -380,7 +383,7 @@ class TasksController extends Controller
                     $activeSheet = count($userWiseTasks);
                     $excel->setActiveSheetIndex($activeSheet);
                     });
-                   // $xls_sheet->download('xlsx');
+                   $xls_sheet->download('xlsx');
                 }
             }
             
@@ -399,8 +402,8 @@ class TasksController extends Controller
             $data['clients']='';
             $viewName = $this->moduleViewName.".clientIndex";
         }
-
-       return view($viewName, $data);
+        $data = customSession($this->moduleRouteText,$data, 100);
+        return view($viewName, $data);
     }
 
     /**
@@ -431,6 +434,7 @@ class TasksController extends Controller
         $data['hours'] = ['0'=>'0','1'=>'1','2'=>'2','3'=>'3','4'=>'4','5'=>'5','6'=>'6','7'=>'7','8'=>'8','9'=>'9','10'=>'10','11'=>'11','12'=>'12','13'=>'13','14'=>'14','15'=>'15','16'=>'16','17'=>'17','18'=>'18','19'=>'19','20'=>'20','21'=>'21','22'=>'22','23'=>'23','24'=>'24'];
         $data['mins'] = ['0.00'=>'0.00','0.25'=>'0.25','0.50'=>'0.50','0.75'=>'0.75'];
 
+        $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
         return view($this->moduleViewName.'.add', $data);
     }
 
@@ -449,10 +453,11 @@ class TasksController extends Controller
             return $checkrights;
         }
 
+        $data = array();
         $status = 1;
         $msg = $this->addMsg;
-        $data = array();
-        
+        $goto = $this->list_url;
+
         $message = ['task_date.*'=>'Task date must be less than equal to today.'];
         $validator = Validator::make($request->all(), [
             'project_id.*' => 'required|exists:'.TBL_PROJECT.',id',
@@ -488,7 +493,7 @@ class TasksController extends Controller
             }
             if($hourFlag == 0){
                 $status = 0;
-                return ['status' => $status, 'msg' => 'please enter valid time']; 
+                return ['status' => $status, 'msg' => 'please enter valid time','goto' => $goto]; 
             }
 
 
@@ -579,14 +584,10 @@ class TasksController extends Controller
                 $logs=\App\Models\AdminLog::writeadminlog($params);
                 }
             }
-
-            
- 
-            
             session()->flash('success_message', $msg);                    
         }
         
-        return ['status' => $status, 'msg' => $msg, 'data' => $data];              
+        return ['status' => $status, 'msg' => $msg, 'data' => $data, 'goto' => $goto];
     }
 
     /**
@@ -648,7 +649,7 @@ class TasksController extends Controller
         $data['users'] = User::where('status',1)->pluck("name","id")->all();
         $data['hours'] = ['0'=>'0','1'=>'1','2'=>'2','3'=>'3','4'=>'4','5'=>'5','6'=>'6','7'=>'7','8'=>'8','9'=>'9','10'=>'10','11'=>'11','12'=>'12','13'=>'13','14'=>'14','15'=>'15','16'=>'16','17'=>'17','18'=>'18','19'=>'19','20'=>'20','21'=>'21','22'=>'22','23'=>'23','24'=>'24'];
         $data['mins'] = ['0.00'=>'0.00','0.25'=>'0.25','0.50'=>'0.50','0.75'=>'0.75'];
-
+        $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
 
         return view($this->moduleViewName.'.add', $data);
     }
@@ -671,9 +672,12 @@ class TasksController extends Controller
 
         $model = $this->modelObj->find($id);
 
+        $data = array();
         $status = 1;
         $msg = $this->updateMsg;
-        $data = array();        
+        $goto = session()->get($this->moduleRouteText.'_goto');
+        if(empty($goto)){  $goto = $this->list_url;  }
+
         $auth_user = \Auth::guard('admins')->user();
         $created_at = date('Y-m-d',strtotime($model->task_date));
         $today = date('Y-m-d');
@@ -715,7 +719,7 @@ class TasksController extends Controller
             {
                 $msg .= $message . "<br />";
             }
-        }         
+        }
         else
         {
             $hourFlag= 1;
@@ -728,7 +732,7 @@ class TasksController extends Controller
             }
             if($hourFlag == 0){
                 $status = 0;
-                return ['status' => $status, 'msg' => 'please enter valid time']; 
+                return ['status' => $status, 'msg' => 'please enter valid time','goto' => $goto]; 
             }
 
             $project_id = $request->get('project_id');
@@ -791,7 +795,7 @@ class TasksController extends Controller
                 $logs=\App\Models\AdminLog::writeadminlog($params);         
         }
         
-        return ['status' => $status,'msg' => $msg, 'data' => $data];               
+        return ['status' => $status,'msg' => $msg, 'data' => $data, 'goto' => $goto];               
     }
 
     /**
@@ -813,9 +817,11 @@ class TasksController extends Controller
         if($modelObj) 
         {
             try 
-            {             
+            {
                 $backUrl = $request->server('HTTP_REFERER');
                 $modelObj->delete();
+                $goto = session()->get($this->moduleRouteText.'_goto');
+                if(empty($goto)){  $goto = $this->list_url;  }
                 session()->flash('success_message', $this->deleteMsg); 
 
                 //store logs detail
@@ -828,7 +834,7 @@ class TasksController extends Controller
 
                     $logs=\App\Models\AdminLog::writeadminlog($params);    
 
-                return redirect($backUrl);
+                return redirect($goto);
             } 
             catch (Exception $e) 
             {
@@ -910,7 +916,7 @@ class TasksController extends Controller
           
             ->filter(function ($query) 
             {
-                $query = Task::listFilter($query);                  
+                $query = Task::listFilter($query);
             });
         $data = $data->with('hours',$totalHours);
         $data = $data->make(true);

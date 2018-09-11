@@ -30,7 +30,7 @@ $popup_id = request()->get('popup_id');
                                <th width="5%">ID</th>                                   
                                <th width="35%">Project</th>
                                <th width="30%">Type</th>
-								<th width="20%">Title</th>
+								               <th width="20%">Title</th>
                                <th width="5%">Environment</th>
                                <th width="20%">Created At</th>
                                <th width="5%" data-orderable="false">Action</th>
@@ -38,13 +38,13 @@ $popup_id = request()->get('popup_id');
                         </thead>
                         <tbody>
                         </tbody>
-                    </table>                                              
+                    </table>
                 </div>
-            </div>              
+            </div>
         </div>
     </div>
 </div>
-</div>
+
 <div class="modal fade bs-modal-lg" id="credential_view" role="dialog" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
     
@@ -138,6 +138,8 @@ function openView($id){
             processing: true,
             serverSide: true,
             searching: false,
+             pageLength: '{{ $length }}',
+            displayStart: '{{ $start }}',
             lengthMenu:
               [
                 [50,100,150,200,250],
@@ -152,17 +154,17 @@ function openView($id){
                     data.search_project = $("#search-frm select[name='search_project']").val();
                 }
             },            
-            "order": [[ '0', "desc" ]],    
+            "order": [[ "{{ $orderClm }}", "{{ $orderDir }}" ]],
             columns: [
                 { data: 'id', name: 'id' },
                 { data: 'project_name', name: '{{TBL_PROJECT}}.title' },
                 { data: 'protocol', name: 'protocol' }, 
-				{ data: 'title', name: 'title' },
-                { data: 'environment', name: 'environment' },                         
-                { data: 'created_at', name: 'created_at' },                                         
+				        { data: 'title', name: 'title' },
+                { data: 'environment', name: 'environment' },
+                { data: 'created_at', name: 'created_at' },
                 { data: 'action', orderable: false, searchable: false}
             ]
-        });        
+        });
     });
     </script>
 @endsection

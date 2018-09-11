@@ -2,8 +2,6 @@
 
 @section('styles')
 
-    <link href="{{ asset("/themes/admin/assets")}}/global/plugins/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
-    <link href="{{ asset("/themes/admin/assets")}}/global/plugins/select2/css/select2-bootstrap.min.css" rel="stylesheet" type="text/css" />
 @endsection
 <?php 
 $auth = Auth::guard('admins')->user()->user_type_id;
@@ -22,7 +20,7 @@ $auth = Auth::guard('admins')->user()->user_type_id;
                 <div class="portlet-title">
                     <div class="caption">
                         <i class="fa fa-gift"></i>{{ $page_title }}</div>
-                        <a class="btn btn-default pull-right btn-sm mTop5" href="{{ $list_url }}">Back</a>
+                        <a class="btn btn-default pull-right btn-sm mTop5" href="{{ $back_url }}">Back</a>
                 </div>
                 <div class="portlet-body form">
                     <div class="form-body"> 
@@ -170,9 +168,7 @@ $auth = Auth::guard('admins')->user()->user_type_id;
 
 @endsection
 @section('scripts')
-<script src="{{ asset('/themes/admin/assets')}}/global/plugins/select2/js/select2.full.min.js" type="text/javascript"></script>
-<script src="{{ asset('/themes/admin/assets')}}/pages/scripts/components-select2.min.js" type="text/javascript"></script>
-
+ 
 <script type="text/javascript">
 
 $(document).ready(function(){
@@ -221,7 +217,7 @@ $(document).ready(function(){
                         if (result.status == 1)
                         {
                             $.bootstrapGrowl(result.msg, {type: 'success', delay: 4000});
-                            window.location = '{{ $list_url }}';    
+                            window.location = result.goto;
                         }
                         else
                         {
@@ -233,11 +229,10 @@ $(document).ready(function(){
                         $.bootstrapGrowl("Internal server error !", {type: 'danger', delay: 4000});
                     }
                 });
-            }            
+            }
             return false;
         });
-    });
-   
+    });   
 </script>
 
 @endsection

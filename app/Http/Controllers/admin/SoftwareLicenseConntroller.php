@@ -59,7 +59,8 @@ class SoftwareLicenseConntroller extends Controller
         $data['add_url'] = route($this->moduleRouteText.'.create');
         $data['btnAdd'] = \App\Models\Admin::isAccess(\App\Models\Admin::$ADD_SOFTWARE_LICENSE);
 
-       return view($this->moduleViewName.".index", $data);  
+        $data = customSession($this->moduleRouteText,$data, 100);
+        return view($this->moduleViewName.".index", $data);  
     }
 
     /**
@@ -88,7 +89,8 @@ class SoftwareLicenseConntroller extends Controller
         $data['buttonText'] = "Save";
         $data["method"] = "POST"; 
         $data['action_url'] = $this->moduleRouteText.".store";
-        
+        $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
+
         return view($this->moduleViewName.'.add', $data);
     }
 
@@ -112,10 +114,11 @@ class SoftwareLicenseConntroller extends Controller
 		{
 			return Redirect('/dashboard');
 		}
+        $data = array();
         $status = 1;
         $msg = $this->addMsg;
-        $data = array();
-        
+        $goto = $this->list_url;
+
         $validator = Validator::make($request->all(), [
             'title' => 'required|min:2',
             'url' => 'required',
@@ -154,7 +157,7 @@ class SoftwareLicenseConntroller extends Controller
             session()->flash('success_message', $msg);                    
         }
         
-        return ['status' => $status, 'msg' => $msg, 'data' => $data];              
+        return ['status' => $status, 'msg' => $msg, 'data' => $data, 'goto' => $goto];              
     }
 
     /**
@@ -202,6 +205,7 @@ class SoftwareLicenseConntroller extends Controller
         $data['action_url'] = $this->moduleRouteText.".update";
         $data['action_params'] = $formObj->id;
         $data['method'] = "PUT";
+        $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
 
         return view($this->moduleViewName.'.add', $data);
     }
@@ -228,10 +232,12 @@ class SoftwareLicenseConntroller extends Controller
 		}
         $model = $this->modelObj->find($id);
 
+        $data = array();
         $status = 1;
         $msg = $this->updateMsg;
-        $data = array();        
-        
+        $goto = session()->get($this->moduleRouteText.'_goto');
+        if(empty($goto)){  $goto = $this->list_url;  }
+
         $validator = Validator::make($request->all(), [
             'title' => 'required|min:2',
             'url' => 'required',
@@ -256,7 +262,7 @@ class SoftwareLicenseConntroller extends Controller
             {
                 $msg .= $message . "<br />";
             }
-        }         
+        }
         else
         {
             $input = $request->all();
@@ -273,7 +279,7 @@ class SoftwareLicenseConntroller extends Controller
                 $logs=\App\Models\AdminLog::writeadminlog($params);         
         }
         
-        return ['status' => $status,'msg' => $msg, 'data' => $data];               
+        return ['status' => $status,'msg' => $msg, 'data' => $data, 'goto' => $goto];               
     }
 
     /**
@@ -304,6 +310,8 @@ class SoftwareLicenseConntroller extends Controller
             {             
                 $backUrl = $request->server('HTTP_REFERER');
                 $modelObj->delete();
+                $goto = session()->get($this->moduleRouteText.'_goto');
+                if(empty($goto)){  $goto = $this->list_url;  }
                 session()->flash('success_message', $this->deleteMsg); 
 
                 //store logs detail
@@ -316,7 +324,7 @@ class SoftwareLicenseConntroller extends Controller
 
                     $logs=\App\Models\AdminLog::writeadminlog($params);    
 
-                return redirect($backUrl);
+                return redirect($goto);
             } 
             catch (Exception $e) 
             {
@@ -352,9 +360,9 @@ class SoftwareLicenseConntroller extends Controller
                 return view("admin.partials.action",
                     [
                         'currentRoute' => $this->moduleRouteText,
-                        'row' => $row,                                 
+                        'row' => $row,
                         'isEdit' =>\App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_SOFTWARE_LICENSE),
-                        'isDelete' => \App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_SOFTWARE_LICENSE),                                                  
+                        'isDelete' => \App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_SOFTWARE_LICENSE),
                     ]
                 )->render();
             })
@@ -363,27 +371,35 @@ class SoftwareLicenseConntroller extends Controller
                 if(!empty($row->created_at))          
                     return date("j M, Y h:i:s A",strtotime($row->created_at));
                 else
-                    return '-';    
+                    return '-';
             })->rawColumns(['action'])             
             
             ->filter(function ($query) 
-            {                              
+            {
                 $search_title = request()->get("search_title");                                
                 $search_license = request()->get("search_license");
                 $search_type = request()->get("search_type");
 
+                $searchData = array();
+                customDatatble($this->moduleRouteText);
+
                 if(!empty($search_title))
                 {
                     $query = $query->where("title", 'LIKE', '%'.$search_title.'%');
+                    $searchData['search_title'] = $search_title;
                 }
                 if(!empty($search_license))
                 {
                     $query = $query->where("license_key", 'LIKE', '%'.$search_license.'%');
+                    $searchData['search_license'] = $search_license;
                 }
                 if($search_type == "net banking" || $search_type == "CC")
                 {
                     $query = $query->where("payment_type", $search_type);
-                }                
+                }
+                    $searchData['search_type'] = $search_type;
+                $goto = \URL::route($this->moduleRouteText.'.index', $searchData);
+                \session()->put($this->moduleRouteText.'_goto',$goto);
             })
             ->make(true);        
     }

@@ -79,7 +79,8 @@ class SalarySlipController extends Controller
 			
             $data['users'] = User::pluck("name","id")->all();
             $viewName = $this->moduleViewName . ".index";        
-        }    
+        }
+        $data = customSession($this->moduleRouteText,$data);
         return view($viewName, $data);  
     }
 
@@ -115,6 +116,7 @@ class SalarySlipController extends Controller
         $data["years"] = ['2016'=>'2016','2017'=>'2017','2018'=>'2018','2019'=>'2019','2020'=>'2020','2021'=>'2021','2022'=>'2022','2023'=>'2023','2024'=>'2024','2025'=>'2025','2026'=>'2026','2027'=>'2027','2028'=>'2028','2029'=>'2029','2030'=>'2030']; 
         $data['users'] = User::pluck("name","id")->all();
         
+        $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
         return view($this->moduleViewName.'.add', $data);
     }
     public function getuserdetail(Request $request)
@@ -188,10 +190,11 @@ class SalarySlipController extends Controller
         {
             return $checkrights;
         }
+        $data = array();
         $status = 1;
         $msg = $this->addMsg;
-        $data = array();
-        
+        $goto = $this->list_url;
+
         $validator = Validator::make($request->all(), [
             'user_id' => 'required|exists:'.TBL_USERS.',id',
             'ctc' => 'required|numeric|min:2',
@@ -235,7 +238,7 @@ class SalarySlipController extends Controller
             {
                 $msg .= $message . "<br />";
             }
-        }         
+        }
         else
         {
             $input = $request->all();
@@ -284,7 +287,7 @@ class SalarySlipController extends Controller
             session()->flash('success_message', $msg);                    
         }
         
-        return ['status' => $status, 'msg' => $msg, 'data' => $data];              
+        return ['status' => $status, 'msg' => $msg, 'data' => $data, 'goto' => $goto];              
     }
 
     /**
@@ -339,7 +342,8 @@ class SalarySlipController extends Controller
         $data["months"] = ['01'=>'January','02'=>'February','03'=>'March','04'=>'April','05'=>'May','06'=>'June','07'=>'July','08'=>'August','09'=>'September','10'=>'October','11'=>'November','12'=>'December']; 
         $data["years"] = ['2016'=>'2016','2017'=>'2017','2018'=>'2018','2019'=>'2019','2020'=>'2020','2021'=>'2021','2022'=>'2022','2023'=>'2023','2024'=>'2024','2025'=>'2025','2026'=>'2026','2027'=>'2027','2028'=>'2028','2029'=>'2029','2030'=>'2030']; 
         $data['users'] = User::pluck("name","id")->all();
-        
+        $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
+
         return view($this->moduleViewName.'.edit', $data);
     }
 
@@ -369,9 +373,11 @@ class SalarySlipController extends Controller
 
         $model = $this->modelObj->find($id);
 
+        $data = array();
         $status = 1;
         $msg = $this->updateMsg;
-        $data = array();        
+        $goto = session()->get($this->moduleRouteText.'_goto');
+        if(empty($goto)){  $goto = $this->list_url;  }
         
         $validator = Validator::make($request->all(), [
             'user_id' => 'required|exists:'.TBL_USERS.',id',
@@ -468,7 +474,7 @@ class SalarySlipController extends Controller
                 $logs=\App\Models\AdminLog::writeadminlog($params);         
         }
         
-        return ['status' => $status,'msg' => $msg, 'data' => $data];               
+        return ['status' => $status,'msg' => $msg, 'data' => $data, 'goto' => $goto];               
     }
 
     /**
@@ -498,9 +504,11 @@ class SalarySlipController extends Controller
         if($modelObj) 
         {
             try 
-            {             
+            {
                 $backUrl = $request->server('HTTP_REFERER');
                 $modelObj->delete();
+                $goto = session()->get($this->moduleRouteText.'_goto');
+                if(empty($goto)){  $goto = $this->list_url;  }
                 session()->flash('success_message', $this->deleteMsg); 
 
                 //store logs detail
@@ -513,7 +521,7 @@ class SalarySlipController extends Controller
 
                     $logs=\App\Models\AdminLog::writeadminlog($params);    
 
-                return redirect($backUrl);
+                return redirect($goto);
             } 
             catch (Exception $e) 
             {
@@ -563,10 +571,11 @@ class SalarySlipController extends Controller
                 return view("admin.partials.action",
                     [
                         'currentRoute' => $this->moduleRouteText,
-                        'row' => $row,                                 
+                        'row' => $row,
                         'isEdit' =>\App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_SALARY_SLIP),
                         'isPDF' =>\App\Models\Admin::isAccess(\App\Models\Admin::$LIST_SALARY_SLIP),
-                        'isDelete' => \App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_SALARY_SLIP),                                                  			'isView' => \App\Models\Admin::isAccess(\App\Models\Admin::$LIST_SALARY_SLIP),
+                        'isDelete' => \App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_SALARY_SLIP),
+                        'isView' => \App\Models\Admin::isAccess(\App\Models\Admin::$LIST_SALARY_SLIP),
                     ]
                 )->render();
             })
@@ -577,11 +586,11 @@ class SalarySlipController extends Controller
                     return date("j M, Y h:i:s A",strtotime($row->created_at));
                 else
                     return '-';    
-            })->rawColumns(['action'])             
+            })->rawColumns(['action'])
             
-            ->filter(function ($query) 
-            {                              
-                 $query = SalarySlip::listFilter($query);
+            ->filter(function ($query)
+            {
+                $query = SalarySlip::listFilter($query);
             });
             $data = $data->with('net_total',$net_total);
 
@@ -952,5 +961,4 @@ class SalarySlipController extends Controller
         }
         return ['status' => $status, 'msg' => $msg];
     }
-    
 }

@@ -17,12 +17,16 @@ class FixTask extends Model
         $search_client = request()->get("search_client");
         $search_status = request()->get("search_status");
 
+        $searchData = array();
+        customDatatble('fix-tasks');
+
         if (!empty($search_start_date)) {
 
             $from_date = $search_start_date . ' 00:00:00';
             $convertFromDate = $from_date;
 
             $query = $query->where(TBL_FIX_TASKS.".created_at", ">=", addslashes($convertFromDate));
+            $searchData['search_start_date'] = $search_start_date;
         }
         if (!empty($search_end_date)) {
 
@@ -30,15 +34,21 @@ class FixTask extends Model
             $convertToDate = $to_date;
 
             $query = $query->where(TBL_FIX_TASKS.".created_at", "<=", addslashes($convertToDate));
+            $searchData['search_end_date'] = $search_end_date;
         }
         if (!empty($search_client)) {
             $query = $query->where(TBL_CLIENT.".id",$search_client);
+            $searchData['search_client'] = $search_client;
         }
         if($search_status == "1" || $search_status == "0")
         {
             $query = $query->where(TBL_FIX_TASKS.".invoice_status", $search_status);
         }
-        
+            $searchData['search_status'] = $search_status;
+
+            $goto = \URL::route('fix-tasks.index', $searchData);
+            \session()->put('fix-tasks_goto',$goto);
+
         return $query;
     }
     public static function getFixTasksList($client_id)

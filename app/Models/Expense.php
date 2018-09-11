@@ -18,7 +18,9 @@ class Expense extends Model
         $search_amount = request()->get("search_amount");
 		$start_expense_date = request()->get("search_invoice_start_date");
         $end_expense_date = request()->get("search_invoice_end_date");
-            
+        
+        $searchData = array();
+        customDatatble('expense');
 
         if (!empty($search_start_date)) {
 
@@ -26,6 +28,7 @@ class Expense extends Model
             $convertFromDate = $from_date;
 
             $query = $query->where(TBL_EXPENSES . ".created_at", ">=", addslashes($convertFromDate));
+            $searchData['search_start_date'] = $search_start_date;
         }
         if (!empty($search_end_date)) {
 
@@ -33,20 +36,24 @@ class Expense extends Model
             $convertToDate = $to_date;
 
             $query = $query->where(TBL_EXPENSES . ".created_at", "<=", addslashes($convertToDate));
+            $searchData['search_end_date'] = $search_end_date;
         }      
         if(!empty($search_title))
         {
             $query = $query->where("title", 'LIKE', '%'.$search_title.'%');
+            $searchData['search_title'] = $search_title;
         }
         if (!empty($search_amount)) {
-               $query = $query->where(TBL_EXPENSES.".amount", $search_hour_op, $search_amount);
+            $query = $query->where(TBL_EXPENSES.".amount", $search_amount);
+            $searchData['search_amount'] = $search_amount;
         }  
-		if (!empty($start_expense_date)) {
+        if (!empty($start_expense_date)) {
 
             $from_date = $start_expense_date . ' 00:00:00';
             $convertFromDate = $from_date;
 
             $query = $query->where(TBL_EXPENSES.".date", ">=", addslashes($convertFromDate));
+            $searchData['start_expense_date'] = $start_expense_date;
         }
         if (!empty($end_expense_date)) {
 
@@ -54,9 +61,10 @@ class Expense extends Model
             $convertToDate = $to_date;
 
             $query = $query->where(TBL_EXPENSES.".date", "<=", addslashes($convertToDate));
+            $searchData['end_expense_date'] = $end_expense_date;
         }
-
+            $goto = \URL::route('expense.index', $searchData);
+            \session()->put('expense_goto',$goto);
         return $query;
     }
-
 }

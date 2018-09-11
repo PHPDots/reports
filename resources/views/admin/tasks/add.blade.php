@@ -37,7 +37,7 @@ z-index: 9!important;
                             <i class="fa fa-tasks"></i>
                            {{ $page_title }}
                         </div>
-                        <a class="btn btn-default pull-right btn-sm mTop5" href="{{ $list_url }}">Back</a>
+                        <a class="btn btn-default pull-right btn-sm mTop5" href="{{ $back_url }}">Back</a>
                     </div>
                     <div class="portlet-body">
                         <div class="form-body">
@@ -191,7 +191,7 @@ z-index: 9!important;
                         if (result.status == 1)
                         {
                             $.bootstrapGrowl(result.msg, {type: 'success', delay: 4000});
-                            window.location = '{{ $list_url }}';    
+                            window.location = result.goto;    
                         }
                         else
                         {

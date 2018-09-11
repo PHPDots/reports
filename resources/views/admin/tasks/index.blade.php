@@ -34,26 +34,26 @@
                     <table class="table table-striped table-bordered table-hover table-checkable order-column" id="server-side-datatables">
                         <thead>
                             <tr>
-                               <th width="2%">ID</th>                                    
-                               <th width="10%">UserName</th>                                    
+                               <th width="2%">ID</th>
+                               <th width="10%">UserName</th>
                                <th width="12%">Project</th>
                                <th width="20%">Task</th>
                                <th width="10%">Status<br/>
                                     <i class="fa fa-clock-o" aria-hidden="true"></i> Hour</th>
                                <th width="15%">Link</th> 
-                               <th width="13%">Task Date<br/><i style="color: blue; font-size: 12px">CreatedAt</i></th>                          
+                               <th width="13%">Task Date<br/><i style="color: blue; font-size: 12px">CreatedAt</i></th>
                                <th width="10%" data-orderable="false">Action</th>
                             </tr>
                         </thead>                                         
                         <tbody>
                         </tbody>
-                    </table>                                              
+                    </table>
                 </div>
             </div>              
         </div>
     </div>
 </div>
-</div>            
+
 <div class="modal fade bs-modal-lg" id="task_view" role="dialog" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
     
@@ -128,6 +128,12 @@ function openView($id){
                 minimumInputLength: 2,
                 width: null
         });
+        $("#task_date_id").select2({
+                placeholder: "Search Task Date",
+                allowClear: true,
+                minimumInputLength: 2,
+                width: null
+        });
 		$(document).on('click', '.btn-download', function () {
             $("#is_download").val(1);
             setTimeout(function(){
@@ -144,15 +150,6 @@ function openView($id){
                 window.location = $url;
             },400);                       
         });
-		
-        $(document).ready(function() 
-        {
-          $('#example').DataTable( 
-          {
-              "order": [[ 3, "desc" ]]
-              });
-        });
-
 
         $("#search-frm").submit(function(){
             oTableCustom.draw();
@@ -173,6 +170,8 @@ function openView($id){
             processing: true,
             serverSide: true,
             searching: false,
+            pageLength: '{{ $length }}',
+            displayStart: '{{ $start }}',
             lengthMenu:
               [
                 [100,200,300,400,500],
@@ -194,7 +193,6 @@ function openView($id){
                     data.search_hour_op = $("#search-frm select[name='search_hour_op']").val();
                     data.search_min_op = $("#search-frm select[name='search_min_op']").val();
                     data.search_status = $("#search-frm select[name='search_status']").val();
-                 
                 },
 				    dataSrc: function(response){
                       $("#overall-hours").html(response.hours);
@@ -202,7 +200,7 @@ function openView($id){
                     return response.data;
                 }
             },
-            "order": [[ '0', "desc" ]],    
+            "order": [[ "{{ $orderClm }}", "{{ $orderDir }}" ]],
             columns: [
                 { data: 'id', name: 'id' },
                 { data: 'user_name', name: '{{ TBL_USERS }}.name' },
@@ -212,10 +210,7 @@ function openView($id){
                 { data: 'ref_link', name: 'ref_link' },
                 { data: 'task_date', name: 'task_date' },
                 { data: 'action', orderable: false, searchable: false}             
-            ],
-            //dom: 'Bfrtip',       
-            //  buttons: ['csvHtml5']
-        
+            ],        
         });        
     });
     </script>

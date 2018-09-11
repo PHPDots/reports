@@ -1,9 +1,6 @@
 @extends('admin.layouts.app')
 
 @section('styles')
-<link href="{{asset('themes/admin//assets')}}/global/plugins/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
-<link href="{{asset('themes/admin//assets')}}/global/plugins/select2/css/select2-bootstrap.min.css" rel="stylesheet" type="text/css" />
-
 @endsection
 @section('content')
 
@@ -17,7 +14,7 @@
                             <i class="fa fa-user"></i>
                            {{ $page_title }}
                         </div>
-                        <a class="btn btn-default pull-right btn-sm mTop5" href="{{ $list_url }}">Back</a>
+                        <a class="btn btn-default pull-right btn-sm mTop5" href="{{ $back_url }}">Back</a>
                     </div>
                     <div class="portlet-body">
                         <div class="form-body">
@@ -25,14 +22,14 @@
                            
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <label class="control-label">Holiday Title: <span class="required">*</span></label>                            
+                                        <label class="control-label">Holiday Title: <span class="required">*</span></label>
                                         {!! Form::text('holiday_title',null,['class' => 'form-control', 'data-required' => true,'placeholder' => 'Holiday Title','rows'=>4]) !!}
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="control-label">Status: <span class="required">*</span></label>                            
+                                        <label class="control-label">Status: <span class="required">*</span></label>
                                         {!! Form::select('status',['1'=>'Active','0'=>'Inactive'],null,['class' => 'form-control', 'data-required' => true]) !!}
                                     </div>
-                                    
+
                                 </div>
                                 <div class="clearfix">&nbsp;</div>
                                 <div class="row">
@@ -44,7 +41,7 @@
                                                 <i class="fa fa-calendar"></i>
                                             </span>
                                         </div>
-                                    </div>                                    
+                                    </div>
                                     <div class="col-md-6">
                                         <label class="control-label">Holiday To Date:</label>
                                         <div class="input-group input-large date-picker input-daterange" data-date="10/11/2012" data-date-format="mm/dd/yyyy">
@@ -52,11 +49,8 @@
                                             <span class="input-group-addon">
                                                 <i class="fa fa-calendar"></i>
                                             </span>
-                                                                            
                                         </div>
                                     </div>
-
-                                    
                                 </div> 
                                 <div class="row">
                                     <div class="col-md-12">
@@ -97,7 +91,7 @@
                         if (result.status == 1)
                         {
                             $.bootstrapGrowl(result.msg, {type: 'success', delay: 4000});
-                            window.location = '{{ $list_url }}';    
+                            window.location = result.goto;    
                         }
                         else
                         {
@@ -114,12 +108,6 @@
         });
     });
 </script>
-
-
- <script src="{{ asset("themes/admin/assets/")}}/global/plugins/select2/js/select2.full.min.js" type="text/javascript"></script>
-        <script src="{{ asset("themes/admin/assets/")}}../assets/global/plugins/select2/js/select2.full.min.js" type="text/javascript"></script>
-        <script src="{{ asset("themes/admin/assets/")}}/global/plugins/bootstrap-wizard/jquery.bootstrap.wizard.min.js" type="text/javascript"></script>
-        <script src="{{ asset("themes/admin/assets/")}}/pages/scripts/form-wizard.min.js" type="text/javascript"></script>
 
 @endsection
 

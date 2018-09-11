@@ -10,7 +10,7 @@
 
             @include("admin.AdminUserLoges.search")
 
-            <div class="clearfix"></div>    
+            <div class="clearfix"></div>
             <div class="portlet box green">
                 <div class="portlet-title">
                     <div class="caption">
@@ -23,20 +23,20 @@
                             <tr>
                                 <th width="5%">ID</th>
                                 <th width="15%">Username</th>
-                                <th width="30%">#Action Name <br/># Action Value</th>              
-                                <th width="20%"> Remarks</th> 
+                                <th width="30%">#Action Name <br/># Action Value</th>
+                                <th width="20%"> Remarks</th>
                                 <th width="10%">Ip Address</th>
                                 <th width="20%">  Log Date</th>
                             </tr>
-                        </thead>                                         
+                        </thead>
                         <tbody>
                         </tbody>
-                    </table>                                              
+                    </table>
                 </div>
-            </div>              
+            </div>
         </div>
     </div>
-</div>  
+</div>
 
 @endsection
 
@@ -71,11 +71,8 @@
             processing: true,
             serverSide: true,
             searching: false,
-            lengthMenu: [
-                [100, 200, 300, 400, 500],
-                [100, 200, 300, 400, 500]
-            ],
-            pageLength: 100,
+            pageLength: '{{ $length }}',
+            displayStart: '{{ $start }}',
             ajax: {
                 "url": "{!! route($moduleRouteText.'.data') !!}",
                 "data": function (data)
@@ -87,10 +84,14 @@
                     data.search_actionvalue = $("#search-frm input[name='search_actionvalue']").val();
                     data.search_remark = $("#search-frm input[name='search_remark']").val();
                     data.search_ipaddress = $("#search-frm input[name='search_ipaddress']").val();
-
                 }
             },
-            "order": [['0', "desc"]],
+            lengthMenu:
+              [
+                [100,200,300,400,500],
+                [100,200,300,400,500]
+              ],
+            "order": [[ "{{ $orderClm }}", "{{ $orderDir }}" ]],
             columns: [
                 {data: 'id', name: 'id'},
                 {data: 'name', name: 'adminuserid'},
@@ -100,9 +101,7 @@
                 {data: 'created_at', name: '{{ TBL_ADMIN_LOG }}.created_at'}
             ]
         });
-
     });
-    
 </script>
 
 @endsection

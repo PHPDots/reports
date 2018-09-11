@@ -1,7 +1,6 @@
 @extends('admin.layouts.app')
 @section('styles')
-<link href="{{asset('themes/admin//assets')}}/global/plugins/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
-<link href="{{asset('themes/admin//assets')}}/global/plugins/select2/css/select2-bootstrap.min.css" rel="stylesheet" type="text/css" />
+ 
 @endsection
 
 <?php
@@ -19,7 +18,7 @@
                     <i class="fa fa-picture"></i>{{ $page_title }}
                     </div>
                     <a href="javascript:;" class="reload" onclick="invoice_cal()" id="reload_id"> </a>
-                    <a class="btn btn-default pull-right btn-sm mTop5" href="{{ $list_url }}">Back</a>
+                    <a class="btn btn-default pull-right btn-sm mTop5" href="{{ $back_url }}">Back</a>
                 </div>
                 <div class="portlet-body">
                     <div class="table">
@@ -339,7 +338,7 @@
                         if (result.status == 1)
                         {
                             $.bootstrapGrowl(result.msg, {type: 'success', delay: 4000});
-                            window.location = '{{ $list_url }}';    
+                            window.location = result.goto;    
                         }
                         else
                         {
@@ -356,8 +355,5 @@
         });
     });
 </script>
- <script src="{{ asset("themes/admin/assets/")}}/global/plugins/select2/js/select2.full.min.js" type="text/javascript"></script>
-<script src="{{ asset("themes/admin/assets/")}}/assets/global/plugins/select2/js/select2.full.min.js" type="text/javascript"></script>
-<script src="{{ asset("themes/admin/assets/")}}/global/plugins/bootstrap-wizard/jquery.bootstrap.wizard.min.js" type="text/javascript"></script>
-<script src="{{ asset("themes/admin/assets/")}}/pages/scripts/form-wizard.min.js" type="text/javascript"></script>
+
 @endsection

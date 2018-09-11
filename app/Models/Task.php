@@ -21,34 +21,38 @@ class Task extends Model
 	public static function listFilter($query)
     {
         $search_start_date = request()->get("search_start_date");
-        $search_end_date = request()->get("search_end_date");                                
+        $search_end_date = request()->get("search_end_date");
         $search_id = request()->get("search_id");
 		$search_task_date = request()->get("search_task_date");
-        $search_project = request()->get("search_project");                                
-        $search_title = request()->get("search_title");                                
-        $search_status = request()->get("search_status");                            
+        $search_project = request()->get("search_project");
+        $search_title = request()->get("search_title");
+        $search_status = request()->get("search_status");
         $search_user = request()->get("search_user");
         $search_client = request()->get("search_client");
-        $search_hour = request()->get("search_hour");                                
-        $search_hour_op = request()->get("search_hour_op");                                
+        $search_hour = request()->get("search_hour");
+        $search_hour_op = request()->get("search_hour_op");
         $search_min = request()->get("search_min");
         $search_min_op = request()->get("search_min_op");
 		$is_download = request()->get("isDownload");
 
+        $searchData = array();
+        customDatatble('tasks');
+
         if(!empty($search_hour) && empty($search_min))
         {
-            $search_min ='0.00';   
+            $search_min ='0.00';
         }
         else if(empty($search_hour) && !empty($search_min))
         {
             $search_hour = '0.00';
-        } 
+        }
         if (!empty($search_start_date)){
 
             $from_date=$search_start_date.' 00:00:00';
             $convertFromDate= $from_date;
 
             $query = $query->where(TBL_TASK.".task_date",">=",addslashes($convertFromDate));
+            $searchData['search_start_date'] = $search_start_date;
         }
         if (!empty($search_end_date)){
 
@@ -56,6 +60,7 @@ class Task extends Model
             $convertToDate= $to_date;
 
             $query = $query->where(TBL_TASK.".task_date","<=",addslashes($convertToDate));
+            $searchData['search_end_date'] = $search_end_date;
         }
         if(!empty($search_id))
         {
@@ -64,42 +69,56 @@ class Task extends Model
             if(count($idArr)>0)
             {
                 $query = $query->whereIn(TBL_TASK.".id",$idArr);
+                $searchData['search_id'] = $search_id;
             } 
         }
 		if (!empty($search_task_date)) {
             $query = $query->where(TBL_TASK.".task_date", "LIKE", '%'.$search_task_date.'%');
         }
+            $searchData['search_task_date'] = $search_task_date;
         if(!empty($search_project))
         {
             $query = $query->where(TBL_TASK.".project_id", $search_project);
+            $searchData['search_project'] = $search_project;
         }
         if(!empty($search_client))
         {
             $query = $query->where(TBL_PROJECT.".client_id", $search_client);
+            $searchData['search_client'] = $search_client;
         }
         if(!empty($search_title))
         {
             $query = $query->where(TBL_TASK.".title", 'LIKE', '%'.$search_title.'%');
+            $searchData['search_title'] = $search_title;
         }
         if (!empty($search_hour)) {
-               $query = $query->where(TBL_TASK.".hour", $search_hour_op, $search_hour);
+            $query = $query->where(TBL_TASK.".hour", $search_hour_op, $search_hour);
+            $searchData['search_hour'] = $search_hour;
         }
         if (!empty($search_min)) {
-               $query = $query->where(TBL_TASK.".min", $search_min_op, $search_min);
+            $query = $query->where(TBL_TASK.".min", $search_min_op, $search_min);
+            $searchData['search_min'] = $search_min;
         }
         if($search_status == "1" || $search_status == "0")
         {
             $query = $query->where(TBL_TASK.".status", $search_status);
         }
+            $searchData['search_status'] = $search_status;
         if(!empty($search_user))
         {
             $query = $query->where(TBL_TASK.".user_id",$search_user);
+            $searchData['search_user'] = $search_user;
         }
 		if(!empty($is_download) && $is_download == 1)
         {
             $query = $query->limit(1000)->get();
         }
-
+        
+        if(\Auth::guard('admins')->user()->user_type_id == ADMIN_USER_TYPE)
+        {
+            $goto = \URL::route('tasks.index', $searchData);
+            \session()->put('tasks_goto',$goto);
+        }
         return $query;
     }
 	public static function halfLeaveUsers($yesterday)

@@ -5,36 +5,36 @@
 <!-- BEGIN PAGE CONTENT BODY -->
 <div class="page-content">
     <div class="container">
-
-        <div class="">
+          <div class="">
             
-            @include($moduleViewName.".search")           
-			<div class="clearfix"></div>
+            @include($moduleViewName.".search")
+
+			   <div class="clearfix"></div>
             <a class="btn btn-default pull-right">
               Total Net Pay: <span id="overall-netpay"> 0 </span>
             </a>
-            <div class="clearfix"></div>    
+            <div class="clearfix"></div>
             <div class="portlet box green">
                 <div class="portlet-title">
                     <div class="caption">
-                        <i class="fa fa-list"></i>{{ $page_title }}    
+                        <i class="fa fa-list"></i>{{ $page_title }}
                     </div>
 
                     @if($btnAdd)
                         <a class="btn btn-default pull-right btn-sm mTop5" href="{{ $add_url }}">Add New</a>
 						<a class="btn btn-default btn-sm mTop5 pull-right" style="margin-right: 10px;" href="{{ route('salaryslipForAll') }}">Add For All</a>
-                    @endif                     
+                    @endif
 
                 </div>
                 <div class="portlet-body">                    
                     <table class="table table-bordered table-striped table-condensed flip-content" id="server-side-datatables">
                         <thead>
                             <tr>
-                               <th width="5%">ID</th>                                    
-                               <th width="30%">UserName</th>                           
+                               <th width="5%">ID</th>
+                               <th width="30%">UserName</th>
                                <th width="10%">Month</th>
 								               <th width="8%">Net Pay</th>
-                               <th width="15%">Created At</th>                           
+                               <th width="15%">Created At</th>
                                <th width="10%" data-orderable="false">Action</th>
                             </tr>
                         </thead>
@@ -45,7 +45,7 @@
             </div>
         </div>
     </div>
-</div> 
+</div>
 <div class="modal fade bs-modal-lg" id="slip_view" role="dialog" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
     
@@ -64,7 +64,6 @@
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         </div>
       </div>
-      
     </div>
 </div>
 @endsection
@@ -101,7 +100,19 @@ function openView($id){
 		
 		
     $(document).ready(function(){
-		$("#user_id").select2({
+        $("#month_id").select2({
+                placeholder: "Search Month",
+                allowClear: true,
+                minimumInputLength: 2,
+                width: null
+        });
+        $("#year_id").select2({
+                placeholder: "Search Year",
+                allowClear: true,
+                minimumInputLength: 2,
+                width: null
+        });
+		    $("#user_id").select2({
                 placeholder: "Search User Name",
                 allowClear: true,
                 minimumInputLength: 2,
@@ -119,6 +130,8 @@ function openView($id){
             processing: true,
             serverSide: true,
             searching: false,
+            pageLength: '{{ $length }}',
+            displayStart: '{{ $start }}',
             ajax: {
                 "url": "{!! route($moduleRouteText.'.data') !!}",
                 "data": function ( data ) 
@@ -133,12 +146,12 @@ function openView($id){
                     return response.data;
                 }
             },
-			lengthMenu:
+			     lengthMenu:
               [
                 [25,50,100,150,200],
                 [25,50,100,150,200]
               ],
-            "order": [[ '0', "desc" ]],    
+            "order": [[ "{{ $orderClm }}", "{{ $orderDir }}" ]],
             columns: [
                 { data: 'id', name: 'id' },
                 { data: 'user_name', name: '{{ TBL_USERS }}.firstname' },
@@ -147,7 +160,7 @@ function openView($id){
                 { data: 'created_at', name: 'created_at' },
                 { data: 'action', orderable: false, searchable: false}
             ]
-        });        
+        });
     });
     </script>
 @endsection

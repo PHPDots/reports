@@ -57,7 +57,8 @@ class HolidaysController extends Controller {
         $data['add_url'] = route($this->moduleRouteText.'.create');
         $data['btnAdd'] = \App\Models\Admin::isAccess(\App\Models\Admin::$ADD_TASKS);
         $data['projects'] = \App\Models\Project::getList();
-     
+        $data = customSession($this->moduleRouteText,$data);
+
         return view($this->moduleViewName.".index", $data);         
     }
 
@@ -83,6 +84,7 @@ class HolidaysController extends Controller {
         $data['buttonText'] = "Save";
         $data["method"] = "POST"; 
         $data["editMode"] = 1; 
+        $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
 
         return view($this->moduleViewName.'.add', $data);
     }
@@ -102,9 +104,10 @@ class HolidaysController extends Controller {
             return $checkrights;
         }
 
+        $data = array();
         $status = 1;
         $msg = $this->addMsg;
-        $data = array();
+        $goto = $this->list_url;
 
         $validator = Validator::make($request->all(), [
             'status' => ['required', Rule::in([0, 1])],
@@ -182,7 +185,7 @@ class HolidaysController extends Controller {
             session()->flash('success_message', $msg);
         }
 
-        return ['status' => $status, 'msg' => $msg, 'data' => $data];
+        return ['status' => $status, 'msg' => $msg, 'data' => $data, 'goto' => $goto];
     }
 
     /**
@@ -221,10 +224,10 @@ class HolidaysController extends Controller {
         $data['formObj'] = $formObj;
         $data['page_title'] = "Edit ".$this->module;
         $data['buttonText'] = "Update";
-
         $data['action_url'] = $this->moduleRouteText.".update";
         $data['action_params'] = $formObj->id;
         $data['method'] = "PUT";
+        $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
 
         return view($this->moduleViewName.'.add', $data);
     }
@@ -247,15 +250,17 @@ class HolidaysController extends Controller {
 
         $model = $this->modelObj->find($id);
 
+        $data = array();
         $status = 1;
         $msg = $this->updateMsg;
-        $data = array();
+        $goto = session()->get($this->moduleRouteText.'_goto');
+        if(empty($goto)){  $goto = $this->list_url;  }
 
         $validator = Validator::make($request->all(), [
-                    'status' => ['required', Rule::in([0, 1])],
-                    'from_date' => 'required',
-                    'to_date' => 'required',
-                    'holiday_title' => 'required|min:5',
+            'status' => ['required', Rule::in([0, 1])],
+            'from_date' => 'required',
+            'to_date' => 'required',
+            'holiday_title' => 'required|min:5',
         ]);
 
         // check validations
@@ -315,9 +320,7 @@ class HolidaysController extends Controller {
 
                     $detail->holiday_id = $holiday_id;
                     $detail->date = $date;
-
                     $detail->save();
-
                 }
             }
                 //store logs detail
@@ -330,7 +333,7 @@ class HolidaysController extends Controller {
                                         
                 $logs=\App\Models\AdminLog::writeadminlog($params);
         }
-        return ['status' => $status, 'msg' => $msg, 'data' => $data];
+        return ['status' => $status, 'msg' => $msg, 'data' => $data, 'goto' => $goto];
     }
 
     /**
@@ -356,6 +359,8 @@ class HolidaysController extends Controller {
                 $holiData->delete();
                 
                 $backUrl = $request->server('HTTP_REFERER');
+                $goto = session()->get($this->moduleRouteText.'_goto');
+                if(empty($goto)){  $goto = $this->list_url;  }
                 $modelObj->delete();
                 session()->flash('success_message', $this->deleteMsg);
 
@@ -369,7 +374,7 @@ class HolidaysController extends Controller {
                                             
                     $logs=\App\Models\AdminLog::writeadminlog($params);
 
-                return redirect($backUrl);
+                return redirect($goto);
             } catch (Exception $e) {
                 session()->flash('error_message', $this->deleteErrorMsg);
                 return redirect($this->list_url);
@@ -392,81 +397,92 @@ class HolidaysController extends Controller {
         $model = Holiday::query();
 
         return \Datatables::eloquent($model)
-                        ->addColumn('action', function(Holiday $row) {
-                            return view("admin.partials.action", [
-                                        'currentRoute' => $this->moduleRouteText,
-                                        'row' => $row,
-                                        'isEdit' => \App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_HOLIDAYS),
-                                        'isDelete' => \App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_HOLIDAYS),
-                                            ]
-                                    )->render();
-                        })
+            ->addColumn('action', function(Holiday $row) {
+                return view("admin.partials.action", [
+                    'currentRoute' => $this->moduleRouteText,
+                    'row' => $row,
+                    'isEdit' => \App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_HOLIDAYS),
+                    'isDelete' => \App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_HOLIDAYS),
+                ])->render();
+            })
                         
-                        ->editColumn('created_at', function($row) {
+            ->editColumn('created_at', function($row) {
 
-                            if (!empty($row->created_at))
-                                return date("j M, Y h:i:s A", strtotime($row->created_at));
-                            else
-                                return '-';
-                        })
-                         ->editColumn('status', function ($row) {
-                            if ($row->status == 1){
-                                $html = "<a class='btn btn-xs btn-success'>Active</a><br/>";
-                                return $html;
-                            }
-                            else{
-                                $html ='<a class="btn btn-xs btn-danger">In Active</a><br/>';
-                                return $html;
-                            }
-                        })
+                if (!empty($row->created_at))
+                    return date("j M, Y h:i:s A", strtotime($row->created_at));
+                else
+                    return '-';
+            })
+            ->editColumn('status', function ($row) {
+                if ($row->status == 1){
+                    $html = "<a class='btn btn-xs btn-success'>Active</a><br/>";
+                    return $html;
+                }
+                else{
+                    $html ='<a class="btn btn-xs btn-danger">In Active</a><br/>';
+                    return $html;
+                }
+            })
                         
-                       ->rawColumns(['created_at', 'action', 'status', 'to_date'])
-                        ->filter(function ($query) {
-                            $search_start_date = request()->get("search_start_date");
-                            $search_end_date = request()->get("search_end_date");
-                            $search_id = request()->get("search_id");
-                            $search_title = request()->get("search_title");
-                            $search_start_leave = request()->get("search_start_leave");
-                            $search_end_leave = request()->get("search_end_leave");
-                            $search_status = request()->get("search_status");
+            ->rawColumns(['created_at', 'action', 'status'])
+                ->filter(function ($query) {
+                    $search_start_date = request()->get("search_start_date");
+                    $search_end_date = request()->get("search_end_date");
+                    $search_id = request()->get("search_id");
+                    $search_title = request()->get("search_title");
+                    $search_start_leave = request()->get("search_start_leave");
+                    $search_end_leave = request()->get("search_end_leave");
+                    $search_status = request()->get("search_status");
 
-                            if (!empty($search_start_date)) {
+                    $searchData = array();
+                    customDatatble($this->moduleRouteText);
 
-                                $from_date = $search_start_date . ' 00:00:00';
-                                $convertFromDate = $from_date;
+                    if (!empty($search_start_date)) {
 
-                                $query = $query->where(TBL_HOLIDAYS . ".created_at", ">=", addslashes($convertFromDate));
-                            }
-                            if (!empty($search_end_date)) {
+                        $from_date = $search_start_date . ' 00:00:00';
+                        $convertFromDate = $from_date;
 
-                                $to_date = $search_end_date . ' 23:59:59';
-                                $convertToDate = $to_date;
+                        $query = $query->where(TBL_HOLIDAYS . ".created_at", ">=", addslashes($convertFromDate));
+                        $searchData['search_start_date'] = $search_start_date;
 
-                                $query = $query->where(TBL_HOLIDAYS . ".created_at", "<=", addslashes($convertToDate));
-                            }
-                            if(!empty($search_id))
-                            {
-                                $idArr = explode(',', $search_id);
-                                $idArr = array_filter($idArr);                
-                                if(count($idArr)>0)
-                                {
-                                    $query = $query->whereIn(TBL_HOLIDAYS.".id",$idArr);
-                                } 
-                            }
-                            if(!empty($search_title))
-                            {
-                                $query = $query->where(TBL_HOLIDAYS.".holiday_title", 'LIKE', '%'.$search_title.'%');
-                            }
-                            if (!empty($search_start_leave) || !empty($search_end_leave)) {
-                                $query = $query->whereBetween(TBL_HOLIDAYS . '.from_date', [$search_start_leave, $search_end_leave])
-                                        ->whereBetween(TBL_HOLIDAYS . '.to_date', [$search_start_leave, $search_end_leave]);
-                            }
-                            if ($search_status == "1" || $search_status == "0") {
-                                $query = $query->where(TBL_HOLIDAYS . ".status", $search_status);
-                            }
+                    }
+                    if (!empty($search_end_date)) {
 
-                        })
-                        ->make(true);
+                        $to_date = $search_end_date . ' 23:59:59';
+                        $convertToDate = $to_date;
+
+                        $query = $query->where(TBL_HOLIDAYS . ".created_at", "<=", addslashes($convertToDate));
+                        $searchData['search_end_date'] = $search_end_date;
+                    }
+                    if(!empty($search_id))
+                    {
+                        $idArr = explode(',', $search_id);
+                        $idArr = array_filter($idArr);                
+                        if(count($idArr)>0)
+                        {
+                            $query = $query->whereIn(TBL_HOLIDAYS.".id",$idArr);
+                            $searchData['search_id'] = $search_id;
+                        } 
+                    }
+                    if(!empty($search_title))
+                    {
+                        $query = $query->where(TBL_HOLIDAYS.".holiday_title", 'LIKE', '%'.$search_title.'%');
+                        $searchData['search_title'] = $search_title;
+                    }
+                    if (!empty($search_start_leave) || !empty($search_end_leave)) {
+                        $query = $query->whereBetween(TBL_HOLIDAYS . '.from_date', [$search_start_leave, $search_end_leave])
+                                ->whereBetween(TBL_HOLIDAYS . '.to_date', [$search_start_leave, $search_end_leave]);
+                        $searchData['search_start_leave'] = $search_start_leave;
+                        $searchData['search_end_leave'] = $search_end_leave;
+                    }
+                    if ($search_status == "1" || $search_status == "0") {
+                        $query = $query->where(TBL_HOLIDAYS . ".status", $search_status);
+                    }
+                        $searchData['search_status'] = $search_status;
+                        $goto = \URL::route($this->moduleRouteText.'.index', $searchData);
+                        \session()->put($this->moduleRouteText.'_goto',$goto);
+                })
+                ->make(true);
     }
 }
 

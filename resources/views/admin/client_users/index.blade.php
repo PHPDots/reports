@@ -16,7 +16,7 @@
                     <div class="caption">
                         <i class="fa fa-list"></i>{{ $page_title }}    
                     </div>
-                  
+
                     @if($btnAdd)
                         <a class="btn btn-default pull-right btn-sm mTop5" href="{{ $add_url }}">Add New</a>
                     @endif                     
@@ -26,12 +26,12 @@
                     <table class="table table-bordered table-striped table-condensed flip-content" id="server-side-datatables">
                         <thead>
                             <tr>
-                               <th width="5%">ID</th>                                    
-                               <th width="20%">Client Name</th>                           
-                               <th width="20%">User Name</th>                           
-                               <th width="15%">User Email</th>                           
-                               <th width="5%">Status</th>                           
-                               <th width="10%">Created At</th>                           
+                               <th width="5%">ID</th>
+                               <th width="20%">Client Name</th>
+                               <th width="20%">User Name</th>
+                               <th width="15%">User Email</th>
+                               <th width="5%">Status</th>
+                               <th width="10%">Created At</th>
                                <th width="5%" data-orderable="false">Action</th>
                             </tr>
                         </thead>                                         
@@ -43,7 +43,7 @@
         </div>
     </div>
 </div>
-</div>            
+
 @endsection
 
 @section('styles')
@@ -52,7 +52,6 @@
 
 @section('scripts')
     <script type="text/javascript">
-    
 
     $(document).ready(function(){
 
@@ -72,6 +71,8 @@
             processing: true,
             serverSide: true,
             searching: false,
+            pageLength: '{{ $length }}',
+            displayStart: '{{ $start }}',
             ajax: {
                 "url": "{!! route($moduleRouteText.'.data') !!}",
                 "data": function ( data ) 
@@ -87,7 +88,7 @@
                 [25,50,100,150,200],
                 [25,50,100,150,200]
               ],
-            "order": [[ '0', "desc" ]],    
+            "order": [[ "{{ $orderClm }}", "{{ $orderDir }}" ]],
             columns: [
                 { data: 'id', name: 'id' },
                 { data: 'client', name: '{{ TBL_CLIENT }}.name' },

@@ -1,10 +1,4 @@
-<?php
-$search_month = \Request::get("search_month");
-if(!empty($search_month))
-    $search_month = $search_month;
-else
-    $search_month = date('Y-m',strtotime('first day of this month')); 
-?>
+
 <div class="portlet box blue">
     <div class="portlet-title">
         <div class="caption">
@@ -56,7 +50,7 @@ else
                     </div>
 					<div class="col-md-4">
                         <label class="control-label">Current Month</label>
-                        {!! Form::select('search_month', [''=>'All'] + $months, $search_month, ['class' => 'form-control']) !!}
+                        {!! Form::select('search_month', [''=>'All'] + $months, (!empty(Request::get("search_month")) ? Request::get("search_month") : date('Y-m')), ['class' => 'form-control']) !!}
 					</div>
                     @endif
                 </div>
@@ -64,9 +58,8 @@ else
                 <input type="hidden" name="isDownload" id="is_download"/>
                 <input type="submit" class="btn blue mTop25" value="Search"/>
                 &nbsp;
-                <a href="{{ $list_url }}" class="btn red mTop25">Reset</a>                                
-           	 </div>                                  
-                           
+                <a href="{{ $list_url }}" class="btn red mTop25">Reset</a>
+           	 </div>
         </form>
     </div>    
-</div>      
+</div>

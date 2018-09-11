@@ -55,6 +55,7 @@ class ClientUsersController extends Controller
         $data['add_url'] = route($this->moduleRouteText.'.create');
         $data['btnAdd'] = \App\Models\Admin::isAccess(\App\Models\Admin::$ADD_CLIENT_USER);
         $data['clients'] = Client::pluck("name","id")->all();
+        $data = customSession($this->moduleRouteText,$data);
 
        return view($this->moduleViewName.".index", $data);  
     }
@@ -81,7 +82,8 @@ class ClientUsersController extends Controller
         $data['buttonText'] = "Save";
         $data["method"] = "POST"; 
         $data["clients"] = \App\Models\Client::pluck('name','id')->all();
-        
+        $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
+
         return view($this->moduleViewName.'.add', $data);
     }
     /**
@@ -99,10 +101,11 @@ class ClientUsersController extends Controller
             return $checkrights;
         }
 
+        $data = array();
         $status = 1;
         $msg = $this->addMsg;
-        $data = array();
-        
+        $goto = $this->list_url;
+
         $validator = Validator::make($request->all(), [
             'client_id'=>'required|exists:'.TBL_CLIENT.',id',
             'name' => 'required',
@@ -132,7 +135,7 @@ class ClientUsersController extends Controller
                 $status = 0;
                 $msg = "Email Already exists on Users table !";
 
-                return ['status' => $status, 'msg' => $msg, 'data' => $data];
+                return ['status' => $status, 'msg' => $msg, 'data' => $data, 'goto' => $goto];
             }
 			else{
 				$input = $request->all();
@@ -169,7 +172,7 @@ class ClientUsersController extends Controller
             session()->flash('success_message', $msg);
         }
         
-        return ['status' => $status, 'msg' => $msg, 'data' => $data];              
+        return ['status' => $status, 'msg' => $msg, 'data' => $data, 'goto' => $goto];              
     }
 
     /**
@@ -213,6 +216,7 @@ class ClientUsersController extends Controller
         $data['action_params'] = $formObj->id;
         $data['method'] = "PUT";
         $data["clients"] = \App\Models\Client::pluck('name','id')->all();
+        $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
 
         return view($this->moduleViewName.'.add', $data);
     }
@@ -235,9 +239,11 @@ class ClientUsersController extends Controller
 
         $model = $this->modelObj->find($id);
 
+        $data = array();
         $status = 1;
         $msg = $this->updateMsg;
-        $data = array();        
+        $goto = session()->get($this->moduleRouteText.'_goto');
+        if(empty($goto)){  $goto = $this->list_url;  }
         
         $validator = Validator::make($request->all(), [
            'client_id'=>'required|exists:'.TBL_CLIENT.',id',
@@ -275,7 +281,7 @@ class ClientUsersController extends Controller
                 $status = 0;
                 $msg = "Email Already exists on Users table !";
 
-                return ['status' => $status, 'msg' => $msg, 'data' => $data];
+                return ['status' => $status, 'msg' => $msg, 'data' => $data,'goto' => $goto];
             }
             else{
 				$input = $request->all();
@@ -319,7 +325,7 @@ class ClientUsersController extends Controller
                 $logs=\App\Models\AdminLog::writeadminlog($params);         
         }
         
-        return ['status' => $status,'msg' => $msg, 'data' => $data];               
+        return ['status' => $status,'msg' => $msg, 'data' => $data,'goto' => $goto];               
     }
 	
 	public function sendRegisterEmail($user, $password)
@@ -365,6 +371,8 @@ class ClientUsersController extends Controller
                 $backUrl = $request->server('HTTP_REFERER');
 				User::where('user_type_id','=',CLIENT_USER)->where('client_user_id','=',$id)->delete();
                 $modelObj->delete();
+                $goto = session()->get($this->moduleRouteText.'_goto');
+                if(empty($goto)){  $goto = $this->list_url;  }
                 session()->flash('success_message', $this->deleteMsg); 
 
                 //store logs detail
@@ -377,9 +385,9 @@ class ClientUsersController extends Controller
 
                     $logs=\App\Models\AdminLog::writeadminlog($params);    
 
-                return redirect($backUrl);
+                return redirect($goto);
             } 
-            catch (Exception $e) 
+            catch (Exception $e)
             {
                 session()->flash('error_message', $this->deleteErrorMsg);
                 return redirect($this->list_url);
@@ -430,28 +438,38 @@ class ClientUsersController extends Controller
             })->rawColumns(['action','status'])             
             
             ->filter(function ($query) 
-            {                              
+            {
                 $search_name = request()->get("search_name");                                
                 $search_email = request()->get("search_email");
                 $search_client = request()->get("search_client");
-                $search_status = request()->get("search_status");                                         
+                $search_status = request()->get("search_status");
+                
+                $searchData = array();
+                customDatatble($this->moduleRouteText);
+
                 if(!empty($search_name))
                 {
                     $query = $query->where(TBL_CLIENT_USER.".name", 'LIKE', '%'.$search_name.'%');
+                    $searchData['search_name'] = $search_name;
                 }
                 if(!empty($search_email))
                 {
                     $query = $query->where(TBL_CLIENT_USER.".email", 'LIKE', '%'.$search_email.'%');
+                    $searchData['search_email'] = $search_email;
                 }
                 if(!empty($search_client))
                 {
                     $query = $query->where(TBL_CLIENT_USER.".client_id", $search_client);
+                    $searchData['search_client'] = $search_client;
                 }
                 if($search_status == "1" || $search_status == "0")
                 {
                     $query = $query->where(TBL_CLIENT_USER.".status", $search_status);
-                }                   
+                }
+                $searchData['search_status'] = $search_status;
+                $goto = \URL::route($this->moduleRouteText.'.index', $searchData);
+                \session()->put($this->moduleRouteText.'_goto',$goto);
             })
-            ->make(true);        
+            ->make(true);
     }
 }

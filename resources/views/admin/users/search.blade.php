@@ -42,7 +42,7 @@
                 </div>
                 <div class="col-md-4">
                     <label class="control-label">User Type</label>
-                    {!! Form::select('search_type', [''=>'Search User Type'] + $types, 3, ['class' => 'form-control','id'=>'user_id']) !!}
+                    {!! Form::select('search_type', [''=>'Search User Type'] + $types, (!empty(\Request::get("search_type")) ? \Request::get("search_type") : 3), ['class' => 'form-control','id'=>'user_id']) !!}
                 </div>
 			</div>
 			<div class="clearfix">&nbsp;</div>

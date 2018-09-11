@@ -18,7 +18,7 @@ $user_id =$formObj->id;
                             <i class="fa fa-user"></i>
                            {{ $page_title }}
                         </div>
-                        <a class="btn btn-default pull-right btn-sm mTop5" href="{{ $list_url }}">Back</a>
+                        <a class="btn btn-default pull-right btn-sm mTop5" href="{{ $back_url }}">Back</a>
                     </div>
                     <div class="portlet-body">
                         <div class="form-body">
@@ -121,14 +121,14 @@ $user_id =$formObj->id;
                                 <div class="clearfix">&nbsp;</div>
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <label class="control-label">Designation <span class="required">*</span></label>                                        
+                                        <label class="control-label">Designation <span class="required">*</span></label>
                                         {!! Form::text('designation',null,['class' => 'form-control', 'data-required' => true,'placeholder'=>'Enter Designation']) !!}
                                     </div>
 									<div class="col-md-6">
-                                        <label class="control-label">Is Require To Add Tasks: <span class="required">*</span></label>                            
+                                        <label class="control-label">Is Require To Add Tasks: <span class="required">*</span></label>
                                         {!! Form::select('is_add_task',['1'=>'Yes','0'=>'No'],null,['class' => 'form-control', 'data-required' => true]) !!}
                                     </div>
-                                    
+
                                 </div>
 								 <?php if(!empty($formObj->id)){ ?>
                                 <div class="clearfix">&nbsp;</div>
@@ -280,7 +280,7 @@ legend.scheduler-border
                         if (result.status == 1)
                         {
                             $.bootstrapGrowl(result.msg, {type: 'success', delay: 4000});
-                            window.location = '{{ $list_url }}';    
+                            window.location = result.goto;    
                         }
                         else
                         {

@@ -147,7 +147,7 @@ function sendHtmlMail($params) {
     $params['to_emails'] = $toEmails;
     
 
-    \Mail::send('emails.index', $params, function($message) use ($params, $files) {
+   /* \Mail::send('emails.index', $params, function($message) use ($params, $files) {
 		
 		$fromName = "PHPDots";
 		if(isset($params['from_name']))
@@ -169,7 +169,7 @@ function sendHtmlMail($params) {
                 $message->attach($file['path']);
             }
         }
-    }); 
+    }); */
 
     $dataToInsert = [
             'to_email' => $params['to'],
@@ -186,7 +186,7 @@ function sendHtmlMail($params) {
             'updated_at' => \DB::raw('NOW()')
         ];
 
-        \DB::table(TBL_EMAIL_SENT_LOG)->insert($dataToInsert);
+       // \DB::table(TBL_EMAIL_SENT_LOG)->insert($dataToInsert);
 }
 
 // to generate random string
@@ -510,4 +510,45 @@ function getYear()
 {
     $years = ['2016'=>'2016','2017'=>'2017','2018'=>'2018','2019'=>'2019','2020'=>'2020','2021'=>'2021','2022'=>'2022','2023'=>'2023','2024'=>'2024','2025'=>'2025','2026'=>'2026','2027'=>'2027','2028'=>'2028','2029'=>'2029','2030'=>'2030','2031'=>'2031','2032'=>'2032','2033'=>'2033','2034'=>'2034','2035'=>'2035','2036'=>'2036','2037'=>'2037','2038'=>'2038','2039'=>'2039','2040'=>'2040'];
     return $years;
+}
+
+function customDatatble($module)
+{
+    $orderArr = request()->get("order");
+    \session()->put([$module.'_orderClm' => $orderArr[0]['column']]);
+    \session()->put([$module.'_orderDir' => $orderArr[0]['dir']]);
+    \session()->put([$module.'_length' => \request()->get("length")]);
+    \session()->put([$module.'_start' => \request()->get("start")]);
+}
+function customIndexAttr($module, $data)
+{
+    $data['orderClm'] = session()->get($module.'_orderClm');
+    $data['orderDir'] =  session()->get($module.'_orderDir');
+    $data['length'] =  session()->get($module.'_length');
+    $data['start'] =  session()->get($module.'_start');
+    return $data;
+}
+function customSession($module,$data,$length = 25)
+{
+    $goto = session()->get($module.'_goto');
+    $data['orderClm'] = '0';
+    $data['orderDir'] = "desc";
+    $data['length'] = $length;
+    $data['start'] = 0;
+
+    if(!empty($goto))
+    {
+        $data = customIndexAttr($module, $data);
+    }
+    return $data;
+}
+function customBackUrl($module, $list_url, $data)
+{
+    $goto = session()->get($module.'_goto');
+    if(empty($goto))
+    {
+        $goto = $list_url;
+    }
+    $data["back_url"] = $goto;
+    return $data;
 }

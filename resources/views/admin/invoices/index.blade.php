@@ -184,7 +184,7 @@ function openPaymentModel($id)
                       {
                         $('#payment_submit').attr('disabled',false);
                         $.bootstrapGrowl(result.msg, {type: 'success', delay: 4000});
-                        window.location = '{{ $list_url }}';    
+                        window.location = result.goto;    
                       }
                       else
                       {
@@ -214,6 +214,8 @@ function openPaymentModel($id)
             processing: true,
             serverSide: true,
             searching: false,
+            pageLength: '{{ $length }}',
+            displayStart: '{{ $start }}',
             lengthMenu:
               [
                 [100,150,200,250,300],
@@ -237,17 +239,17 @@ function openPaymentModel($id)
                     $("#is_total").val(response.amounts);
                     return response.data;
                 }
-            },            
-            "order": [[ '0', "desc" ]],    
+            },
+            "order": [[ "{{ $orderClm }}", "{{ $orderDir }}" ]],
             columns: [
                 { data: 'id', name: 'id' },
                 { data: 'invoice_no', name: 'invoice_no' },
                 { data: 'client_name', name: '{{ TBL_CLIENT }}.name' },
-				{ data: 'total_without_gst', name: 'total_without_gst' },
+				        { data: 'total_without_gst', name: 'total_without_gst' },
                 { data: 'total_with_gst', name: 'total_with_gst' },
                 { data: 'total_amount', name: 'total_amount' },
-				{ data: 'invoice_date', name: 'invoice_date' },
-				{ data: 'payment', name: 'payment' },
+				        { data: 'invoice_date', name: 'invoice_date' },
+				        { data: 'payment', name: 'payment' },
                 { data: 'created_at', name: 'created_at' },
                 { data: 'action', orderable: false, searchable: false}
             ]

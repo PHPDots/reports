@@ -78,6 +78,7 @@ class CredentialController extends Controller
         if($auth_id == ADMIN_USER_TYPE){
             $viewName = $this->moduleViewName.".index";
         }
+        $data = customSession($this->moduleRouteText,$data,50);
 
        return view($viewName, $data);
     }
@@ -124,7 +125,7 @@ class CredentialController extends Controller
 
             $viewName = $this->moduleViewName.".add";
         }
-
+        $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
         return view($viewName, $data);
     }
 
@@ -143,10 +144,11 @@ class CredentialController extends Controller
         {
             return $checkrights;
         }
+        $data = array();
         $status = 1;
         $msg = $this->addMsg;
-        $data = array();
-        
+        $goto = $this->list_url;
+
         $i = 0;
         foreach($request->get("group-a") as $r)
         {
@@ -237,7 +239,7 @@ class CredentialController extends Controller
         }
             session()->flash('success_message', $msg);
 
-        return ['status' => $status, 'msg' => $msg, 'data' => $data];              
+        return ['status' => $status, 'msg' => $msg, 'data' => $data, 'goto' => $goto];              
     }
 
     /**
@@ -384,7 +386,8 @@ class CredentialController extends Controller
 		$data['share_users'] = \DB::table(TBL_USERS)->orderBy("name","ASC")->where('id','!=',\Auth::guard('admins')->user()->id)->get();
         $data['list_users'] =$formObj->getUsers(1);
 		$data['modes'] = ['Default'=>'Default','Active'=>'Active','Passive'=>'Passive'];
-		
+        $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
+
         return view($this->moduleViewName.'.edit', $data);
     }
 
@@ -409,7 +412,9 @@ class CredentialController extends Controller
         $status = 1;
         $msg = $this->updateMsg;
         $data = array();
-        
+        $goto = session()->get($this->moduleRouteText.'_goto');
+        if(empty($goto)){  $goto = $this->list_url;  }
+
         $validator = Validator::make($request->all(), [
             'project_id' => 'required|exists:'.TBL_PROJECT.',id',
             'protocol' => ['required',Rule::in(['FTP','CPANEL','SSH','ADMIN/WP-ADMIN','FRONT-END','HOSTING','EXTRA'])],
@@ -441,7 +446,7 @@ class CredentialController extends Controller
             if($auth_user->user_type_id == NORMAL_USER && $model->created_by != $auth_user->id)
             {
                 $msg = "You are not authorised to edit this record.";
-                return ['status' => 0,'msg' => $msg, 'data' => $data];
+                return ['status' => 0,'msg' => $msg, 'data' => $data,'goto' => $goto];
             }
 			if(\Auth::guard('admins')->user()->id ==  $model->created_by){
                 $auth_id = \Auth::guard('admins')->user()->id;
@@ -462,7 +467,6 @@ class CredentialController extends Controller
             $environment = $request->get('environment');
 			$key_file_password = $request->get('key_file_password');
 		 	$mode = $request->get('mode');
-
 
                 if(!empty($key_file))
                 {
@@ -574,7 +578,7 @@ class CredentialController extends Controller
             
         }
         
-        return ['status' => $status, 'msg' => $msg, 'data' => $data];              
+        return ['status' => $status, 'msg' => $msg, 'data' => $data, 'goto' => $goto];              
     
     }
 
@@ -606,6 +610,8 @@ class CredentialController extends Controller
                     $destinationPath = public_path().'/uploads/project_credentials'.$key_file;          
                     //unlink($destinationPath);
                 }
+                $goto = session()->get($this->moduleRouteText.'_goto');
+                if(empty($goto)){  $goto = $this->list_url;  }
                 $modelObj->delete();
                 session()->flash('success_message', $this->deleteMsg); 
 
@@ -619,7 +625,7 @@ class CredentialController extends Controller
 
                     $logs=\App\Models\AdminLog::writeadminlog($params);    
 
-                return redirect($backUrl);
+                return redirect($goto);
             } 
             catch (Exception $e) 
             {
@@ -686,10 +692,10 @@ class CredentialController extends Controller
                 return view("admin.partials.action",
                     [
                         'currentRoute' => $this->moduleRouteText,
-                        'row' => $row,                                 
+                        'row' => $row,
                         'isView' =>\App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_PROJECT_CREDENTIAL),
                         'isEdit' =>\App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_PROJECT_CREDENTIAL),
-                        'isDelete' => \App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_PROJECT_CREDENTIAL),                                                  
+                        'isDelete' => \App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_PROJECT_CREDENTIAL),
                     ]
                 )->render();
             })
@@ -707,18 +713,26 @@ class CredentialController extends Controller
                 $search_protocol = request()->get("search_protocol");
                 $search_env = request()->get("search_env");
 
+                $searchData = array();
+                customDatatble($this->moduleRouteText);
+
                 if(!empty($search_protocol))
                 {
                     $query = $query->where(TBL_CREDENTIAL.".protocol", $search_protocol);
+                    $searchData['search_protocol'] = $search_protocol;
                 }
                 if(!empty($search_env))
                 {
                     $query = $query->where(TBL_CREDENTIAL.".environment",$search_env);
+                    $searchData['search_env'] = $search_env;
                 }
                 if(!empty($search_project))
                 {
                     $query = $query->where(TBL_CREDENTIAL.".project_id", $search_project);
+                    $searchData['search_project'] = $search_project;
                 }
+                $goto = \URL::route($this->moduleRouteText.'.index', $searchData);
+                \session()->put($this->moduleRouteText.'_goto',$goto);
             })
             ->make(true);        
     }
@@ -733,7 +747,7 @@ class CredentialController extends Controller
         $auth_id = \Auth::guard('admins')->id();
         $model = Credential::select(TBL_CREDENTIAL.".*",TBL_PROJECT.".title as project_name")
                 ->join(TBL_PROJECT,TBL_PROJECT.".id","=",TBL_CREDENTIAL.".project_id") 
-                ->leftJoin(TBL_SHARE_USER,TBL_SHARE_USER.".credential_id","=",TBL_CREDENTIAL.".id")               
+                ->leftJoin(TBL_SHARE_USER,TBL_SHARE_USER.".credential_id","=",TBL_CREDENTIAL.".id")
                 ->where(TBL_CREDENTIAL.".created_by",$auth_id)
                 ->orWhere(TBL_SHARE_USER.".user_id",$auth_id)
                 ;
@@ -749,11 +763,11 @@ class CredentialController extends Controller
                     $deleteFlag = \App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_PROJECT_CREDENTIAL);
                     $editFlag= \App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_PROJECT_CREDENTIAL);
                 }                
-                    
+
                 return view("admin.partials.action",
                     [
                         'currentRoute' => $this->moduleRouteText,
-                        'row' => $row,                                 
+                        'row' => $row,
                         'isView' =>\App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_PROJECT_CREDENTIAL),
                         'isEdit' => $editFlag,
                         'isDelete' => $deleteFlag,
@@ -769,7 +783,7 @@ class CredentialController extends Controller
             })->rawColumns(['action'])
             
             ->filter(function ($query) 
-            {                              
+            {
                 $search_project = request()->get("search_project");                                
                 $search_protocol = request()->get("search_protocol");
                 $search_env = request()->get("search_env");

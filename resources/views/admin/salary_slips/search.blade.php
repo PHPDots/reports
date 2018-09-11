@@ -5,7 +5,7 @@
         </div>
         <div class="tools">
             <a href="javascript:;" class="expand"> </a>
-        </div>                    
+        </div>
     </div>
     <div class="portlet-body" style="display: none">  
         <form id="search-frm">
@@ -29,9 +29,9 @@
                 <div class="row" align="center">                     
                     <input type="submit" class="btn blue mTop25" value="Search"/>
                     &nbsp;
-                    <a href="{{ $list_url }}" class="btn red mTop25">Reset</a>                                
+                    <a href="{{ $list_url }}" class="btn red mTop25">Reset</a>
                 </div>                                   
-            </div>                
+            </div>
         </form>
-    </div>    
-</div>      
+    </div>
+</div>

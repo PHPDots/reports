@@ -58,8 +58,8 @@ class DocumentController extends Controller
         $data['btnAdd'] = \App\Models\Admin::isAccess(\App\Models\Admin::$ADD_EMP_DOCUMENT);
         $data['users'] = User::where('status',1)->pluck("name","id")->all();
         $data["document"] = \App\Models\DocumentsType::pluck("title","id")->all();
-       return view($this->moduleViewName.".index", $data);  
-       
+        $data = customSession($this->moduleRouteText,$data);
+        return view($this->moduleViewName.".index", $data);
     }
 
     /**
@@ -85,6 +85,7 @@ class DocumentController extends Controller
         $data["method"] = "POST"; 
         $data['users'] = User::where('status',1)->pluck("name","id")->all();        
         $data["document"] = \App\Models\DocumentsType::pluck("title","id")->all();
+        $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
 
         return view($this->moduleViewName.'.add', $data);
     }
@@ -104,10 +105,11 @@ class DocumentController extends Controller
             return $checkrights;
         } 
 
+        $data = array();
         $status = 1;
         $msg = $this->addMsg;
-        $data = array();
-        
+        $goto = $this->list_url;
+
         $validator = Validator::make($request->all(), [
             'user_id' => 'exists:'.TBL_USERS.',id',
             'doc_type_id' => 'exists:'.TBL_DOCUMENTS_TYPE.',id',  
@@ -153,7 +155,7 @@ class DocumentController extends Controller
             
             //store logs detail 
             $params=array();    
-                                    
+
             $params['adminuserid']  = \Auth::guard('admins')->id();
             $params['actionid']     = $this->adminAction->ADD_EMP_DOCUMENT ;
             $params['actionvalue']  = $id;
@@ -164,7 +166,7 @@ class DocumentController extends Controller
             session()->flash('success_message', $msg);                    
         }
         
-        return ['status' => $status, 'msg' => $msg, 'data' => $data];       
+        return ['status' => $status, 'msg' => $msg, 'data' => $data, 'goto' => $goto];       
     }
 
     /**
@@ -209,6 +211,7 @@ class DocumentController extends Controller
         $data['editMode'] = "";
         $data['users'] = User::where('status',1)->pluck("name","id")->all();        
         $data['document'] = \App\Models\DocumentsType::pluck("title","id")->all();
+        $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
 
         return view($this->moduleViewName.'.add', $data);
     }
@@ -231,9 +234,11 @@ class DocumentController extends Controller
 
         $model = $this->modelObj->find($id);
 
+        $data = array();
         $status = 1;
         $msg = $this->updateMsg;
-        $data = array();        
+        $goto = session()->get($this->moduleRouteText.'_goto');
+        if(empty($goto)){  $goto = $this->list_url;  }
 
         $validator = Validator::make($request->all(), [
             'user_id' => 'exists:'.TBL_USERS.',id',
@@ -268,14 +273,14 @@ class DocumentController extends Controller
                    $file_name= $doc_name.'.'.$extension;
                    $file =$filename->move($destinationPath,$file_name);
 
-                    $model->filename = $file_name;                
-                    $model->user_id = $user_id;               
+                    $model->filename = $file_name;
+                    $model->user_id = $user_id;
                     $model->doc_type_id = $doc_type_id;
                     $model->update(); 
             
             //store logs detail
-            $params=array();    
-                                    
+            $params=array();
+
             $params['adminuserid']  = \Auth::guard('admins')->id();
             $params['actionid']     = $this->adminAction->EDIT_EMP_DOCUMENT;
             $params['actionvalue']  = $id;
@@ -286,7 +291,7 @@ class DocumentController extends Controller
             session()->flash('success_message', $msg);                    
         }
         
-        return ['status' => $status, 'msg' => $msg, 'data' => $data];
+        return ['status' => $status, 'msg' => $msg, 'data' => $data, 'goto' => $goto];
     }
 
     /**
@@ -315,7 +320,10 @@ class DocumentController extends Controller
             unlink($destinationPath);
         
         $employess->delete();
-        return redirect($this->list_url);
+        $goto = session()->get($this->moduleRouteText.'_goto');
+        if(empty($goto)){  $goto = $this->list_url;  }
+
+        return redirect($goto);
     }
 
     public function data(Request $request)
@@ -337,34 +345,36 @@ class DocumentController extends Controller
                 return view("admin.partials.action",
                     [
                         'currentRoute' => $this->moduleRouteText,
-                        'row' => $row,                                 
+                        'row' => $row,
                         'isEdit' =>\App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_EMP_DOCUMENT),
-                        'isDelete' => \App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_EMP_DOCUMENT),                                                  
+                        'isDelete' => \App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_EMP_DOCUMENT),
                     ]
                 )->render();
-            })  
+            })
 
             ->editColumn('filename', function($row){
                 $url = url("users-documents/download/".$row->id);
-                return "<a class='btn btn-xs btn-success' href='".$url."'>Download</a>";                                 
+                return "<a class='btn btn-xs btn-success' href='".$url."'>Download</a>";
             })
-
             
             ->editColumn('created_at', function($row){
                 
                 if(!empty($row->created_at))          
                     return date("j M, Y h:i:s A",strtotime($row->created_at));
                 else
-                    return '-';    
+                    return '-';
             })->rawColumns(['status','action','filename'])             
             
             ->filter(function ($query) 
-            {                              
+            {
                 $search_start_date = request()->get("search_start_date");
                 $search_end_date = request()->get("search_end_date");
                 $search_id = request()->get("search_id");
                 $search_emp_nm= request()->get("search_emp_nm");
                 $search_type= request()->get("search_type");
+
+                $searchData = array();
+                customDatatble($this->moduleRouteText);
 
                 if (!empty($search_start_date)){
 
@@ -372,6 +382,7 @@ class DocumentController extends Controller
                     $convertFromDate= $from_date;
 
                     $query = $query->where(TBL_EMPLOYESS_DOCUMENTS.".created_at",">=",addslashes($convertFromDate));
+                    $searchData['search_start_date'] = $search_start_date;
                 }
                 if (!empty($search_end_date)){
 
@@ -379,6 +390,7 @@ class DocumentController extends Controller
                     $convertToDate= $to_date;
 
                     $query = $query->where(TBL_EMPLOYESS_DOCUMENTS.".created_at","<=",addslashes($convertToDate));
+                    $searchData['search_end_date'] = $search_end_date;
                 }
 
                 if(!empty($search_id))
@@ -388,19 +400,24 @@ class DocumentController extends Controller
                     if(count($idArr)>0)
                     {
                         $query = $query->whereIn(TBL_EMPLOYESS_DOCUMENTS.".id",$idArr);
+                        $searchData['search_id'] = $search_id;
                     } 
                 }
 
                 if(!empty($search_emp_nm))
                 {
                     $query = $query->where(TBL_EMPLOYESS_DOCUMENTS.".user_id",$search_emp_nm);
+                    $searchData['search_emp_nm'] = $search_emp_nm;
                 }
                 if(!empty($search_type))
                 {
                     $query = $query->where(TBL_EMPLOYESS_DOCUMENTS.".doc_type_id",$search_type);
-                }             
+                    $searchData['search_type'] = $search_type;
+                }
+                $goto = \URL::route($this->moduleRouteText.'.index', $searchData);
+                \session()->put($this->moduleRouteText.'_goto',$goto);
             })
-            ->make(true);        
+            ->make(true);
     }
 
     public function downloadFile($id, Request $request)
@@ -418,5 +435,5 @@ class DocumentController extends Controller
         {
             abort(404);
         }
-    }   
+    }
 }

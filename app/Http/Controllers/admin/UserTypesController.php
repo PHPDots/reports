@@ -13,8 +13,6 @@ use App\Models\UserType;
 
 class UserTypesController extends Controller
 {
-
-
     public function __construct() {
     
         $this->moduleRouteText = "user-types";
@@ -22,11 +20,11 @@ class UserTypesController extends Controller
         $this->list_url = route($this->moduleRouteText.".index");
 
         $module = "User Type";
-        $this->module = $module;  
+        $this->module = $module;
 
-        $this->adminAction= new AdminAction; 
-        
-        $this->modelObj = new UserType();  
+        $this->adminAction= new AdminAction;
+
+        $this->modelObj = new UserType();
 
         $this->addMsg = $module . " has been added successfully!";
         $this->updateMsg = $module . " has been updated successfully!";
@@ -44,13 +42,21 @@ class UserTypesController extends Controller
      */
     public function index()
     {
-        $data = array();        
+        $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$LIST_USER_TYPE);
+        
+        if($checkrights) 
+        {
+            return $checkrights;
+        }
+
+        $data = array();
         $data['page_title'] = "Manage User Types";
-
         $data['add_url'] = route($this->moduleRouteText.'.create');
-        $data['btnAdd'] = \App\Models\Admin::isAccess(\App\Models\Admin::$LIST_USER_TYPE);  
+        $data['btnAdd'] = \App\Models\Admin::isAccess(\App\Models\Admin::$LIST_USER_TYPE);
 
-       return view($this->moduleViewName.".index", $data);
+        $data = customSession($this->moduleRouteText,$data);
+
+        return view($this->moduleViewName.".index", $data);
     }
 
     /**
@@ -74,7 +80,7 @@ class UserTypesController extends Controller
         $data['action_params'] = 0;
         $data['buttonText'] = "Save";
         $data["method"] = "POST"; 
-
+        $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
         return view($this->moduleViewName.'.add', $data);
     }
 
@@ -96,10 +102,10 @@ class UserTypesController extends Controller
         $status = 1;
         $msg = $this->addMsg;
         $data = array();
-        
+        $goto = $this->list_url;
+
         $validator = Validator::make($request->all(), [
-            'title' => 'required|min:2|unique:'.TBL_USER_TYPES.',title',  
-            
+            'title' => 'required|min:2|unique:'.TBL_USER_TYPES.',title',
         ]);
         if ($validator->fails())         
         {
@@ -132,7 +138,7 @@ class UserTypesController extends Controller
             session()->flash('success_message', $msg);                    
         }
         
-        return ['status' => $status, 'msg' => $msg, 'data' => $data];              
+        return ['status' => $status, 'msg' => $msg, 'data' => $data, 'goto' => $goto];              
     }
 
     /**
@@ -172,10 +178,10 @@ class UserTypesController extends Controller
         $data['formObj'] = $formObj;
         $data['page_title'] = "Edit ".$this->module;
         $data['buttonText'] = "Update";
-
         $data['action_url'] = $this->moduleRouteText.".update";
         $data['action_params'] = $formObj->id;
-        $data['method'] = "PUT";     
+        $data['method'] = "PUT";
+        $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
 
         return view($this->moduleViewName.'.add', $data);
     }
@@ -198,13 +204,14 @@ class UserTypesController extends Controller
 
         $model = $this->modelObj->find($id);
 
+        $data = array();
         $status = 1;
         $msg = $this->updateMsg;
-        $data = array();        
-        
+        $goto = session()->get($this->moduleRouteText.'_goto');
+        if(empty($goto)){  $goto = $this->list_url;  }
+
         $validator = Validator::make($request->all(), [            
-            'title' => 'required|min:2|unique:'.TBL_USER_TYPES.',title,'.$id,                 
-            
+            'title' => 'required|min:2|unique:'.TBL_USER_TYPES.',title,'.$id,
         ]);
         
         // check validations
@@ -230,7 +237,7 @@ class UserTypesController extends Controller
             $input = $request->all();
             $model->update($input); 
 
-            //store logs detail
+                //store logs detail
                 $params=array();
                 
                 $params['adminuserid']  = \Auth::guard('admins')->id();
@@ -241,7 +248,7 @@ class UserTypesController extends Controller
                 $logs=\App\Models\AdminLog::writeadminlog($params);         
         }
         
-        return ['status' => $status,'msg' => $msg, 'data' => $data];               
+        return ['status' => $status,'msg' => $msg, 'data' => $data, 'goto' => $goto];
     }
 
     /**
@@ -267,6 +274,8 @@ class UserTypesController extends Controller
             try 
             {             
                 $backUrl = $request->server('HTTP_REFERER');
+                $goto = session()->get($this->moduleRouteText.'_goto');
+                if(empty($goto)){  $goto = $this->list_url;  }
                 $modelObj->delete();
                 session()->flash('success_message', $this->deleteMsg); 
 
@@ -280,7 +289,7 @@ class UserTypesController extends Controller
 
                     $logs=\App\Models\AdminLog::writeadminlog($params);    
 
-                return redirect($backUrl);
+                return redirect($goto);
             } 
             catch (Exception $e) 
             {
@@ -312,9 +321,9 @@ class UserTypesController extends Controller
                 return view("admin.partials.action",
                     [
                         'currentRoute' => $this->moduleRouteText,
-                        'row' => $row,                                 
+                        'row' => $row,
                         'isEdit' =>\App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_USER_TYPE),
-                        'isDelete' => \App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_USER_TYPE),                                                         
+                        'isDelete' => \App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_USER_TYPE),
                     ]
                 )->render();
             })
@@ -329,13 +338,17 @@ class UserTypesController extends Controller
             ->filter(function ($query) 
             {                                                    
                 $search_title = request()->get("search_title");      
-
+                $searchData = array();
+                customDatatble($this->moduleRouteText);
                       
                 if(!empty($search_title))
                 {
                     $query = $query->where("title", 'LIKE', '%'.$search_title.'%');
-                }  
+                    $searchData['search_title'] = $search_title;
+                }
+                $goto = \URL::route($this->moduleRouteText.'.index', $searchData);
+                \session()->put($this->moduleRouteText.'_goto',$goto);
             })
-            ->make(true);        
+            ->make(true);
     } 
 }

@@ -70,9 +70,11 @@
             processing: true,
             serverSide: true,
             searching: false,
+            pageLength: '{{ $length }}',
+            displayStart: '{{ $start }}',
             ajax: {
                 "url": "{!! route($moduleRouteText.'.data') !!}",
-                "data": function ( data ) 
+                "data": function ( data )
                 {
                     data.search_start_date = $("#search-frm input[name='search_start_date']").val();
                     data.search_end_date = $("#search-frm input[name='search_end_date']").val();
@@ -88,15 +90,15 @@
                 [25,50,100,150,200],
                 [25,50,100,150,200]
               ],
-            "order": [[ '0', "desc" ]],    
+            "order": [[ "{{ $orderClm }}", "{{ $orderDir }}" ]],
             columns: [
-                { data: 'id', name: 'id' },                                             
+                { data: 'id', name: 'id' },
                 { data: 'holiday_title', name: 'holiday_title' },
                 { data: 'from_date', name: 'from_date' },
                 { data: 'to_date', name: 'to_date' },
                 { data: 'status', name: 'status' },
                 { data: 'created_at', name: 'created_at' },
-                { data: 'action', orderable: false, searchable: false}             
+                { data: 'action', orderable: false, searchable: false}
             ]
         });        
     });

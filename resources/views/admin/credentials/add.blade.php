@@ -18,7 +18,7 @@ $auth = Auth::guard('admins')->user()->user_type_id;
                 <div class="portlet-title">
                     <div class="caption">
                         <i class="fa fa-gift"></i>{{ $page_title }}</div>
-                <a class="btn btn-default pull-right btn-sm mTop5" href="{{ $list_url }}">Back</a>
+                <a class="btn btn-default pull-right btn-sm mTop5" href="{{ $back_url }}">Back</a>
                 </div>
                 <div class="portlet-body form">
                     <div class="form-body"> 
@@ -303,7 +303,7 @@ $auth = Auth::guard('admins')->user()->user_type_id;
                         if (result.status == 1)
                         {
                             $.bootstrapGrowl(result.msg, {type: 'success', delay: 4000});
-                            window.location = '{{ $list_url }}';    
+                            window.location = result.goto;
                         }
                         else
                         {

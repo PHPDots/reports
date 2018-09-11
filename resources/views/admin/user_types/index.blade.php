@@ -36,11 +36,11 @@
                         </tbody>
                     </table>                                              
                 </div>
-            </div>              
+            </div>
         </div>
     </div>
 </div>
-</div>            
+
 @endsection
 
 @section('styles')
@@ -59,29 +59,33 @@
             return false;
         });
 
-
         $.fn.dataTableExt.sErrMode = 'throw';
 
         var oTableCustom = $('#server-side-datatables').DataTable({
             processing: true,
             serverSide: true,
             searching: false,
+            pageLength: '{{ $length }}',
+            displayStart: '{{ $start }}',
             ajax: {
                 "url": "{!! route($moduleRouteText.'.data') !!}",
                 "data": function ( data ) 
                 {
                     data.search_title = $("#search-frm input[name='search_title']").val();
-                 
                 }
-            },            
-            "order": [[ '0', "desc" ]],    
+            },
+            lengthMenu:[
+                    [25,50,100,200],
+                    [25,50,100,200]
+                ],
+            "order": [[ "{{ $orderClm }}", "{{ $orderDir }}" ]],    
             columns: [
-                { data: 'id', name: 'id' },                                             
-                { data: 'title', name: 'title' },                                             
-                { data: 'created_at', name: 'created_at' },                                         
-                { data: 'action', orderable: false, searchable: false}             
+                { data: 'id', name: 'id' },
+                { data: 'title', name: 'title' },
+                { data: 'created_at', name: 'created_at' },
+                { data: 'action', orderable: false, searchable: false}
             ]
-        });        
+        });
     });
     </script>
 @endsection

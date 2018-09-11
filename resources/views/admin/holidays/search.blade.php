@@ -40,10 +40,9 @@
                     <div class="col-md-4">
                         <label class="control-label">Status</label>
                         <select name="search_status" class="form-control">
-                            <option value="all">Search Status</option>                        
+                            <option value="all" {!! \Request::get("search_status") == "all" ? 'selected="selected"':'' !!}>Search Status</option>
                             <option value="0" {!! \Request::get("search_status") == "0" ? 'selected="selected"':'' !!}>In Active</option>                        
                             <option value="1" {!! \Request::get("search_status") == "1" ? 'selected="selected"':'' !!}>Active</option>
-                                                    
                         </select>
                     </div>
                     <div class="col-md-4"><center>
@@ -52,10 +51,9 @@
                         &nbsp;
                         <a href="{{ $list_url }}" class="btn red mTop25">Reset</a></center>
                     </div>
-                
                 </div>
             <div class="clearfix">&nbsp;</div>  
             </div>                
         </form>
     </div>    
-</div>      
+</div>

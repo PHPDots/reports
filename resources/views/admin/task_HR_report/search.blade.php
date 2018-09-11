@@ -21,10 +21,9 @@
                 <div class="col-md-4">
                     <label class="control-label">MM/YY</label>
                     <div class="input-group">
-                        {!! Form::select('search_month', [''=>'Search Month'] + $months, date('m'), ['class' => 'form-control','id'=>'month_id']) !!} 
+                        {!! Form::select('search_month', [''=>'Search Month'] + $months, (!empty(\Request::get("search_month")) ? \Request::get("search_month") : date('m')), ['class' => 'form-control','id'=>'month_id']) !!} 
                         <span class="input-group-addon"> / </span>
-
-                        {!! Form::select('search_year', [''=>'Search Year'] + $years, date('Y'), ['class' => 'form-control','id'=>'year_id']) !!} 
+                        {!! Form::select('search_year', [''=>'Search Year'] + $years, (!empty(\Request::get("search_year")) ? \Request::get("search_year") : date('Y')), ['class' => 'form-control','id'=>'year_id']) !!} 
                     </div>
                 </div>
                 <div class="col-md-4">

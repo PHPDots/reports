@@ -13,7 +13,7 @@
                             <i class="fa fa-user"></i>
                            {{ $page_title }}
                         </div>
-                        <a class="btn btn-default pull-right btn-sm mTop5" href="{{ $list_url }}">Back</a>
+                        <a class="btn btn-default pull-right btn-sm mTop5" href="{{ $back_url }}">Back</a>
                     </div>
                     <div class="portlet-body">
                         <div class="form-body">
@@ -22,9 +22,9 @@
                                 <div class="row">                                
                                      
                                     <div class="col-md-12">
-                                        <label class="control-label">Title: <span class="required">*</span></label>                                        
+                                        <label class="control-label">Title: <span class="required">*</span></label>
                                         {!! Form::text('title',null,['class' => 'form-control', 'data-required' => true,'placeholder' => 'Enter User Type']) !!}
-                                    </div>                                     
+                                    </div>
                                 </div>
                                 <div class="clearfix">&nbsp;</div>                                                              
                                 <div class="row">
@@ -39,7 +39,7 @@
             </div>
         </div>
     </div>
-</div>            
+</div>
 
 
 @endsection
@@ -65,7 +65,7 @@
                         if (result.status == 1)
                         {
                             $.bootstrapGrowl(result.msg, {type: 'success', delay: 4000});
-                            window.location = '{{ $list_url }}';    
+                            window.location = result.goto;    
                         }
                         else
                         {
@@ -77,7 +77,7 @@
                         $.bootstrapGrowl("Internal server error !", {type: 'danger', delay: 4000});
                     }
                 });
-            }            
+            }
             return false;
         });
     });

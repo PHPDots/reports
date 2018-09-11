@@ -39,6 +39,7 @@ class UserTaskHRReportController extends Controller
         $data['users'] = User::whereNull('client_user_id')->pluck('name','id')->all();
         $data['months'] = getMonths();
         $data['years'] = getYear();
+        $data = customSession($this->moduleRouteText,$data,100);
         return view($this->moduleViewName.".index", $data);
     }
 
@@ -82,12 +83,16 @@ class UserTaskHRReportController extends Controller
                 $search_month = request()->get("search_month");
                 $search_year = request()->get("search_year");
 
+                $searchData = array();
+                customDatatble($this->moduleRouteText);
+
                 if (!empty($search_start_date)){
 
                     $from_date=$search_start_date.' 00:00:00';
                     $convertFromDate= $from_date;
 
                     $query = $query->where(TBL_TASK.".task_date",">=",addslashes($convertFromDate));
+                    $searchData['search_start_date'] = $search_start_date;
                 }
                 if (!empty($search_end_date)){
 
@@ -95,19 +100,25 @@ class UserTaskHRReportController extends Controller
                     $convertToDate= $to_date;
 
                     $query = $query->where(TBL_TASK.".task_date","<=",addslashes($convertToDate));
+                    $searchData['search_end_date'] = $search_end_date;
                 }
 
                 if (!empty($search_month)) {
 
                     $query = $query->where(\DB::raw("DATE_FORMAT(".TBL_TASK.".task_date,'%m')"), $search_month);
+                    $searchData['search_month'] = $search_month;
                 }
                 if (!empty($search_year)) {
 
                     $query = $query->where(\DB::raw("DATE_FORMAT(".TBL_TASK.".task_date,'%Y')"), $search_year);
+                    $searchData['search_year'] = $search_year;
                 }
                 if (!empty($search_user)) {
                     $query = $query->where(TBL_TASK . ".user_id", $search_user);
+                    $searchData['search_user'] = $search_user;
                 }
+                $goto = \URL::route($this->moduleRouteText.'.index', $searchData);
+                \session()->put($this->moduleRouteText.'_goto',$goto);
             });
             
             $data = $data->make(true);
