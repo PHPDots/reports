@@ -156,11 +156,14 @@ class InvoiceExpenseController extends Controller
                         $inv_border = 1;
                         $row_manipulate = array();
                         /*Calculation for invoice data*/
-                        $invoice_title[] = array("No./month","Company Name.","","Party GSTN No.","Invoice No.","Invoice Date","Taxable Value","18% Tax","Total Value (rs.)","Total Value (usd)","Rate","Amount Received (INR)","Payment Received Date");
+                        $invoice_title[] = array("No./month","Company Name.","","Party GSTN No.","Invoice No.","Invoice Date","Taxable Value","CGST 9% Tax","SGST 9% Tax","IGST 18% Tax","Total Value (rs.)","Total Value (usd)","Rate","Amount Received (INR)","Payment Received Date");
                         foreach ($invoice_data as $row)
                         {
                             $total_taxable_value = '';
                             $total_tax = '';
+                            $total_cgst = '';
+                            $total_sgst = '';
+                            $total_igst = '';
                             $total_value_rs = '';
                             $total_value_usd = '';
                             $party_gstn_no = $row->gstn_no;
@@ -176,6 +179,9 @@ class InvoiceExpenseController extends Controller
                                 $total_taxable_value = floatval($row->total_without_gst);
                                 $total_tax = floatval($row->total_with_gst);
                                 $total_value_rs = floatval($row->total_amount);
+                                $total_cgst = floatval($row->cgst_amount);
+                                $total_sgst = floatval($row->sgst_amount);
+                                $total_igst = floatval($row->igst_amount);
                             }
                             else{
                                 $total_value_usd = $row->total_amount;
@@ -198,13 +204,13 @@ class InvoiceExpenseController extends Controller
                             if($cflag != $invoice_month)
                             {
                                 $row_manipulate[] = $inv_border+1;
-                                $invoice_record[] = [$invoice_month,'','','','','','','','','','','',''];
+                                $invoice_record[] = [$invoice_month,'','','','','','','','','','','','','',''];
                                 $cflag = date('M-y',strtotime($row->invoice_date));  
                                 $inv_border++;
                                 $i = 1;
                             }
                                
-                            $invoice_record[] = [$i, $client_name, $bill_name, $party_gstn_no, $row->invoice_no, $invoice_date, $total_taxable_value, $total_tax,$total_value_rs,$total_value_usd,'',$amount_recevied,$payment_recevied_date];
+                            $invoice_record[] = [$i, $client_name, $bill_name, $party_gstn_no, $row->invoice_no, $invoice_date, $total_taxable_value, $total_cgst,$total_sgst,$total_igst,$total_value_rs,$total_value_usd,'',$amount_recevied,$payment_recevied_date];
                             $i++;
                             $inv_border++;
                         }
@@ -229,7 +235,7 @@ class InvoiceExpenseController extends Controller
                         {
                             $excel->sheet($first_sheet_name, function($sheet) use($invoice_title,$invoice_record,$inv_border,$row_manipulate) {
                                 
-                                $sheet->cell('A1:M1', function($cell) {
+                                $sheet->cell('A1:O1', function($cell) {
                                     $cell->setAlignment('center');
                                     $cell->setBackground('#dde3e6');
                                     $cell->setFont(array('family'=> 'Calibri','size'=>'11','bold'=>true));
@@ -247,8 +253,10 @@ class InvoiceExpenseController extends Controller
                                     'H' => '#,##0.00',
                                     'I' => '#,##0.00',
                                     'J' => '#,##0.00',
-                                    'M' => 'dd-mm-yyyy',
+                                    'K' => '#,##0.00',
                                     'L' => '#,##0.00',
+                                    'N' => '#,##0.00',
+                                    'O' => 'dd-mm-yyyy',
                                 ));
                                 $sheet->freezeFirstRow();
                                 $sheet->setAutoSize(true);

@@ -9,7 +9,7 @@ class Invoice extends Model
     public $timestamps = true;
     protected $table = TBL_INVOICE;
      
-    protected $fillable = ['to_address', 'invoice_no', 'invoice_date', 'cgst_amount','sgst_amount','total_amount','total_amount_words','address','pan_no','gst_regn_no','bank_account_no','bank_name','bank_swift_code','ifsc_code','require_gst','currency','client_id','payment','total_without_gst','total_with_gst'];
+    protected $fillable = ['to_address', 'invoice_no', 'invoice_date', 'cgst_amount','sgst_amount','total_amount','total_amount_words','address','pan_no','gst_regn_no','bank_account_no','bank_name','bank_swift_code','ifsc_code','require_gst','currency','client_id','payment','total_without_gst','total_with_gst','igst_amount','require_igst'];
 	
 	public static function listFilter($query){
     	

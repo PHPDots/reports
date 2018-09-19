@@ -253,7 +253,7 @@ function openPaymentModel($id)
                 { data: 'created_at', name: 'created_at' },
                 { data: 'action', orderable: false, searchable: false}
             ]
-        });        
+        });
     });
     </script>
 @endsection

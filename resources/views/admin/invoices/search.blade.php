@@ -38,7 +38,7 @@ else
              <div class="row">                
                 <div class="col-md-4">
                     <label class="control-label">Client Name :</label>
-                    {!! Form::select('search_client_name',[''=>'Select']+$clients,'',['class' => 'form-control','id'=>'client_id']) !!}
+                    {!! Form::select('search_client_name',[''=>'Select']+$clients,\Request::get("search_client_name"),['class' => 'form-control','id'=>'client_id']) !!}
                 </div>
 				 <div class="col-md-4">
                     <label class="control-label">Status</label>

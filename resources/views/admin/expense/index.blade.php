@@ -79,7 +79,7 @@ function openView($id){
       jQuery('#expense_view').modal();     
       $('#AjaxLoaderDiv').fadeIn('slow');
      
-      var expense_url="{{asset('/expense/view') }}";  
+      var expense_url="{{ url('/expense/view') }}";  
       $.ajax({
           type: "GET",
           url: expense_url,

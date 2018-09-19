@@ -101,9 +101,15 @@
                                 </tr>
                                 <tr>
                                     <td></td>
-                                    <td colspan="2" align="center"><b>SGST </b> </td>
+                                    <td colspan="2" align="center"><b> SGST </b> </td>
                                     <td>{!! Form::text('sgst',"9.00%",['class' => 'form-control', 'data-required' => true,'id'=>'sgst']) !!}</td>
                                     <td align="left">{!! Form::text('sgst_amount',null,['class' => 'form-control', 'data-required' => true,'id'=>'sgst_amount']) !!}</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" name="require_igst" class="form-control" id="is_igst" value="{!! $formObj->require_igst !!}" {!! $formObj->require_igst == 1 ? 'checked="checked"':'' !!}></td>
+                                    <td colspan="2" align="center"><b>IGST </b> </td>
+                                    <td>{!! Form::text('igst','18.00%',['class' => 'form-control', 'data-required' => true,'id'=>'igst_id']) !!}</td>
+                                    <td align="right">{!! Form::text('igst_amount',null,['class' => 'form-control', 'data-required' => true,'id'=>'igst_amount']) !!}</td>
                                 </tr>
                                 <tr>
                                     <td align="right" colspan="4" style="font-size: 16px"><b>Total : </b></td>
@@ -183,6 +189,7 @@
         } 
         var gst_total = 0;
         var is_gst = parseInt($('#is_gst').val());
+        var is_igst = parseInt($('#is_igst').val());
         if(is_gst == 1)
         {
             var cgst_amount = amounts*9/100;
@@ -191,12 +198,23 @@
             var sgst_amount = parseInt(sgst_amount);
             $('#cgst_amount').val(cgst_amount);
             $('#sgst_amount').val(sgst_amount); 
-        var gst_total = cgst_amount + sgst_amount;      
+            var gst_total = cgst_amount + sgst_amount;      
         }
         if(is_gst == 0)
         {
             $('#cgst_amount').val(0);
             $('#sgst_amount').val(0);
+        }
+        if(is_igst == 1)
+        {
+            var igst_amount = amounts*18/100;
+            var igst_amount = parseInt(igst_amount);
+            $('#igst_amount').val(igst_amount);
+            var gst_total = gst_total + igst_amount;
+        }
+        if(is_igst == 0)
+        {
+            $('#igst_amount').val(0);
         }
 		$('#total_without_gst').val(amounts);
         $('#total_with_gst').val(gst_total);
@@ -243,6 +261,17 @@
             }
         });
 
+        $(document).on('change','#is_igst',function(){
+            var checkval = parseInt($('#is_igst').val());
+            if(checkval == 1){
+                $('#is_igst').val(0);
+                $("#reload_id").trigger('click');
+            }else{
+                $('#is_igst').val(1);
+                $("#reload_id").trigger('click');
+            }
+        });
+
          $(document).on('change','#currency',function(){
             var curr_name = $('#currency').val();
             if(curr_name == 'in_usd'){ var curr = '(In USD)';}
@@ -276,7 +305,7 @@
 							$("#main-frm1 textarea[name='to_address']").val(result.address);
                             $("#main-frm1 select[name='currency']").val(result.currency);
                         }      
-                    }                 
+                    }
                 },
                 error : function (error) {
                     alert(error);
@@ -301,7 +330,7 @@
             cell4.innerHTML = '<input type="text" name="particular[]" class="form-control"  placeholder="Type..." required>';
             cell5.innerHTML = '<input type="text" name="amount[]" value="0" class="form-control amounts" required>';
             $('#add_no').val(add_no);
-            $('#no').val(no);                       
+            $('#no').val(no);
         });
         $('#delete_tr').click(function(){
             $text = 'Are you sure you want to remove?';

@@ -30,7 +30,7 @@ class InvoicesController extends Controller
 
         $this->adminAction= new AdminAction; 
         
-        $this->modelObj = new Invoice();  
+        $this->modelObj = new Invoice();
 
         $this->addMsg = $module . " has been added successfully!";
         $this->updateMsg = $module . " has been updated successfully!";
@@ -262,6 +262,8 @@ class InvoicesController extends Controller
             'require_gst' => Rule::in([1, 0]),
             'currency' => ['required',Rule::in(['in_rs','in_usd'])],
             'client_id' => 'required|exists:'.TBL_CLIENT.',id',
+            'require_igst' => Rule::in([1, 0]),
+            'igst_amount' => 'required|numeric',
         ]);
         
         // check validations
@@ -293,6 +295,8 @@ class InvoicesController extends Controller
             $client_id = $request->get('client_id');
             $total_with_gst = $request->get('total_with_gst');
             $total_without_gst = $request->get('total_without_gst');
+            $require_igst = $request->get('require_igst');
+            $igst_amount = $request->get('igst_amount');
             $pan_no = 'AAUFP4850D';
             $gst_regn_no = '24AAUFP4850D1Z3';
             $bank_account_no = '201001635127';
@@ -320,6 +324,8 @@ class InvoicesController extends Controller
             $invoice->client_id = $client_id;
             $invoice->total_with_gst = $total_with_gst;
             $invoice->total_without_gst = $total_without_gst;
+            $invoice->require_igst = $require_igst;
+            $invoice->igst_amount = $igst_amount;
             $invoice->save();
             $invoice_id = $invoice->id;
 
@@ -370,7 +376,7 @@ class InvoicesController extends Controller
                         $params["from_name"] = 'PHPdots : Invoice';  
                         $params["files"] = $file;
                         $params["body"] = $message;
-                        sendHtmlMail($params);
+                        //sendHtmlMail($params);
                     }
                 }
             }
@@ -436,7 +442,6 @@ class InvoicesController extends Controller
         $data['formObj'] = $formObj;
         $data['page_title'] = "Edit ".$this->module;
         $data['buttonText'] = "Update";
-
         $data['action_url'] = $this->moduleRouteText.".update";
         $data['action_params'] = $formObj->id;
         $data['method'] = "PUT";
@@ -493,6 +498,8 @@ class InvoicesController extends Controller
             'require_gst' => Rule::in([1, 0]),
             'currency' => ['required',Rule::in(['in_rs','in_usd'])],
             'client_id' => 'required|exists:'.TBL_CLIENT.',id',
+            'igst_amount' => 'required|numeric',
+            'require_igst' => Rule::in([1, 0]),
         ]);
         
         // check validations
@@ -528,6 +535,8 @@ class InvoicesController extends Controller
             $client_id = $request->get('client_id');
             $total_with_gst = $request->get('total_with_gst');
             $total_without_gst = $request->get('total_without_gst');
+            $igst_amount = $request->get('igst_amount');
+            $require_igst = $request->get('require_igst');
             $pan_no = 'AAUFP4850D';
             $gst_regn_no = '24AAUFP4850D1Z3';
             $bank_account_no = '201001635127';
@@ -554,6 +563,8 @@ class InvoicesController extends Controller
             $model->client_id = $client_id;
             $model->total_with_gst = $total_with_gst;
             $model->total_without_gst = $total_without_gst;
+            $model->igst_amount = $igst_amount;
+            $model->require_igst = $require_igst;
             $model->save(); 
 
             $invoice_details = InvoiceDetail::where('invoice_id',$id);
@@ -565,7 +576,7 @@ class InvoicesController extends Controller
             
             for ($i=0; $i < $max; $i++) {
 
-                $detail = new InvoiceDetail(); 
+                $detail = new InvoiceDetail();
                 $detail->invoice_id = $id; 
                 $detail->particular = $particular[$i]; 
                 $detail->amount = $amount[$i]; 
