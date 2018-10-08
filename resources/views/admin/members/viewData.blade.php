@@ -68,7 +68,7 @@
         {{$leader_name}}</div>
 		</div>
 		<div class="row static-info">
-			<div class="col-md-5 name"> Satatus: </div>
+			<div class="col-md-5 name"> Status: </div>
 			<div class="col-md-7 value"> @if($view->status == 1) <div class="btn btn-xs btn-success"> Active</div> @else <div class="btn btn-xs btn-danger">In Active</div> @endif</div>
 		</div>
 	</div>

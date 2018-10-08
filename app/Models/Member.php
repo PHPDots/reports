@@ -117,4 +117,58 @@ class Member extends Model
         return $members;
 
     }
+    
+    public static function getloanMembers(){
+        $members = array();
+       
+
+        $doctor = \DB::table(TBL_LOAN_MASTER)
+            ->select(TBL_MEMBER.".firstname",TBL_MEMBER.".middlename",TBL_MEMBER.".lastname",TBL_MEMBER.".id")
+            ->join(TBL_MEMBER, TBL_LOAN_MASTER.".member_id", "=", TBL_MEMBER.".id")
+            ->where(TBL_LOAN_MASTER.".status", "=", '0')
+            ->groupBy(TBL_LOAN_MASTER.".member_id")
+            ->get();
+            
+        foreach($doctor as $doc_data)
+        {
+            $members[$doc_data->id] = $doc_data->firstname.' '.$doc_data->middlename.' '.$doc_data->lastname;
+        }    
+        return $members;
+
+    }
+    public static function getaddloanMembers(){
+        $members = array();
+       
+
+        $doctor = \DB::table(TBL_LOAN_BACHAT)
+            ->select(TBL_MEMBER.".firstname",TBL_MEMBER.".middlename",TBL_MEMBER.".lastname",TBL_MEMBER.".id")
+            ->join(TBL_MEMBER, TBL_LOAN_BACHAT.".member_id", "=", TBL_MEMBER.".id")
+            ->groupBy(TBL_LOAN_BACHAT.".member_id")
+            ->get();
+            
+        foreach($doctor as $doc_data)
+        {
+            $members[$doc_data->id] = $doc_data->firstname.' '.$doc_data->middlename.' '.$doc_data->lastname;
+        }    
+        return $members;
+
+    }
+    public static function getaddledgerMembers(){
+        $members = array();
+        
+         $doctor =\DB::table(TBL_LEDGER)
+            ->select(TBL_LEDGER.".*", TBL_MEMBER.".firstname",TBL_MEMBER.".middlename",TBL_MEMBER.".lastname") 
+            ->join(TBL_BB_ACOUNT, TBL_LEDGER.".bb_account_id", "=", TBL_BB_ACOUNT.".id")
+            ->join(TBL_LOAN_BACHAT, TBL_BB_ACOUNT.".bb_bachat_id", "=", TBL_LOAN_BACHAT.".id")
+            ->join(TBL_MEMBER, TBL_LOAN_BACHAT.".member_id", "=", TBL_MEMBER.".id")
+            ->groupBy(TBL_LOAN_BACHAT.".member_id")
+            ->get();                   
+        foreach($doctor as $doc_data)
+        {
+            $members[$doc_data->id] = $doc_data->firstname.' '.$doc_data->middlename.' '.$doc_data->lastname;
+        }    
+        return $members;
+
+    }
+    
 }

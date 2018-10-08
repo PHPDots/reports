@@ -24,6 +24,20 @@
                             List Members
                         </a>
                     </li>
+                    <li class="menu-dropdown classic-menu-dropdown">
+                        <a href="javascript:;">Bachat Mandal<span class="arrow"></span></a>
+                        <ul class="dropdown-menu pull-left">
+                            <li>
+                                <a class="nav-link" href="{{url('member-accounts')}}">Bachat Members</a>
+                            </li>
+                            <li>
+                                <a class="nav-link" href="{{url('multiple-account')}}">Bachat Accounts</a>
+                            </li>
+                            <li>
+                                <a class="nav-link" href="{{url('loans')}}">Bachat Loan Accounts</a>
+                            </li>
+                        </ul>
+                    </li>
                 </ul>
             </div>
             <!-- END MEGA MENU -->

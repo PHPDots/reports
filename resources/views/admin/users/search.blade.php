@@ -1,7 +1,7 @@
 <div class="portlet box blue">
     <div class="portlet-title">
         <div class="caption">
-            <i class="fa fa-search"></i>Advance Search 
+            <i class="fa fa-search"></i>Advance Search  {{ \Request::get("search_type") }}
         </div>
         <div class="tools">
             <a href="javascript:;" class="expand"> </a>
@@ -28,7 +28,6 @@
                     <label class="control-label">FirstName</label>
                     <input type="text" value="{{ \Request::get("search_fnm") }}" class="form-control" name="search_fnm" />
                 </div>
-                                   
             </div>
             <div class="clearfix">&nbsp;</div>
             <div class="row">
@@ -51,8 +50,8 @@
                     <label class="control-label">Status</label>
                     <select name="search_status" class="form-control">
                         <option value="1" {!! \Request::get("search_status") == "1" ? 'selected="selected"':'' !!}>Active</option> 
-                        <option value="0" {!! \Request::get("search_status") == "0" ? 'selected="selected"':'' !!}>Inactive</option>                           			<option value="">All</option>
-                    </select>                                                                 
+                        <option value="0" {!! \Request::get("search_status") == "0" ? 'selected="selected"':'' !!}>Inactive</option>                           			<option value="all" {!! \Request::get("search_status") == "all" ? 'selected="selected"':'' !!}>All</option>
+                    </select>
                 </div>
             </div> 
             &nbsp;
@@ -63,5 +62,5 @@
                 </div> 
             </div>                
         </form>
-    </div>    
-</div>      
+    </div>
+</div>

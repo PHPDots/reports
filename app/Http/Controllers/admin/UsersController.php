@@ -26,7 +26,7 @@ class UsersController extends Controller
 
         $this->adminAction= new AdminAction;
         
-        $this->modelObj = new User();  
+        $this->modelObj = new User();
 
         $this->addMsg = $module . " has been added successfully!";
         $this->updateMsg = $module . " has been updated successfully!";
@@ -79,7 +79,7 @@ class UsersController extends Controller
                 else
                 {
                     session()->flash('success_message', "Status not changed, Please try again");
-                    return redirect($this->list_url);
+                    return redirect($goto);
                 }
 
             return redirect("users");
@@ -719,13 +719,11 @@ class UsersController extends Controller
                 if($search_status == "1" || $search_status == "0" )
                 {
                     $query = $query->where(TBL_USERS.".status", $search_status);
-                    $searchData['search_status'] = $search_status;
                 }
-                $goto = \URL::route($this->moduleRouteText.'.index', $searchData);
+                    $searchData['search_status'] = $search_status;
+                    $goto = \URL::route($this->moduleRouteText.'.index', $searchData);
                 \session()->put($this->moduleRouteText.'_goto',$goto);
             })
-            ->make(true);        
-	}
-	 
-    
+            ->make(true);
+	}    
 }

@@ -94,10 +94,12 @@ class Task extends Model
         if (!empty($search_hour)) {
             $query = $query->where(TBL_TASK.".hour", $search_hour_op, $search_hour);
             $searchData['search_hour'] = $search_hour;
+            $searchData['search_hour_op'] = $search_hour_op;
         }
         if (!empty($search_min)) {
             $query = $query->where(TBL_TASK.".min", $search_min_op, $search_min);
             $searchData['search_min'] = $search_min;
+            $searchData['search_min_op'] = $search_min_op;
         }
         if($search_status == "1" || $search_status == "0")
         {

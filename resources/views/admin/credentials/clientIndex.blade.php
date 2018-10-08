@@ -28,7 +28,7 @@ $popup_id = request()->get('popup_id');
                                <th width="5%">ID</th>                                   
                                <th width="35%">Project</th>
                                <th width="30%">Type</th>
-								<th width="10%">Title</th>
+								               <th width="10%">Title</th>
                                <th width="5%">Environment</th>
                                <th width="20%">Created At</th>
                                <th width="5%" data-orderable="false">Action</th>

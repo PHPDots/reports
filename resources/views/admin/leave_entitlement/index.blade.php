@@ -24,7 +24,7 @@
                     <table class="table table-bordered table-striped table-condensed flip-content" id="server-side-datatables">
                         <thead>
                             <tr>
-                               <th width="5%">ID</th>                                    
+                               <th width="5%">ID</th>
                                <th width="20%">User Name</th>
                                <th width="10%">Month</th>
                                <th width="10%">Year</th>
@@ -42,7 +42,7 @@
         </div>
     </div>
 </div>
-</div>            
+
 @endsection
 
 @section('styles')
@@ -52,7 +52,6 @@
 @section('scripts')
     <script type="text/javascript">
     
-
     $(document).ready(function(){
 
         $("#search-frm").submit(function(){
@@ -83,6 +82,8 @@
             processing: true,
             serverSide: true,
             searching: false,
+            pageLength: '{{ $length }}',
+            displayStart: '{{ $start }}',
             ajax: {
                 "url": "{!! route($moduleRouteText.'.data') !!}",
                 "data": function ( data ) 
@@ -99,7 +100,7 @@
                 [100,200,300,400,500],
                 [100,200,300,400,500]
               ],          
-            "order": [[ '0', "desc" ]],    
+            "order": [[ "{{ $orderClm }}", "{{ $orderDir }}" ]],
             columns: [
                 { data: 'id', name: 'id' },
                 { data: 'user_name', name: '{{ TBL_USERS }}.name' },

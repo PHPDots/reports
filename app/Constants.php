@@ -61,6 +61,13 @@ define("TRAINEE_USER",'5');
 define("TBL_FIX_TASKS","fix_tasks");
 define("TBL_SEND_MAIL_USERS","send_mail_users");
 define("TBL_CLIENT_USERS_RATES","client_users_rates");
+define("TBL_LOAN_BACHAT","bb_bachat_detail");
+define("TBL_BB_ACOUNT","bb_accounts");
+define("TBL_LEDGER", "bb_ledger");
+define("TBL_LOAN_MASTER", "bb_loan_master");
 
-
+define("PENALTY_RATE", 10);
+define("LOAN_EMI", 10);
+define("MONTHLY_INSTALLMENT", 300);
+define("TBL_LOAN", "bb_loan");
 

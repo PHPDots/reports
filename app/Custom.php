@@ -21,6 +21,7 @@ class Custom
         $now = date('Y-m-d h:m:s');
         if($now > $next_three_month)
             $leave = $leave + 1;
+        
         $annual = $leave - $user_month_leave;
         if($annual <0){$annual = 0;}
 		if(($leave - $user_month_leave)  == 0.5){$annual = $leave - $user_month_leave;}

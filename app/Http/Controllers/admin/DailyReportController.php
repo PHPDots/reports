@@ -215,19 +215,19 @@ class DailyReportController extends Controller
     }
   }
 	public function cronLeaveCalculate(Request $request)
-  {
+    {
     $msg = 'Leave calculated successfully !';
     if($request->get('fromcron') == 1)
     {
-      $last_month_start =  date("Y-m-d", strtotime("first day of this month"));
-      $last_month_end =  date("Y-m-d", strtotime("last day of this month"));
+        $last_month_start =  date("Y-m-d", strtotime("first day of this month"));
+        $last_month_end =  date("Y-m-d", strtotime("last day of this month"));
 
-      $user_details = User::whereIn('user_type_id',[1,3])
+        $user_details = User::whereIn('user_type_id',[1,3])
                           ->whereNotIn('id',[10,1])
                           ->where('status',1)
                           ->get();
-      foreach ($user_details as $user)
-      {
+    foreach ($user_details as $user)
+    {
         $last_month = date("Y-m", strtotime($last_month_start));
         $leave_days = \App\Custom::usermothleave($user->id,$last_month);
 
@@ -238,53 +238,103 @@ class DailyReportController extends Controller
         $current_balance_leave = $user->balance_paid_leave;
         if(!$leave_log)
         {
-          if(!empty($user) && $leave_days>0)
-          {
-            $type = 'debit';
-            $days = $leave_days;
-
-            $new_balance_leave = $current_balance_leave - $leave_days;
-        
-            if($new_balance_leave < 0)
+            if(!empty($user) && $leave_days > 0)
             {
-                $new_balance_leave = 0;
+                $type = 'debit';
+                $days = $leave_days;
+
+                $new_balance_leave = $current_balance_leave - $leave_days;
+        
+                if($new_balance_leave < 0)
+                {
+                    $new_balance_leave = 0;
+                }
+
+                $user->balance_paid_leave = $new_balance_leave;
+                $user->save();
+
+                $log = new \App\Models\LeaveEmtitlementLog();
+
+                $log->user_id = $user->id;
+                $log->credit_debit_type = $type;
+                $log->total_leaves = $days;
+                $log->old_balance_leave = $current_balance_leave;
+                $log->new_balance_leave = $new_balance_leave;
+                $log->remark = 'Added from user leave calculate cron';
+                $log->save();
+
+                $leave_log = new \App\Models\LeaveMonthlyLog();
+            
+                $leave_log->user_id = $user->id;    
+                $leave_log->month = date("m", strtotime($last_month_start));    
+                $leave_log->year = date("Y", strtotime($last_month_start));    
+                $leave_log->leave_taken = $leave_days;
+                $leave_log->balance_leave = $new_balance_leave;    
+                $leave_log->save();
             }
+            else
+            {
+                $leave_log = new \App\Models\LeaveMonthlyLog();
 
-            $user->balance_paid_leave = $new_balance_leave;
-            $user->save();
+                $leave_log->user_id = $user->id;
+                $leave_log->month = date("m", strtotime($last_month_start));    
+                $leave_log->year = date("Y", strtotime($last_month_start));    
+                $leave_log->leave_taken = $leave_days;    
+                $leave_log->balance_leave = $current_balance_leave;    
+                $leave_log->save();
+            }
+            // Leave Deduct Cal
+            $deductLeave = LeaveEntitlement::where('user_id',$user->id)->where('is_run',0)
+                            ->where('type','debit')
+                            ->where('month',date("m", strtotime($last_month_start)))
+                            ->where('year',date("Y", strtotime($last_month_start)))
+                            ->sum('leave_day');
 
-            $log = new \App\Models\LeaveEmtitlementLog();
+            if($deductLeave > 0)
+            {
+                $user_balance_leave = $user->balance_paid_leave;
+                $type = 'debit';
 
-            $log->user_id = $user->id;
-            $log->credit_debit_type = $type;
-            $log->total_leaves = $days;
-            $log->old_balance_leave = $current_balance_leave;
-            $log->new_balance_leave = $new_balance_leave;
-            $log->remark = 'Added from user leave calculate cron';
-            $log->save();
-
-            $leave_log = new \App\Models\LeaveMonthlyLog();
+                $new_balance_leave1 = $user_balance_leave - $deductLeave;
             
-            $leave_log->user_id = $user->id;    
-            $leave_log->month = date("m", strtotime($last_month_start));    
-            $leave_log->year = date("Y", strtotime($last_month_start));    
-            $leave_log->leave_taken = $leave_days;    
-            $leave_log->balance_leave = $current_balance_leave;    
-            $leave_log->save();    
-          }
-          else
-          {
-            $leave_log = new \App\Models\LeaveMonthlyLog();
-            
-            $leave_log->user_id = $user->id;    
-            $leave_log->month = date("m", strtotime($last_month_start));    
-            $leave_log->year = date("Y", strtotime($last_month_start));    
-            $leave_log->leave_taken = $leave_days;    
-            $leave_log->balance_leave = $current_balance_leave;    
-            $leave_log->save();  
-          }
+                if($new_balance_leave1 < 0)
+                {
+                    $new_balance_leave1 = 0;
+                }
+                $user->balance_paid_leave = $new_balance_leave1;
+                $user->save();
+               
+                $obj = new \App\Models\LeaveEmtitlementLog();
+
+                $obj->user_id = $user->id;
+                $obj->credit_debit_type = $type;
+                $obj->total_leaves = $deductLeave;
+                $obj->old_balance_leave = $user_balance_leave;
+                $obj->new_balance_leave = $new_balance_leave1;
+                $obj->remark = 'Added from user leave calculate cron ( leave type deduct from Leave Emtitlement )';
+                $obj->save();
+
+                $leave_month_log = LeaveMonthlyLog::where('user_id',$user->id)
+                                        ->where('month',date("m", strtotime($last_month_start)))
+                                        ->where('year',date("Y", strtotime($last_month_start)))
+                                        ->first();
+                if($leave_month_log)
+                {
+                    $leave_month_log->leave_taken = $deductLeave;    
+                    $leave_month_log->balance_leave = $new_balance_leave1;
+                    $leave_month_log->save();
+                }
+                \DB::table(TBL_LEAVE_ENTITLEMENT)->where('user_id',$user->id)
+                                ->where('is_run',0)
+                                ->where('type','debit')
+                                ->where('month',date("m", strtotime($last_month_start)))
+                                ->where('year',date("Y", strtotime($last_month_start)))
+                                ->update([
+                                    'is_run' => 1
+                                ]);
+            }
         }
-      }
+    }
     }
     else
     {
@@ -327,8 +377,7 @@ class DailyReportController extends Controller
 				$leave->remark = $remark;
 				$leave->leave_day = $leave_day;
 				$leave->save();
-			  	
-				
+                				
             	$remark = 'added from leave entitlement cron';
             	LeaveEmtitlementLog::addBalancePaidLeave($user->id,$remark,$leave_day);
           	}
@@ -347,7 +396,6 @@ class DailyReportController extends Controller
 	public function cronTaskNotificationss(Request $request )
 	{
 		$fromcron = $request->get('fromcron');
-		exit;
 	if(!empty($fromcron) && $fromcron == 1){
 		//Task Query
         //$today =  date("Y-m-d");

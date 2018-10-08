@@ -128,6 +128,15 @@ td { border: 1px solid #ddd; padding: 0.5em; }
               <td>9.00%</td>
               <td align="right">{{$invoices->sgst_amount}}</td>
             </tr>
+          <?php } 
+          if($invoices->require_igst == 1){
+          ?>
+            <tr>
+              <td></td>
+              <td><b>IGST</b></td>
+              <td>18.00%</td>
+              <td align="right">{{$invoices->igst_amount}}</td>
+            </tr>
           <?php } ?>
             <tr>
               <td>&nbsp;</td>

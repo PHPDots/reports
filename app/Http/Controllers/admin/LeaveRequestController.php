@@ -370,9 +370,9 @@ class LeaveRequestController extends Controller {
 
         $model = $this->modelObj->find($id);
 
+        $data = array();
         $status = 1;
         $msg = $this->updateMsg;
-        $data = array();
         $goto = session()->get($this->moduleRouteText.'_goto');
         if(empty($goto)){  $goto = $this->list_url;  }
 
@@ -464,7 +464,6 @@ class LeaveRequestController extends Controller {
                     $detail->save();
                 }
             }
-			 
 
             //store logs detail
             $params = array();
@@ -666,12 +665,13 @@ class LeaveRequestController extends Controller {
                 }
                 if ($search_status == "1" || $search_status == "0" || $search_status == "2") {
                     $query = $query->where(TBL_LEAVE_REQUEST . ".status", $search_status);
-                    $searchData['search_status'] = $search_status;
                 }
+                    $searchData['search_status'] = $search_status;
                 if (!empty($search_start_leave) || !empty($search_end_leave)) {
                     $query = $query->whereBetween(TBL_LEAVE_REQUEST . '.from_date', [$search_start_leave, $search_end_leave])
                             ->whereBetween(TBL_LEAVE_REQUEST . '.to_date', [$search_start_leave, $search_end_leave]);
                     $searchData['search_start_leave'] = $search_start_leave;
+                    $searchData['search_end_leave'] = $search_end_leave;
                 }
 				if (!empty($search_month)) {
                     $query = $query->where(TBL_LEAVE_REQUEST . ".from_date",'LIKE','%'.$search_month.'%');

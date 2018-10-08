@@ -1,4 +1,4 @@
-@extends('admin.layouts.app')
+@extends('admin.layouts.bopal_app')
 
 @section('content')
 
@@ -8,30 +8,28 @@
 
         <div class="">
             
-            @include($moduleViewName.".search")           
-
+            
             <div class="clearfix"></div>    
             <div class="portlet box green">
                 <div class="portlet-title">
                     <div class="caption">
                         <i class="fa fa-list"></i>{{ $page_title }}    
                     </div>
-                  
-                    @if($btnAdd)
-                        <a class="btn btn-default pull-right btn-sm mTop5" href="{{ $add_url }}">Add New</a>
-                    @endif                     
 
                 </div>
                 <div class="portlet-body">                    
                     <table class="table table-bordered table-striped table-condensed flip-content" id="server-side-datatables">
                         <thead>
                             <tr>
-                               <th width="5%">ID</th>                                    
-                               <th width="40%">Title</th>                           
-                               <th width="20%">Created At</th>                           
-                               <th width="5%" data-orderable="false">Action</th>
+                                <th width="3%">ID</th>
+                                <th width="32%">Member</th>
+                                <th width="10%">Transaction Amount</th>
+                                <th width="10%">Transaction Source</th>
+                                <th width="10%">Balance</th>
+                                <th width="10%">Transaction Type</th>
+                                <th width="25%">Created</th>
                             </tr>
-                        </thead>                                         
+                        </thead>
                         <tbody>
                         </tbody>
                     </table>
@@ -40,7 +38,7 @@
         </div>
     </div>
 </div>
-
+          
 @endsection
 
 @section('styles')
@@ -49,10 +47,8 @@
 
 @section('scripts')
     <script type="text/javascript">
-    
 
     $(document).ready(function(){
-
 
         $("#search-frm").submit(function(){
             oTableCustom.draw();
@@ -65,25 +61,29 @@
             processing: true,
             serverSide: true,
             searching: false,
-            pageLength: '{{ $length }}',
-            displayStart: '{{ $start }}',
+            
             ajax: {
                 "url": "{!! route($moduleRouteText.'.data') !!}",
                 "data": function ( data ) 
                 {
-                    data.search_title = $("#search-frm input[name='search_title']").val();
+                    //data.search_loan_amount = $("#search-frm input[name='search_loan_amount']").val();
+                    data.search_balance = $("#search-frm input[name='search_balance']").val();
                 }
             },
-            lengthMenu:[
-                    [25,50,100,200],
-                    [25,50,100,200]
-                ],
-            "order": [[ "{{ $orderClm }}", "{{ $orderDir }}" ]],    
+            lengthMenu:
+              [
+                [25,50,100,200],
+                [25,50,100,200]
+              ],
+            "order": [[ 0, 'asc']],  
             columns: [
                 { data: 'id', name: 'id' },
-                { data: 'title', name: 'title' },
+                { data: 'firstname', name: 'firstname' },
+                { data: 'transaction_amount', name: 'transaction_amount' },
+                { data: 'transaction_source', name: 'transaction_source' },
+                { data: 'balance', name: 'balance' },
+                { data: 'transaction_type', name: 'transaction_type' },
                 { data: 'created_at', name: 'created_at' },
-                { data: 'action', orderable: false, searchable: false}
             ]
         });
     });

@@ -69,7 +69,7 @@
         </div>        
 
 
-        @include('admin.includes.footer')                     
+        @include('admin.includes.footer')
 
         {!! Form::open(['method' => 'DELETE','id' => 'global_delete_form']) !!}
         {!! Form::hidden('id', 0,['id' => 'delete_id']) !!}

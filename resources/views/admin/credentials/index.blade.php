@@ -138,7 +138,7 @@ function openView($id){
             processing: true,
             serverSide: true,
             searching: false,
-             pageLength: '{{ $length }}',
+            pageLength: '{{ $length }}',
             displayStart: '{{ $start }}',
             lengthMenu:
               [

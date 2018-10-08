@@ -25,7 +25,7 @@ else
                             <i class="fa fa-file-text-o"></i>
                            {{ $page_title }}
                         </div>
-                        <a class="btn btn-default pull-right btn-sm mTop5" href="{{ $list_url }}">Back</a>
+                        <a class="btn btn-default pull-right btn-sm mTop5" href="{{ $back_url }}">Back</a>
                     </div>
                     <div class="portlet-body">
                         <div class="form-body">
@@ -39,19 +39,23 @@ else
                                 </div>
                                 <div class="clearfix">&nbsp;</div>
                                 <div class="row">
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <label class="control-label">Month: <span class="required">*</span></label>
 
                                         {!! Form::select('month',[''=>'Select Month']+$months,$month,['class' => 'form-control', 'data-required' => false,'id'=>'month_id']) !!}
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <label class="control-label">Year: <span class="required">*</span></label>
 
                                         {!! Form::select('year',[''=>'Select Year']+$years,$year,['class' => 'form-control', 'data-required' => false,'id'=>'year_id']) !!}
                                     </div>
-									<div class="col-md-4">
+									<div class="col-md-3">
                                         <label class="control-label">Leave: <span class="required">*</span></label>
                                         {!! Form::select('leave_day',['1'=>'Full','0.5'=>'Half'],null,['class' => 'form-control', 'data-required' => true]) !!}
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="control-label">Type: <span class="required">*</span></label>
+                                        {!! Form::select('type',['credit'=>'Add','debit'=>'Deduct'],null,['class' => 'form-control', 'data-required' => true]) !!}
                                     </div>
                                 </div>
 							<div class="clearfix">&nbsp;</div>

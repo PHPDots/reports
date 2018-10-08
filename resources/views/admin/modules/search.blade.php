@@ -9,7 +9,7 @@
     </div>
     <div class="portlet-body" style="display: none">  
         <form id="search-frm">
-            <div class="row">                
+            <div class="row">
                 <div class="col-md-4">
                     <label class="control-label">Title</label>
                     <input type="text" value="{{ \Request::get("search_text") }}" class="form-control" name="search_text" />

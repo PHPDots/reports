@@ -22,11 +22,11 @@
                 <div class="col-md-4">
                     <label class="control-label">Status</label>
                     <select name="search_status" class="form-control">
-                        <option value="all">All</option>                        
-                        <option value="0" {!! \Request::get("search_status") == "0" ? 'selected="selected"':'' !!}>Pending</option>                        
+                        <option value="all" {!! \Request::get("search_status") == "all" ? 'selected="selected"':'' !!}>All</option>
+                        <option value="0" {!! \Request::get("search_status") == "0" ? 'selected="selected"':'' !!}>Pending</option>
                         <option value="1" {!! \Request::get("search_status") == "1" ? 'selected="selected"':'' !!}>Accepted</option>
-                        <option value="2" {!! \Request::get("search_status") == "2" ? 'selected="selected"':'' !!}>Rejected</option>                        
-                    </select>                                                                 
+                        <option value="2" {!! \Request::get("search_status") == "2" ? 'selected="selected"':'' !!}>Rejected</option>
+                    </select>
                 </div>
                 <div class="col-md-4">
                     <label class="control-label">Created Date Range</label>

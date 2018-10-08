@@ -51,7 +51,9 @@ class LeaveEntitlementController extends Controller
         $data['users'] = User::whereIn('user_type_id',[1,3])->whereNotin('id',[10,1])->pluck('name','id')->all();
         $data["months"] = ['01'=>'January','02'=>'February','03'=>'March','04'=>'April','05'=>'May','06'=>'June','07'=>'July','08'=>'August','09'=>'September','10'=>'October','11'=>'November','12'=>'December']; 
         $data["years"] = ['2016'=>'2016','2017'=>'2017','2018'=>'2018','2019'=>'2019','2020'=>'2020','2021'=>'2021','2022'=>'2022','2023'=>'2023','2024'=>'2024','2025'=>'2025','2026'=>'2026','2027'=>'2027','2028'=>'2028','2029'=>'2029','2030'=>'2030'];
-        return view($this->moduleViewName.".index", $data);         
+        $data = customSession($this->moduleRouteText,$data,100);
+
+        return view($this->moduleViewName.".index", $data);
     }
 
     public function data(Request $request)
@@ -95,9 +97,11 @@ class LeaveEntitlementController extends Controller
             ->editColumn('leave_type', function($row){
                 $html = '';
                 if($row->leave_type == 0)
-                    $html = '<a class="btn btn-primary btn-xs">annual paid leave</a>';
+                    $html = '<a class="btn btn-primary btn-xs">annual paid leave</a><a class="btn btn-primary btn-xs"><i class="fa fa-plus-square" aria-hidden="true"></i></a>';
+                else if($row->leave_type == 2)
+                    $html = '<a class="btn btn-warning btn-xs">extra deduct leave</a><a class="btn btn-warning btn-xs"><i class="fa fa-minus-square" aria-hidden="true"></i></a>';
                 else
-                    $html = '<a class="btn btn-success btn-xs">extra paid leave</a>';
+                    $html = '<a class="btn btn-success btn-xs">extra paid leave</a><a class="btn btn-success btn-xs"><i class="fa fa-plus-square" aria-hidden="true"></i></a>';
                 return $html;
             })
             ->editColumn('leave_day', function($row){
@@ -118,12 +122,16 @@ class LeaveEntitlementController extends Controller
                 $search_month = request()->get("search_month");
                 $search_year = request()->get("search_year");
 
+                $searchData = array();
+                customDatatble($this->moduleRouteText);
+
                 if (!empty($search_start_date)){
 
                     $from_date=$search_start_date.' 00:00:00';
                     $convertFromDate= $from_date;
 
                     $query = $query->where(TBL_LEAVE_ENTITLEMENT.".created_at",">=",addslashes($convertFromDate));
+                    $searchData['search_start_date'] = $search_start_date;
                 }
                 if (!empty($search_end_date)){
 
@@ -131,18 +139,24 @@ class LeaveEntitlementController extends Controller
                     $convertToDate= $to_date;
 
                     $query = $query->where(TBL_LEAVE_ENTITLEMENT.".created_at","<=",addslashes($convertToDate));
+                    $searchData['search_end_date'] = $search_end_date;
                 }
                 if (!empty($search_user)) {
                     $query = $query->where(TBL_LEAVE_ENTITLEMENT . ".user_id", $search_user);
+                    $searchData['search_user'] = $search_user;
                 }
                 if(!empty($search_month))
                 {
                     $query = $query->where(TBL_LEAVE_ENTITLEMENT.".month", $search_month);
+                    $searchData['search_month'] = $search_month;
                 }
                 if(!empty($search_year))
                 {
                     $query = $query->where(TBL_LEAVE_ENTITLEMENT.".year", $search_year);
+                    $searchData['search_year'] = $search_year;
                 }
+                    $goto = \URL::route($this->moduleRouteText.'.index', $searchData);
+                    \session()->put($this->moduleRouteText.'_goto',$goto);
             });
             
             $data = $data->make(true);
@@ -175,6 +189,7 @@ class LeaveEntitlementController extends Controller
                                 ->where('status',1)->pluck('name','id')->all();
         $data["months"] = ['01'=>'January','02'=>'February','03'=>'March','04'=>'April','05'=>'May','06'=>'June','07'=>'July','08'=>'August','09'=>'September','10'=>'October','11'=>'November','12'=>'December']; 
         $data["years"] = ['2016'=>'2016','2017'=>'2017','2018'=>'2018','2019'=>'2019','2020'=>'2020','2021'=>'2021','2022'=>'2022','2023'=>'2023','2024'=>'2024','2025'=>'2025','2026'=>'2026','2027'=>'2027','2028'=>'2028','2029'=>'2029','2030'=>'2030'];
+        $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
 
         return view($this->moduleViewName.'.add', $data);
     }
@@ -202,7 +217,8 @@ class LeaveEntitlementController extends Controller
             'month' => ['required',Rule::in(['01','02','03','04','05','06','07','08','09','10','11','12'])],
             'user_id' => 'required|exists:'.TBL_USERS.',id',
             'year' => ['required',Rule::in(['2016','2017','2018','2019','2020','2021','2022','2023','2024','2025','2026','2027','2028','2029','2030'])],
-			'leave_day' => ['required',Rule::in(['1','0.5'])],
+            'leave_day' => ['required',Rule::in(['1','0.5'])],
+			'type' => ['required',Rule::in(['credit','debit'])],
         ]);
         if ($validator->fails())
         {
@@ -221,12 +237,17 @@ class LeaveEntitlementController extends Controller
             $user_id = $request->get('user_id');
             $month = $request->get('month');
             $year = $request->get('year');
-			$leave_day = $request->get('leave_day');
+            $leave_day = $request->get('leave_day');
+			$type = $request->get('type');
             $remark = $request->get('remark');
 			if(!empty($remark))
                 $remark = $request->get('remark');
             else
                 $remark = 'monthly one extra paid leave added';
+
+            $leave_type = 1;
+            if($type == 'debit')
+                $leave_type = 2;
 
             $leave = new LeaveEntitlement();
 
@@ -234,13 +255,15 @@ class LeaveEntitlementController extends Controller
             $leave->month = $month;
             $leave->year = $year;
             $leave->remark = $remark;
-			$leave->leave_day = $leave_day;
-            $leave->leave_type = 1;
+            $leave->leave_day = $leave_day;
+			$leave->type = $type;
+            $leave->leave_type = $leave_type;
             $leave->save();
 
 			$remark = 'added from leave entitlement add form';
-            LeaveEmtitlementLog::addBalancePaidLeave($user_id,$remark,$leave_day);
-
+            if($type == 'credit'){
+                LeaveEmtitlementLog::addBalancePaidLeave($user_id,$remark,$leave_day);
+            }
             $id = $leave->id;
  
             //store logs detail
