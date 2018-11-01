@@ -274,7 +274,7 @@
                 $('#is_igst').val(1);
                 $("#reload_id").trigger('click');
             }
-        });             
+        });
 
         $(document).on('change','#currency',function(){
             var curr_name = $('#currency').val();
@@ -406,7 +406,7 @@
             }            
             return false;
         });
-		 $(document).on('click','#save_btn',function(){
+		$(document).on('click','#save_btn',function(){
             $('#send_id').val(0);
             $('#main-frm1').submit();
         });

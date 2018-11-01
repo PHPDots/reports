@@ -64,8 +64,9 @@
             processing: true,
             serverSide: true,
             searching: false,
-            pageLength: '{{ $length }}',
-            displayStart: '{{ $start }}',
+            stateSave: true,
+            //pageLength: '{{ $length }}',
+           // displayStart: '{{ $start }}',
             ajax: {
                 "url": "{!! route($moduleRouteText.'.data') !!}",
                 "data": function ( data )
@@ -79,7 +80,7 @@
                 [25,50,100,200],
                 [25,50,100,200]
               ],
-            "order": [[ "{{ $orderClm }}", "{{ $orderDir }}" ]],
+           // "order": [[ "{{ $orderClm }}", "{{ $orderDir }}" ]],
             columns: [
                 { data: 'id', name: 'id' },
                 { data: 'name', name: 'name' },
