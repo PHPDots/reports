@@ -129,9 +129,15 @@ class AdminAction extends Model
     public $EDIT_FIX_TASK = 83;
     public $DELETE_FIX_TASK = 84; 
 
-    public $ADD_ASSIGN_TASK = 85; 
-    public $EDIT_ASSIGN_TASK = 86; 
-    public $DELETE_ASSIGN_TASK = 87; 
+    public $ADD_BACHAT_ACCOUNT = 85;
+    public $ADD_MULTIPLE_ACCOUNT = 86;
+    public $ADD_INSTALLMENT = 87;
+    public $ADD_LOAN = 88;
+    public $PAY_LOAN = 89;
+
+    public $ADD_ASSIGN_TASK = 90; 
+    public $EDIT_ASSIGN_TASK = 91; 
+    public $DELETE_ASSIGN_TASK = 92;
 
      
 }

@@ -24,15 +24,6 @@
 		</a>
 	
 	@endif
-	<!-- @if($row->status == 0)
-		<a class="btn btn-sm btn-danger" title="Change Status To Pending" href="{{ route($currentRoute.'.index',['changeID' => $row->id, 'changeStatus' => 1]) }}" onclick="return confirm('Are you sure ?');">
-		    <i class="fa fa-check-circle-o"></i>
-		</a>
-	@else
-		<a class="btn btn-sm btn-success" title="Change Status To Done" href="{{ route($currentRoute.'.index',['changeID' => $row->id, 'changeStatus' => 1]) }}" onclick="return confirm('Are you sure ?');">
-		    <i class="fa fa-check-circle-o"></i>
-		</a>
-	@endif -->
 @endif
 
 @if(isset($isAccept) && $isAccept)

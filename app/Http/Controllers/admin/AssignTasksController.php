@@ -476,7 +476,7 @@ class AssignTasksController extends Controller
                 $goto = session()->get($this->moduleRouteText.'_goto');
                 if(empty($goto)){  $goto = $this->list_url;  }
 
-                $taskComment = TaskComment::where('assing_task_id',$id)->first();
+                $taskComment = TaskComment::where('assing_task_id',$id);
                 $taskComment->delete();
                 $modelObj->delete();
                 session()->flash('success_message', $this->deleteMsg); 
