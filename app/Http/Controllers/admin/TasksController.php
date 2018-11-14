@@ -469,6 +469,7 @@ class TasksController extends Controller
             'status.*' => ['required', Rule::in([0,1])],
             'task_date.*'=>'before:tomorrow'
         ],$message);
+        
         if ($validator->fails())         
         {
             $messages = $validator->messages();
@@ -496,8 +497,8 @@ class TasksController extends Controller
                 return ['status' => $status, 'msg' => 'please enter valid time','goto' => $goto]; 
             }
 
-
-            $project_id = $request->get('project_id');
+            $project_id = $request->get('project_id'); 
+            //dd($project_id);
             $title = $request->get('title');
             $description = $request->get('description');
             //$hour = $request->get('hour');
@@ -505,9 +506,23 @@ class TasksController extends Controller
             $statuss = $request->get('status');
             $ref_link = $request->get('ref_link');
 
+            $p = 0;
+            foreach ($project_id as $project)
+            {
+                if($project == MISCELLANEOUS_PROJECT)
+                {
+                    $desc = isset($description[$p]) ? $description[$p] : '';
+                    if(empty($desc) || strlen($desc) < 100)
+                    {
+                        $status = 0;
+                        return ['status' => $status, 'msg' => 'Please enter description of min 100 charecters for <b style="color : red;""> Miscellaneous </b>','goto' => $goto];
+                    }
+                }
+            $p++;
+            }
             $auth_id = \Auth::guard('admins')->user()->user_type_id;
             $user = $request->get('user_id');
-            //dd($user);
+            
             if(!empty($user) && $auth_id == 1 && is_array($user))
             {
                 $user_id = $request->get('user_id');
@@ -745,6 +760,21 @@ class TasksController extends Controller
 
             $auth_id = \Auth::guard('admins')->user()->user_type_id;
             $user = $request->get('user_id');
+
+            $p = 0;
+            foreach ($project_id as $project)
+            {
+                if($project == MISCELLANEOUS_PROJECT)
+                {
+                    $desc = isset($description[$p]) ? $description[$p] : '';
+                    if(empty($desc) || strlen($desc) < 100)
+                    {
+                        $status = 0;
+                        return ['status' => $status, 'msg' => 'Please enter description of min 100 charecters for <b style="color : red;""> Miscellaneous </b>','goto' => $goto];
+                    }
+                }
+            $p++;
+            }
 
             if(!empty($user) && $auth_id == 1 && is_array($user))
             {
