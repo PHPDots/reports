@@ -51,9 +51,8 @@ function equalHeight(group) {
 
 var room = 1;
 function project_task() {
- 
     room++;
-    var objTo = document.getElementById('project_task')
+    var objTo = document.getElementById('project_task');
     var divtest = document.createElement("div");
   divtest.setAttribute("class", "form-group removeclass"+room);
   var rdiv = 'removeclass'+room;

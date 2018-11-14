@@ -127,7 +127,11 @@ class AdminAction extends Model
 	
     public $ADD_FIX_TASK = 82;
     public $EDIT_FIX_TASK = 83;
-    public $DELETE_FIX_TASK = 84;  
+    public $DELETE_FIX_TASK = 84; 
+
+    public $ADD_ASSIGN_TASK = 85; 
+    public $EDIT_ASSIGN_TASK = 86; 
+    public $DELETE_ASSIGN_TASK = 87; 
 
      
 }

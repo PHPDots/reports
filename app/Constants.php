@@ -65,6 +65,8 @@ define("TBL_LOAN_BACHAT","bb_bachat_detail");
 define("TBL_BB_ACOUNT","bb_accounts");
 define("TBL_LEDGER", "bb_ledger");
 define("TBL_LOAN_MASTER", "bb_loan_master");
+define("TBL_ASSIGN_TASK", "assign_tasks");
+define("TBL_TASK_COMMENT", "task_comments");
 
 define("PENALTY_RATE", 10);
 define("LOAN_EMI", 10);

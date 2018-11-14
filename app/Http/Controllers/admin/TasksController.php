@@ -996,7 +996,8 @@ class TasksController extends Controller
                         'currentRoute' => $this->moduleRouteText,
                         'row' => $row, 
                         'isEdit' => \App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_TASKS),
-                        'isDelete' => \App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_TASKS),'isView' =>\App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_TASKS),
+                        'isDelete' => \App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_TASKS),
+                        'isView' =>\App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_TASKS),
                     ]
                 )->render();
             })

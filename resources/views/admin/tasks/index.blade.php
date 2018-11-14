@@ -21,7 +21,7 @@
                         <i class="fa fa-list"></i>{{ $page_title }}    
                     </div>
                   
-                   @if($btnAdd)
+                    @if($btnAdd)
                       
                         <a class="btn btn-primary btn-sm mTop5 pull-right" href="{{ $add_url }}" >Add New</a>
                         <a class="btn btn-primary btn-sm mTop5 btn-download pull-right" style="margin-right: 10px;">Download CSV</a>
@@ -185,7 +185,7 @@ function openView($id){
                     data.search_end_date = $("#search-frm input[name='search_end_date']").val();
                     data.search_task_date = $("#search-frm select[name='search_task_date']").val();
                     data.search_project = $("#search-frm select[name='search_project']").val();
-                    data.search_user = $("#search-frm select[name='search_user']").val();
+                    data.search_user = $("#search-frm sesearch_userlect[name='search_user']").val();
                     data.search_client = $("#search-frm select[name='search_client']").val();
                     data.search_title = $("#search-frm input[name='search_title']").val();
                     data.search_hour = $("#search-frm input[name='search_hour']").val();

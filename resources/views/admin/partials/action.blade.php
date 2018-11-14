@@ -1,14 +1,38 @@
 <div class="btn-group">
-@if($isEdit)
+@if(isset($isEdit) && $isEdit)
 <a href="{{ route($currentRoute.'.edit',['id' => $row->id]) }}" class="btn btn-xs btn-primary" title="edit">
     <i class="fa fa-edit"></i>
 </a>         
 @endif
 
-@if($isDelete)
+@if(isset($isEditHistory) && $isEditHistory)
+<a href="{{ route($currentRoute.'.edit',['id' => $row->id]) }}" class="btn btn-xs btn-primary" title="edit history">
+    <i class="fa fa-history"></i>
+</a>         
+@endif
+
+@if(isset($isDelete) && $isDelete)
 <a data-id="{{ $row->id }}" href="{{ route($currentRoute.'.destroy',['id' => $row->id]) }}" class="btn btn-xs btn-danger btn-delete-record" title="delete">
     <i class="fa fa-trash-o"></i>
 </a>          
+@endif
+
+@if(isset($assign_task_done) && $assign_task_done == 0)
+	@if($row->status == 0)
+		<a class="btn btn-xs btn-danger accepted" title="Change Status Pending" href="{{ route($currentRoute.'.index',['changeID' => $row->id, 'changeStatus' => 1]) }}" onclick="return confirm('Are you sure ?');">
+		    <i class="fa fa-check-circle-o"></i>
+		</a>
+	
+	@endif
+	<!-- @if($row->status == 0)
+		<a class="btn btn-sm btn-danger" title="Change Status To Pending" href="{{ route($currentRoute.'.index',['changeID' => $row->id, 'changeStatus' => 1]) }}" onclick="return confirm('Are you sure ?');">
+		    <i class="fa fa-check-circle-o"></i>
+		</a>
+	@else
+		<a class="btn btn-sm btn-success" title="Change Status To Done" href="{{ route($currentRoute.'.index',['changeID' => $row->id, 'changeStatus' => 1]) }}" onclick="return confirm('Are you sure ?');">
+		    <i class="fa fa-check-circle-o"></i>
+		</a>
+	@endif -->
 @endif
 
 @if(isset($isAccept) && $isAccept)
@@ -134,3 +158,11 @@ $url = url('/invoice-expense?').'search_invoice_id='.$row->id;
 	</a>
 @endif
 </div>
+
+@if(isset($assignTaskView) && $assignTaskView)
+<a data-id="{{ $row->id }}" class="btn btn-xs btn-success" onclick="openView({{$row->id}})" title="view Assign Task">
+    <i class="fa fa-eye"></i>
+</a>
+@endif
+
+
