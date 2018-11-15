@@ -101,24 +101,24 @@ else
                     {!! Form::model($formObj,['method' => $method,'files' => true, 'action' => 'admin\AssignTasksController@SaveComment' ,'class' => 'sky-form form form-group', 'id' => 'main-frm1']) !!}
 
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="form-group"> 
                                 <label>Asssign to</label>
                                 {!! Form::select('user_id',[''=>'Select User']+$users,null,['class' => 'form-control user', 'data-required' => true,'id'=>'user_id']) !!} 
                             </div>
                             
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="form-group">
                                 <label>Status</label> 
                                 {!! Form::select('task_status',['0'=>'Pending','1'=>'Done'],null,['class' => 'form-control', 'data-required' => true]) !!}
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="form-group">
                                 <label>Due date</label> 
 
-                                {!! Form::text('task_due_date',null,['class' => 'task_due_date input-group form-control input-small date-picker  data-date-format="dd/mm/yyyy" ', 'data-required' => false,'id'=>'','placeholder'=>'Due Date']) !!}
+                                {!! Form::text('task_due_date',null,['class' => 'task_due_date input-group form-control date-picker  data-date-format="dd/mm/yyyy" ', 'data-required' => false,'id'=>'','placeholder'=>'Due Date']) !!}
                             </div>
                         </div>
                         @if(!empty($auth) && $auth == 3)
@@ -126,7 +126,7 @@ else
                         @endif
 
                         @if(!empty($auth) && $auth == 1)
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="form-group">
                                 <label>Priority</label>
                                 {!! Form::select('task_priority',['0'=>'High','1'=>'Low','2'=>'Medium'],$viewTask->priority,['class' => 'form-control', 'data-required' => true]) !!}
