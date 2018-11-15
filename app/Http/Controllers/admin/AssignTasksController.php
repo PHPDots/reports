@@ -72,15 +72,15 @@ class AssignTasksController extends Controller
         $changeID = $request->get('changeID');
 
 
-        if($auth_id == NORMAL_USER || $auth_id == TRAINEE_USER){
-             
+        if($auth_id == NORMAL_USER || $auth_id == TRAINEE_USER)
+        {             
             $data['users_task']=''; 
             $viewName = $this->moduleViewName.".index";
             if($changeID > 0 && $changeStatus > 0)
             { 
                 $this->changeStatus($changeID);
-                return view($this->moduleViewName.".assignUserTaskIndex", $data);
             }
+                return view($this->moduleViewName.".assignUserTaskIndex", $data);
         }
         else if($auth_id == ADMIN_USER_TYPE)
         {
@@ -91,6 +91,13 @@ class AssignTasksController extends Controller
 
     public function changeStatus($id)
     {  
+        $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$CHANGE_ASSIGN_TASK_STATUS);
+        
+        if($checkrights) 
+        {
+            return $checkrights;
+        }
+        
         $record = $this->modelObj->find($id);
         if($record)
         {
@@ -274,9 +281,8 @@ class AssignTasksController extends Controller
                     $params["to"]=$user_name->email;
                     $params["subject"] = $subject;
                     $params["body"] = $returnHTML;
-                    //sendHtmlMail($params); 
+                    sendHtmlMail($params); 
                 }
-                die;
             } 
             session()->flash('success_message', $msg);                    
         } 
@@ -410,7 +416,7 @@ class AssignTasksController extends Controller
             
             $returnHTML = view('emails.comment_task_temp',$message)->render();
 
-            $ccEmails[] = 'alka.thumar@phpdots.com'; 
+            $ccEmails[] = 'jitendra.rathod@phpdots.com'; 
             $params["to"]=$user_nm->email;
             $params["ccEmails"] = $ccEmails;
             $params["subject"] = $subject;
@@ -489,7 +495,6 @@ class AssignTasksController extends Controller
                     $model->user_id = $user_id; 
                     $model->comments = $comments;
                     $model->task_priority = $task_priority; 
-                    //dd($model);exit();  
                     if(!empty($task_due_date))
                     {
                         $task_due_dates = $task_due_date; 
@@ -654,7 +659,7 @@ class AssignTasksController extends Controller
         {
             return $checkrights;
         }
-        $auth_id = \Auth::guard('admins')->id(); 
+        $auth_id = \Auth::guard('admins')->user()->id; 
 
         $model = AssignTask::select(TBL_ASSIGN_TASK.".*") 
                 ->where(TBL_ASSIGN_TASK.".user_id",$auth_id);
@@ -666,8 +671,8 @@ class AssignTasksController extends Controller
                     [
                         'currentRoute' => $this->moduleRouteText,
                         'row' => $row,
-                        'isEditHistory' => \App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_ASSIGN_TASK),                   
-                        'assign_task_done' =>\App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_ASSIGN_TASK),                                
+                        'isEditHistory' => \App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_ASSIGN_TASK),
+                        'assign_task_done' =>\App\Models\Admin::isAccess(\App\Models\Admin::$CHANGE_ASSIGN_TASK_STATUS),
                     ]
                 )->render();
             })
