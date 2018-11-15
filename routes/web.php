@@ -124,11 +124,10 @@ Route::get('clear-cache', function () {
     Route::any('tasks/view', 'admin\TasksController@viewData');
     Route::any('tasks/data', 'admin\TasksController@data')->name('tasks.data');
     Route::resource('tasks', 'admin\TasksController');
-    //Assign Tasks
-     
+    
+    //Assign Tasks 
     Route::any('assign-tasks/userData', 'admin\AssignTasksController@assignUserTaskData')->name('assign.task.user.data');
     Route::any('assign-tasks/save-comment', 'admin\AssignTasksController@SaveComment')->name("savecomment");
-    Route::any('assign-tasks/view', 'admin\AssignTasksController@viewData');
     Route::any('assign-tasks/data', 'admin\AssignTasksController@data')->name('assign-tasks.data');
     Route::resource('assign-tasks', 'admin\AssignTasksController');
 

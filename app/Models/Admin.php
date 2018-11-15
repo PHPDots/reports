@@ -158,11 +158,22 @@ class Admin extends Authenticatable
 
     public static $USERS_TASK_REPORT = 116;
 
-    public static $LIST_ASSIGN_TASK = 117;
-    public static $ADD_ASSIGN_TASK = 118;
-    public static $EDIT_ASSIGN_TASK = 119;
-    public static $DELETE_ASSIGN_TASK = 120;
-    public static $LIST_ASSIGN_USER_TASKS = 121;
+    public static $LIST_LOAN = 117;
+    public static $ADD_LOAN = 118;
+    public static $ADD_LOAN_PAYMENT= 119;
+    public static $DELETE_LOAN = 120;
+    public static $LIST_MEMBER_ACCOUNTS = 121;
+    public static $LIST_MULTIPLE_ACCOUNT = 122;
+    public static $LEDGER_LIST = 123;
+    public static $ADD_LEDGER = 124;
+    public static $VIEW_LEDGER=125;
+    public static $VIEW_LOAN=126;
+    public static $ADD_ACCOUNT=127;
+
+    public static $LIST_ASSIGN_TASK = 128;
+    public static $ADD_ASSIGN_TASK = 129;
+    public static $EDIT_ASSIGN_TASK = 130;
+    public static $DELETE_ASSIGN_TASK = 131;
  
     /**
      * check page acces permissions
