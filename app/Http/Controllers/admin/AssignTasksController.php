@@ -12,6 +12,7 @@ use App\Models\AdminAction;
 use App\Models\AssignTask; 
 use App\Models\User;
 use App\Models\TaskComment;
+use App\Models\Project;
 
 class AssignTasksController extends Controller
 {
@@ -80,8 +81,6 @@ class AssignTasksController extends Controller
                 $this->changeStatus($changeID);
                 return view($this->moduleViewName.".assignUserTaskIndex", $data);
             }
-
-            return view($this->moduleViewName.".assignUserTaskIndex", $data);
         }
         else if($auth_id == ADMIN_USER_TYPE)
         {
@@ -167,8 +166,7 @@ class AssignTasksController extends Controller
         $data = array();
         $status = 1;
         $msg = $this->addMsg;
-        $goto = $this->list_url; 
-
+        $goto = $this->list_url;
          
         $validator = Validator::make($request->all(), [
             'user_id.*' => 'exists:'.TBL_USERS.',id',
@@ -198,26 +196,29 @@ class AssignTasksController extends Controller
             $description = $request->get('description'); 
             $statuss = $request->get('status');
             $priority = $request->get('priority');
-
-            $auth_id = \Auth::guard('admins')->user()->user_type_id;
             $user = $request->get('user_id');
 
-             
-            if(!empty($user) && $auth_id == 1 && is_array($user))
+            if(!empty($user) && is_array($user))
             {
-                $user_id = $request->get('user_id'); 
                 $due_date = $request->get('due_date');
                 $count = count($project_id);
                 
                 for($i=0; $i<$count; $i++)
-                {
+                { 
                     $obj = new AssignTask();
-                    $obj->user_id = $user_id[$i];
-                    $obj->project_id = $project_id[$i];
-                    $obj->title = $title[$i];
+                    $user_id = isset($user[$i]) ? $user[$i] : '';
+                    $projectId = isset($project_id[$i]) ? $project_id[$i] : '';
+                    $taskTitle = isset($title[$i]) ? $title[$i] : '';
+                    $Taskstatus = isset($statuss[$i]) ? $statuss[$i] : '';
+                    $Taskpriority = isset($priority[$i]) ? $priority[$i] : '';
+
+                    $obj->user_id = $user_id;
+                    $obj->project_id = $projectId;
+                    $obj->title = $taskTitle;
                     $obj->description = $description[$i]; 
-                    $obj->status = $statuss[$i];
-                    $obj->priority = $priority[$i];
+                    $obj->status = $Taskstatus;
+                    $obj->priority = $Taskpriority;
+                   
                     if(!empty($due_date[$i]))
                     {
                         $due_dates = $due_date[$i]; 
@@ -229,19 +230,53 @@ class AssignTasksController extends Controller
 
                     $obj->due_date = $due_dates;
                     $obj->save(); 
-                    $id = $obj->id;  
+                    $id = $obj->id; 
 
                     //store logs detail
-                $params=array();
-                
-                $params['adminuserid']  = \Auth::guard('admins')->id();
-                $params['actionid']     = $this->adminAction->ADD_ASSIGN_TASK;
-                $params['actionvalue']  = $id;
-                $params['remark']       = "Add Assign Task::".$id;
+                    $params=array();
+                    
+                    $params['adminuserid']  = \Auth::guard('admins')->id();
+                    $params['actionid']     = $this->adminAction->ADD_ASSIGN_TASK;
+                    $params['actionvalue']  = $id;
+                    $params['remark']       = "Add Assign Task::".$id;
 
-                $logs=\App\Models\AdminLog::writeadminlog($params);
-            
+                    $logs=\App\Models\AdminLog::writeadminlog($params); 
+                    
+                    // send email to user
+                    $user_name = User::find($user_id);
+                    $pro_name = Project::find($projectId); 
+
+                    $firstname = $lastname = $prdName = '';
+
+                    if($pro_name)
+                        $prdName = $pro_name->title;
+
+                    if($user_name){
+                        $firstname = ucfirst($user_name->firstname);
+                        $lastname = ucfirst($user_name->lastname);
+                    }
+
+                    $subject = "Reports PHPdots: Assign Task";
+                    
+                    $link = url('/')."/assign-tasks/".$id.'/edit';
+
+                    $message = array();             
+                    $message['firstname'] = $firstname;
+                    $message['lastname'] = $lastname;  
+                    $message['pro_title'] = $prdName;
+                    $message['title'] = $taskTitle;
+                    $message['status'] = $Taskstatus;
+                    $message['priority'] = $Taskpriority;
+                    $message['link'] = $link;                 
+                    
+                    $returnHTML = view('emails.assign_task_temp',$message)->render();
+
+                    $params["to"]=$user_name->email;
+                    $params["subject"] = $subject;
+                    $params["body"] = $returnHTML;
+                    //sendHtmlMail($params); 
                 }
+                die;
             } 
             session()->flash('success_message', $msg);                    
         } 
@@ -347,6 +382,40 @@ class AssignTasksController extends Controller
             $assign->save();
         }
         if(TaskComment::create($data)){
+
+            $user_nm = User::find($request->user_id);
+            $assignTaskTile = AssignTask::find($request->assing_task_id);
+            $firstname = $lastname = $title = $status = '';
+            if($user_nm){
+                $firstname = ucfirst($user_nm->firstname);
+                $lastname = ucfirst($user_nm->lastname);
+            }
+            if($assignTaskTile)
+            {
+                $title = ucfirst($assignTaskTile->title);
+                $$status = ucfirst($assignTaskTile->$status);
+            }
+            // send email
+            $subject = "Reports PHPdots: Assign Task";
+            
+            $link = url('/')."/assign-tasks/".$request->assing_task_id.'/edit';
+
+            $message = array();             
+            $message['firstname'] = $firstname;
+            $message['lastname'] = $lastname;  
+            $message['title'] = $title;  
+            $message['comments'] = $request->comments; 
+            $message['status'] = $status; 
+            $message['link'] = $link;                 
+            
+            $returnHTML = view('emails.comment_task_temp',$message)->render();
+
+            $ccEmails[] = 'alka.thumar@phpdots.com'; 
+            $params["to"]=$user_nm->email;
+            $params["ccEmails"] = $ccEmails;
+            $params["subject"] = $subject;
+            $params["body"] = $returnHTML;
+            sendHtmlMail($params);
 
             session()->flash('success_message', 'Comment Saved!');  
             return ['status' => '1', 'msg' => 'Comment Saved', 'data' => '', 'goto' =>'']; 
@@ -476,7 +545,7 @@ class AssignTasksController extends Controller
                 $goto = session()->get($this->moduleRouteText.'_goto');
                 if(empty($goto)){  $goto = $this->list_url;  }
 
-                $taskComment = TaskComment::where('assing_task_id',$id)->first();
+                $taskComment = TaskComment::where('assing_task_id',$id);
                 $taskComment->delete();
                 $modelObj->delete();
                 session()->flash('success_message', $this->deleteMsg); 
