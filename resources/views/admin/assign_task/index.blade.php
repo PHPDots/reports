@@ -119,7 +119,12 @@
         var oTableCustom = $('#server-side-datatables').DataTable({
             processing: true,
             serverSide: true,
-            searching: false,
+            searching: false, 
+            lengthMenu:
+            [
+              [100,200,300,400,500],
+              [100,200,300,400,500]
+            ],
             ajax: {
                 "url": "{!! route($moduleRouteText.'.data') !!}",
                 "data": function ( data ) 

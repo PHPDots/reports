@@ -110,6 +110,12 @@ else
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
+                                <label>Status</label> 
+                                {!! Form::select('task_status',['0'=>'Pending','1'=>'Done'],null,['class' => 'form-control', 'data-required' => true]) !!}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
                                 <label>Due date</label> 
 
                                 {!! Form::text('task_due_date',null,['class' => 'task_due_date input-group form-control input-small date-picker  data-date-format="dd/mm/yyyy" ', 'data-required' => false,'id'=>'','placeholder'=>'Due Date']) !!}

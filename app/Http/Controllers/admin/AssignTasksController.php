@@ -379,11 +379,13 @@ class AssignTasksController extends Controller
         $data['task_priority'] = $request->task_priority;
         $data['comment_by_user_id'] = \Auth::guard('admins')->user()->id;
         $data['comments'] = $request->comments;
+        $data['task_status'] = $request->task_status;
 
         $assign = AssignTask::find($request->assing_task_id);
         if($assign){
             $assign->user_id = $request->user_id;
             $assign->priority = $request->task_priority;
+            $assign->status = $request->task_status;
             $assign->due_date = date("Y-m-d",strtotime($request->task_due_date));
             $assign->save();
         }
