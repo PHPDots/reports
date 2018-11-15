@@ -425,11 +425,23 @@ class DocumentController extends Controller
         $obj = EmployessDocument::find($id);
         if($obj)
         {
+            $fileName = $obj->filename;
+            $extn = '.png';
+            $file = explode('.',$fileName);
+            if(is_array($file))
+                $extn = isset($file[1])?'.'.$file[1]:'.png';
+
+            $user = \App\Models\User::find($obj->user_id);
+            if($user)
+                $fileName = ucfirst($user->name);
+            $docType = \App\Models\DocumentsType::find($obj->doc_type_id);
+            if($docType)
+                $fileName .= ' '.ucfirst($docType->title).$extn;
+
             $user_id = $obj->user_id;
             $destinationPath = public_path().DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.'users'.DIRECTORY_SEPARATOR.$user_id.DIRECTORY_SEPARATOR.'docs'.DIRECTORY_SEPARATOR.$obj->filename;
 
-            downloadFile($obj->filename,$destinationPath);
-            exit;
+            downloadFile($fileName,$destinationPath);
         }
         else
         {
