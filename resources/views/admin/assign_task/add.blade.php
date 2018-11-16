@@ -48,46 +48,46 @@ z-index: 9!important;
                                             <div class="form-group">
                                             {!! Form::select('user_id[]',[''=>'Select User']+$users,null,['class' => 'form-control user', 'data-required' => true,'id'=>'user_id']) !!}
                                             </div>
-                                        </div>
+                                        </div> 
                                         <div class="col-sm-4 nopadding">
                                             <div class="input-group" style="width:100%;">
                                               {!! Form::select('project_id[]',[''=>'Select Project']+$projects,null,['class' => 'form-control projects', 'data-required' => true,'id'=>'project_id']) !!}
                                               </select>
                                           </div>
-                                        </div>
+                                        </div>  
                                         <div class="col-sm-4 nopadding">
-                                      <div class="form-group">
-                                        {!! Form::text('title[]',null,['class' => 'form-control', 'data-required' => true,'placeholder' => 'Enter Task Title']) !!}
-                                      </div>
-                                        </div>                 
-                                        <div class="col-sm-6 nopadding">
-                                      <div class="form-group">
-                                        {!! Form::textarea('description[]',null,['class' => 'form-control','placeholder' => 'Enter Description','rows'=>'3']) !!}
-                                      </div>
-                                        </div>
-                                        <div class="col-sm-2 nopadding">
-                                      <div class="form-group">
-                                        {!! Form::select('status[]',['0'=>'Pending','1'=>'Done'],null,['class' => 'form-control', 'data-required' => true]) !!}
-                                      </div>
-                                        </div>
-                                        <div class="col-sm-2 nopadding" style="padding: 0px;margin: 0px;">
-                                      <div class="form-group">
-                                        {!! Form::select('priority[]',['0'=>'High','1'=>'Low','2'=>'Medium'],null,['class' => 'form-control', 'data-required' => true]) !!}
-                                      </div>
-                                        </div> 
-                                        <div class="col-sm-2 nopadding">
-                                            <div class="form-group">  
-                                                {!! Form::text('due_date[]',null,['class' => 'due_date input-group form-control input-small date-picker  data-date-format="dd/mm/yyyy" ', 'data-required' => false,'id'=>'','placeholder'=>'Task Date']) !!}
+                                            <div class="form-group">
+                                                {!! Form::text('title[]',null,['class' => 'form-control', 'data-required' => true,'placeholder' => 'Enter Task Title']) !!}
+                                            </div>
+                                        </div>  
+                                        <div class="col-sm-4 nopadding">
+                                            <div class="form-group">
+                                                {!! Form::select('status[]',['0'=>'Pending','1'=>'Done'],null,['class' => 'form-control', 'data-required' => true]) !!}
+                                            </div>
+                                        </div>  
+                                        <div class="col-sm-4 nopadding">
+                                            <div class="form-group">
+                                                {!! Form::select('priority[]',['0'=>'High','1'=>'Low','2'=>'Medium'],null,['class' => 'form-control', 'data-required' => true]) !!}
                                             </div>
                                         </div> 
-                                        <div class="col-sm-6 nopadding">
-                                      <div class="form-group">
-                                        <div class="input-group">  
-                                          <div class="input-group-btn btn-add-task" style="padding-left:5px">
-                                            <button class="btn btn-success pull-right" type="button"  onclick="assign_task();"> <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> </button>
-                                          </div> 
-                                        </div>
-                                      </div>
+                                        <div class="col-sm-4 nopadding">
+                                            <div class="form-group">  
+                                                {!! Form::text('due_date[]',null,['class' => 'due_date input-group form-control date-picker  data-date-format="dd/mm/yyyy" ', 'data-required' => false,'id'=>'','placeholder'=>'Task Date']) !!}
+                                            </div>
+                                        </div>              
+                                        <div class="col-sm-12 nopadding">
+                                            <div class="form-group">
+                                                {!! Form::textarea('description[]',null,['class' => 'form-control ckeditor','placeholder' => 'Enter Description','rows'=>'1','id' => 'ckeditor-1']) !!}
+                                            </div>
+                                        </div> 
+                                        <div class="col-sm-12 nopadding">
+                                            <div class="form-group">
+                                                <div class="input-group">  
+                                                    <div class="input-group-btn btn-add-task" style="padding-left:5px">
+                                                        <button class="btn btn-success pull-right" type="button"  onclick="assign_task();"> <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> </button>
+                                                    </div> 
+                                                </div>
+                                            </div>
                                         </div> 
                                     </div> 
                                 <div id="assign_task">
@@ -128,10 +128,12 @@ z-index: 9!important;
 }
 </style>
 @section('scripts')
+<script src="{{ asset('themes/admin/assets/global/plugins/ckeditor/ckeditor.js') }}" type="text/javascript"></script>
 <script type="text/javascript">
 
     var room = 1;
 function assign_task() { 
+
     room++;
     var objTo = document.getElementById('assign_task');
   
@@ -146,13 +148,23 @@ function assign_task() {
      
     var users = second.innerHTML;
      
-    divtest.innerHTML = '<div class="add_row_new clearfix"><div class="col-sm-4 nopadding"><div class="form-group"><div class="input-group" style="width:100%;"><select data-required="true" class="form-control user" id=" " name="user_id[]" style="width:100%;">'+users+'</select></div></div></div><div class="col-sm-4 nopadding"><div class="form-group"><div class="input-group" style="width:100%;"><select data-required="true" class="form-control projects" id=" " name="project_id[]" style="width:100%;">'+options+'</select></div></div></div><div class="col-sm-4 nopadding"><div class="form-group"><input type="text" class="form-control" data-required="true" id="title" name="title[]" value="" placeholder="Enter Task Title"></div></div><div class="col-sm-6 nopadding"><div class="form-group"><textarea rows="3" class="form-control" id="description" name="description[]" value="" placeholder="Enter Description"></textarea></div></div><div class="col-sm-2 nopadding"><div class="form-group"><select class="form-control" id="status" name="status[]" data-required="true"><option value="0">Pending</option><option value="1">Done</option></select></div></div><div class="col-sm-2 nopadding"><div class="form-group"><select class="form-control" id="priority" name="priority[]" data-required="true"><option value="0">High</option><option value="1">Low</option><option value="2">Medium</option></select></div></div><div class="col-sm-1 nopadding"><input type="text" name="due_date[]" value="'+current_date+'" class="due_date input-group form-control form-control-inline date date-picker input-small " size="16" data-date-format="dd/mm/yyyy" id=""></div><div class="col-sm-6 nopadding"><div class="form-group"><div class="input-group-btn" style="padding-left:5px"><button class="btn btn-danger pull-right" type="button" onclick="remove_education_fields('+ room +');"><span class="glyphicon glyphicon-minus"aria-hidden="true"></span></button></div></div></div></div></div></div>';}
+    divtest.innerHTML = '<div class="add_row clearfix"><div class="col-sm-4 nopadding"><div class="form-group"><div class="input-group" style="width:100%;"><select data-required="true" class="form-control user" id=" " name="user_id[]" style="width:100%;">'+users+'</select></div></div></div><div class="col-sm-4 nopadding"><div class="input-group" style="width:100%;"><select data-required="true" class="form-control projects" id=" " name="project_id[]" style="width:100%;">'+options+'</select></div></div><div class="col-sm-4 nopadding"><div class="form-group"><input type="text" class="form-control" data-required="true" id="title" name="title[]" value="" placeholder="Enter Task Title"></div></div><div class="col-sm-4 nopadding"><div class="form-group"><select class="form-control" id="status" name="status[]" data-required="true"><option value="0">Pending</option><option value="1">Done</option></select></div></div><div class="col-sm-4 nopadding"><div class="form-group"><select class="form-control" id="priority" name="priority[]" data-required="true"><option value="0">High</option><option value="1">Low</option><option value="2">Medium</option></select></div></div><div class="col-sm-4 nopadding"><div class="form-group"><input type="text" name="due_date[]" value="'+current_date+'" class="due_date input-group form-control form-control-inline date date-picker " size="16" data-date-format="dd/mm/yyyy" id=""></div></div><div class="col-sm-12 nopadding"><div class="form-group"><textarea rows="1" class="form-control ckeditor1-'+room+'" id="ckeditor1-'+room+'" name="description[]" value="" placeholder="Enter Description"></textarea></div></div><div class="col-sm-12 nopadding"><div class="form-group"><div class="input-group-btn" style="padding-left:5px"><button class="btn btn-danger pull-right" type="button" onclick="remove_education_fields('+ room +');"><span class="glyphicon glyphicon-minus"aria-hidden="true"></span></button></div></div></div></div></div></div>';}
      else{ 
          divtest.innerHTML = '<div class="add_row_new clearfix"><div class="col-sm-4 nopadding"><div class="form-group"><div class="input-group" style="width:100%;"><select data-required="true" class="form-control projects" id=" " name="project_id[]" style="width:100%;">'+options+'</select></div></div></div><div class="col-sm-4 nopadding"><div class="form-group"><input type="text" class="form-control" data-required="true" id="title" name="title[]" value="" placeholder="Enter Task Title"></div></div></div>';
         }
         objTo.appendChild(divtest)
         serach_project();
         resetValidator(); 
+        $('.ckeditor1-'+room).each(function (){
+            CKEDITOR.replace(this.id,
+            {
+                toolbarGroups: 
+                [
+                    {"name":"basicstyles","groups":["basicstyles"]},
+                    {"name":"paragraph","groups":["list"]}
+                ],
+            });
+        });
 }
 
 function remove_education_fields(rid) 
@@ -195,6 +207,18 @@ function resetValidator()
     }
      
     $(document).ready(function () {
+
+        $(".ckeditor").each(function (){
+            CKEDITOR.replace(this.id,
+            {
+                toolbarGroups: 
+                [
+                    {"name":"basicstyles","groups":["basicstyles"]},
+                    {"name":"paragraph","groups":["list"]}
+                ],
+            });
+        });
+
         $(".projects").select2({
                 placeholder: "Search Project",
                 allowClear: true,
@@ -232,7 +256,14 @@ function resetValidator()
         });*/
         
         $('#main-frm1').submit(function () {
-            
+
+            $form = $(this);
+
+            for(instance in CKEDITOR.instances) 
+            {
+                CKEDITOR.instances[instance].updateElement();
+            } 
+
             if ($(this).parsley('isValid'))
             {
                 $('#submit_btn').attr("disabled", true);

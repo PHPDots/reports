@@ -21,7 +21,7 @@
 		</div>
 		<div class="row static-info">
 			<div class="col-md-5 name"> Account No: </div>
-			<div class="col-md-7 value">20100163512 </div>
+			<div class="col-md-7 value">201001635127 </div>
 		</div>
 		<div class="row static-info">
 			<div class="col-md-5 name"> Address: </div>
