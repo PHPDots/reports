@@ -111,7 +111,7 @@ else
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label>Status</label> 
-                                {!! Form::select('task_status',['0'=>'Pending','1'=>'Done'],null,['class' => 'form-control', 'data-required' => true]) !!}
+                                {!! Form::select('task_status',['0'=>'Pending','1'=>'Done'],$viewTask->status,['class' => 'form-control', 'data-required' => true]) !!}
                             </div>
                         </div>
                         <div class="col-md-3">
