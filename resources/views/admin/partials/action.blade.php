@@ -19,7 +19,7 @@
 
 @if(isset($assign_task_done) && $assign_task_done)
 	@if($row->status == 0)
-		<a class="btn btn-xs btn-danger accepted" title="Change Status Pending" href="{{ route($currentRoute.'.index',['changeID' => $row->id, 'changeStatus' => 1]) }}" onclick="return confirm('Are you sure ?');">
+		<a class="btn btn-xs btn-success accepted" title="Change Status To Done" href="{{ route($currentRoute.'.index',['changeID' => $row->id, 'changeStatus' => 1]) }}" onclick="return confirm('Are you sure ?');">
 		    <i class="fa fa-check-circle-o"></i>
 		</a>
 	

@@ -597,11 +597,10 @@ class AssignTasksController extends Controller
                 return view("admin.partials.action",
                     [
                         'currentRoute' => $this->moduleRouteText,
-                        'row' => $row,  
-                        'isEditHistory' => \App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_ASSIGN_TASK),                
+                        'row' => $row,
+                        'isEditHistory' => \App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_ASSIGN_TASK),
                         'isDelete' => \App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_ASSIGN_TASK),
-                        /*'isView' => \App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_ASSIGN_TASK),*/               
-                                                     
+                        'assign_task_done' =>\App\Models\Admin::isAccess(\App\Models\Admin::$CHANGE_ASSIGN_TASK_STATUS),
                     ]
                 )->render();
             })
