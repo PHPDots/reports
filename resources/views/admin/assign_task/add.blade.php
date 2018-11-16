@@ -189,17 +189,14 @@ function resetValidator()
 }
     function serach_project()
     {
-        $(".user").select2({
-                placeholder: "Search User",
+        $(".projects").select2({
+                placeholder: "Search Project",
                 allowClear: true,
                 minimumInputLength: 2,
                 width: null
         });
-    }
-    function serach_project()
-    {
-        $(".projects").select2({
-                placeholder: "Search Project",
+        $(".user").select2({
+                placeholder: "Search User",
                 allowClear: true,
                 minimumInputLength: 2,
                 width: null
