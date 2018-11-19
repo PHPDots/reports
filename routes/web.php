@@ -125,12 +125,6 @@ Route::get('clear-cache', function () {
     Route::any('tasks/data', 'admin\TasksController@data')->name('tasks.data');
     Route::resource('tasks', 'admin\TasksController');
 
-    //Clients Reports  
-    Route::any('clients-reports/data', 'admin\ClientMonthlyReportsController@data')->name('clients-reports.data');    
-    Route::resource('clients-reports', 'admin\ClientMonthlyReportsController');
-    //Employee Reports
-    Route::any('employee-reports/data', 'admin\EmployeeReportsController@data')->name('employee-reports.data');
-    Route::resource('employee-reports', 'admin\EmployeeReportsController'); 
     
     //Assign Tasks 
     Route::any('assign-tasks/userData', 'admin\AssignTasksController@assignUserTaskData')->name('assign.task.user.data');
@@ -232,4 +226,11 @@ Route::get('clear-cache', function () {
     
 	Route::any('member-logs/data', 'admin\MemberLogsController@data')->name('member-logs.data');
     Route::resource('member-logs', 'admin\MemberLogsController');
-    });    
+
+    //Reports  
+    Route::any('clients-reports/data', 'admin\ClientMonthlyReportsController@data')->name('clients-reports.data');    
+    Route::resource('clients-reports', 'admin\ClientMonthlyReportsController');
+
+    Route::any('employee-reports/data', 'admin\EmployeeReportsController@data')->name('employee-reports.data');
+    Route::resource('employee-reports', 'admin\EmployeeReportsController'); 
+});    
