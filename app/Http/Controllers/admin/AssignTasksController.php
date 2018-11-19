@@ -281,7 +281,7 @@ class AssignTasksController extends Controller
                     $params["to"]=$user_name->email;
                     $params["subject"] = $subject;
                     $params["body"] = $returnHTML;
-                    sendHtmlMail($params); 
+                    //sendHtmlMail($params); 
                 }
             } 
             session()->flash('success_message', $msg);                    
@@ -371,8 +371,86 @@ class AssignTasksController extends Controller
         return view($this->moduleViewName.'.edit', $data);
     }
     public function SaveComment(Request $request)
-    {   
+    {  
+        $status = 1;
+        $msg = "Comment Saved";
         $data = array();
+
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required|exists:'.TBL_USERS.',id',
+            'task_status' => ['required', Rule::in([0,1])], 
+            'task_priority' => ['required', Rule::in([0,1,2])],
+            'task_due_date' => 'required',
+            'comments' => 'required|min:15',
+        ]);
+        if ($validator->fails())
+        {
+             $messages = $validator->messages();
+            
+            $status = 0;
+            $msg = "";
+            
+            foreach ($messages->all() as $message) 
+            {
+                $msg .= $message . "<br />";    
+            }
+            return ['status' => $status, 'msg' => $msg];
+        }
+        else
+        {    
+            $data['user_id'] = request()->get('user_id');
+            $data['assing_task_id'] = request()->get('assing_task_id');
+            $data['task_status'] = request()->get('task_status');
+            $data['task_priority'] = request()->get('task_priority');
+            $data['task_due_date'] = date("Y-m-d",strtotime($request->task_due_date));
+            $data['comments'] = request()->get('comments');
+            $data['comment_by_user_id'] = \Auth::guard('admins')->user()->id;
+
+            $assign = AssignTask::find($request->assing_task_id);
+
+            if($assign){
+                $assign->user_id = $request->user_id;
+                $assign->priority = $request->task_priority;
+                $assign->status = $request->task_status;
+                $assign->due_date = date("Y-m-d",strtotime($request->task_due_date));
+                $assign->save();
+            }
+            if(TaskComment::create($data)){
+                $user_nm = User::find($request->user_id);
+                $assignTaskTile = AssignTask::find($request->assing_task_id);
+                $firstname = $lastname = $title = $status = '';
+                if($user_nm){
+                    $firstname = ucfirst($user_nm->firstname);
+                    $lastname = ucfirst($user_nm->lastname);
+                } 
+                // send email
+                $subject = "Reports PHPdots: Assign Task";
+                
+                $link = url('/')."/assign-tasks/".$request->assing_task_id.'/edit';
+
+                $message = array();             
+                $message['firstname'] = $firstname;
+                $message['lastname'] = $lastname;
+                $message['title'] = $title;
+                $message['comments'] = $request->comments;
+                $message['status'] = $status;
+                $message['link'] = $link;
+                
+                $returnHTML = view('emails.comment_task_temp',$message)->render();
+            
+                $ccEmails[] = 'rinkal.shiroya@phpdots.com'; 
+                $params["to"]=$user_nm->email;
+                $params["ccEmails"] = $ccEmails;
+                $params["subject"] = $subject;
+                $params["body"] = $returnHTML;
+                sendHtmlMail($params); 
+
+                session()->flash('success_message', $msg); 
+                return ['status' => $status, 'msg' => $msg, 'data' => '', 'goto' =>''];
+            }
+        }
+            return ['status' => $status, 'msg' => $msg, 'data' => '', 'goto' =>''];
+        /*$data = array();
         $data['user_id'] = $request->user_id;
         $data['assing_task_id'] = $request->assing_task_id;
         $data['task_due_date'] = date("Y-m-d",strtotime($request->task_due_date));
@@ -427,8 +505,8 @@ class AssignTasksController extends Controller
 
             session()->flash('success_message', 'Comment Saved!');  
             return ['status' => '1', 'msg' => 'Comment Saved', 'data' => '', 'goto' =>'']; 
-        }
-            return ['status' => '0', 'msg' => 'Something is wrong!', 'data' => '', 'goto' =>'']; 
+        }*/
+            //return ['status' => '0', 'msg' => 'Something is wrong!', 'data' => '', 'goto' =>''];  
     }
 
     /**
