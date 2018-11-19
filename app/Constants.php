@@ -58,6 +58,11 @@ define("OTP_COUNTER",3);
 define("OFFER_LETTER_ID",6);
 define("TRAINEE_USER",'5');
 define("MISCELLANEOUS_PROJECT",7);
+define("RAVI_GAJERA",21);
+define("KISHAN_LASHKARI",11);
+define("LIST_ASSIGN_TASK",117);
+define("ADD_ASSIGN_TASK",118);
+define("DELETE_ASSIGN_TASK",120);
 
 define("TBL_FIX_TASKS","fix_tasks");
 define("TBL_SEND_MAIL_USERS","send_mail_users");
