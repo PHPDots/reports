@@ -371,8 +371,7 @@ class AssignTasksController extends Controller
         return view($this->moduleViewName.'.edit', $data);
     }
     public function SaveComment(Request $request)
-    {  
-
+    {
         $status1 = 1;
         $msg = "Comment Saved";
         $data = array();
@@ -427,7 +426,7 @@ class AssignTasksController extends Controller
                 if($assignTaskTile)
                 {
                     $title = ucfirst($assignTaskTile->title);
-                    $status = ucfirst($assignTaskTile->$status);
+                    $status = $assignTaskTile->$status;
                 } 
                 // send email
                 $subject = "Reports PHPdots: Assign Task";
@@ -442,9 +441,9 @@ class AssignTasksController extends Controller
                 $message['status'] = $assign->status;
                 $message['link'] = $link;
                 
-            echo    $returnHTML = view('emails.comment_task_temp',$message)->render();
-            die();
-                $ccEmails[] = 'rinkal.shiroya@phpdots.com'; 
+                $returnHTML = view('emails.comment_task_temp',$message)->render();
+
+                $ccEmails[] = 'jitendra.rathod@phpdots.com'; 
                 $params["to"]=$user_nm->email;
                 $params["ccEmails"] = $ccEmails;
                 $params["subject"] = $subject;
@@ -456,63 +455,6 @@ class AssignTasksController extends Controller
             }
         }
             return ['status' => $status1, 'msg' => $msg, 'data' => '', 'goto' =>''];
-        /*$data = array();
-        $data['user_id'] = $request->user_id;
-        $data['assing_task_id'] = $request->assing_task_id;
-        $data['task_due_date'] = date("Y-m-d",strtotime($request->task_due_date));
-        $data['task_priority'] = $request->task_priority;
-        $data['comment_by_user_id'] = \Auth::guard('admins')->user()->id;
-        $data['comments'] = $request->comments;
-        $data['task_status'] = $request->task_status;
-
-        $assign = AssignTask::find($request->assing_task_id);
-        if($assign){
-            $assign->user_id = $request->user_id;
-            $assign->priority = $request->task_priority;
-            $assign->status = $request->task_status;
-            $assign->due_date = date("Y-m-d",strtotime($request->task_due_date));
-            $assign->save();
-        }
-        if(TaskComment::create($data)){
-
-            $user_nm = User::find($request->user_id);
-            $assignTaskTile = AssignTask::find($request->assing_task_id);
-            $firstname = $lastname = $title = $status = '';
-            if($user_nm){
-                $firstname = ucfirst($user_nm->firstname);
-                $lastname = ucfirst($user_nm->lastname);
-            }
-            if($assignTaskTile)
-            {
-                $title = ucfirst($assignTaskTile->title);
-                $$status = ucfirst($assignTaskTile->$status);
-            }
-            // send email
-            $subject = "Reports PHPdots: Assign Task";
-            
-            $link = url('/')."/assign-tasks/".$request->assing_task_id.'/edit';
-
-            $message = array();             
-            $message['firstname'] = $firstname;
-            $message['lastname'] = $lastname;  
-            $message['title'] = $title;  
-            $message['comments'] = $request->comments; 
-            $message['status'] = $status; 
-            $message['link'] = $link;                 
-            
-            $returnHTML = view('emails.comment_task_temp',$message)->render();
-
-            $ccEmails[] = 'jitendra.rathod@phpdots.com'; 
-            $params["to"]=$user_nm->email;
-            $params["ccEmails"] = $ccEmails;
-            $params["subject"] = $subject;
-            $params["body"] = $returnHTML;
-            sendHtmlMail($params);
-
-            session()->flash('success_message', 'Comment Saved!');  
-            return ['status' => '1', 'msg' => 'Comment Saved', 'data' => '', 'goto' =>'']; 
-        }*/
-            //return ['status' => '0', 'msg' => 'Something is wrong!', 'data' => '', 'goto' =>''];  
     }
 
     /**
