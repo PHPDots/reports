@@ -164,7 +164,7 @@ class ClientMonthlyReportsController extends Controller
                         ->join(TBL_PROJECT,TBL_TASK.".project_id","=",TBL_PROJECT.".id")
                         ->join(TBL_CLIENT,TBL_PROJECT.".client_id","=",TBL_CLIENT.".id");
                          
-        $hours_query = Task::ReportFilter($hours_query);
+        $hours_query = Task::listFilter($hours_query);
 
         $totalHours = $hours_query->sum(TBL_TASK.".total_time");
         $totalHours = number_format($totalHours,2);
@@ -180,7 +180,7 @@ class ClientMonthlyReportsController extends Controller
           
             ->filter(function ($query) 
             {
-                $query = Task::ReportFilter($query); 
+                $query = Task::listFilter($query); 
             }); 
         $data = $data->with('hours',$totalHours); 
         $data = $data->make(true);

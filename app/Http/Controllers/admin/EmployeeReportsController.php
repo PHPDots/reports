@@ -162,7 +162,7 @@ class EmployeeReportsController extends Controller
 
         $hours_query = Task::select(TBL_TASK.".*"); 
 
-        $hours_query = Task::ReportFilter($hours_query);
+        $hours_query = Task::listFilter($hours_query);
 
         $totalHours = $hours_query->sum("total_time");
         $totalHours = number_format($totalHours,2); 
@@ -178,7 +178,7 @@ class EmployeeReportsController extends Controller
           
             ->filter(function ($query) 
             {
-                $query = Task::ReportFilter($query); 
+                $query = Task::listFilter($query); 
             }); 
         $data = $data->with('hours',$totalHours); 
         $data = $data->make(true);
