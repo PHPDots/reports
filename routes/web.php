@@ -124,6 +124,13 @@ Route::get('clear-cache', function () {
     Route::any('tasks/view', 'admin\TasksController@viewData');
     Route::any('tasks/data', 'admin\TasksController@data')->name('tasks.data');
     Route::resource('tasks', 'admin\TasksController');
+
+    //Clients Reports  
+    Route::any('clients-reports/data', 'admin\ClientMonthlyReportsController@data')->name('clients-reports.data');    
+    Route::resource('clients-reports', 'admin\ClientMonthlyReportsController');
+    //Employee Reports
+    Route::any('employee-reports/data', 'admin\EmployeeReportsController@data')->name('employee-reports.data');
+    Route::resource('employee-reports', 'admin\EmployeeReportsController'); 
     
     //Assign Tasks 
     Route::any('assign-tasks/userData', 'admin\AssignTasksController@assignUserTaskData')->name('assign.task.user.data');
