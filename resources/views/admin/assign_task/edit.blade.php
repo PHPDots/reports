@@ -52,7 +52,7 @@ else
             <div class="task_desc">
                 <div class="row">
                     <div class="col-md-9 left"> 
-                        <p>{{ $viewTask->description }}</p>
+                        <p>{!! $viewTask->description !!}</p>
                     </div> 
                     <div class="col-md-3 right">
                         <div class="prioritylabel">

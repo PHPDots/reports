@@ -31,7 +31,7 @@ else
                 </div> 
                 <div class="clearfix">&nbsp;</div>
                 <div class="col-md-4">
-                    <label class="control-label">Task Date</label>
+                    <label class="control-label">Month</label>
                     {!! Form::select('search_task_date',['' => 'All'] + $task_data,$search_task_date,['class' => 'form-control','id'=>'task_date_id'] ) !!}
                 </div>
                 <div class="col-md-4">              
