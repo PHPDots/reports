@@ -45,8 +45,14 @@ class AssignTasksController extends Controller
      */
     public function index(Request $request)
     {
-        $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$LIST_ASSIGN_TASK);
-        
+        $id = \Auth::guard('admins')->user()->id;
+        if($id == RAVI_GAJERA || $id == KISHAN_LASHKARI){
+            $checkrights='';
+        }
+        else
+        {
+            $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$LIST_ASSIGN_TASK);
+        }
         if($checkrights) 
         {
             return $checkrights;
@@ -58,6 +64,13 @@ class AssignTasksController extends Controller
         $data['add_url'] = route($this->moduleRouteText.'.create');
         $data['btnAdd'] = \App\Models\Admin::isAccess(\App\Models\Admin::$ADD_ASSIGN_TASK);
 
+        $id = \Auth::guard('admins')->user()->id;
+        if($id == RAVI_GAJERA || $id == KISHAN_LASHKARI)
+        {
+            $data['add_url'] = route($this->moduleRouteText.'.create');
+            $data['btnAdd'] = '1';
+        }
+
         $data['users'] = User::where('status',1)
         ->where('user_type_id', '!=', CLIENT_USER)
         ->where('id', '!=' ,'1')
@@ -66,13 +79,18 @@ class AssignTasksController extends Controller
 
         $data['projects'] = \App\Models\Project::getList();
 
-        $auth_id = \Auth::guard('admins')->user()->user_type_id;
+        $auth_id = \Auth::guard('admins')->user()->user_type_id; 
+        $id = \Auth::guard('admins')->user()->id;
         
         $changeStatus = $request->get("changeStatus");
         $changeID = $request->get('changeID');
 
 
-        if($auth_id == NORMAL_USER || $auth_id == TRAINEE_USER)
+        if($auth_id == ADMIN_USER_TYPE || $id == RAVI_GAJERA || $id == KISHAN_LASHKARI)
+        {
+            $data['users_task'] = User::getList();
+        } 
+        else if($auth_id == NORMAL_USER || $auth_id == TRAINEE_USER)
         {             
             $data['users_task']=''; 
             $viewName = $this->moduleViewName.".index";
@@ -81,10 +99,6 @@ class AssignTasksController extends Controller
                 $this->changeStatus($changeID);
             }
                 return view($this->moduleViewName.".assignUserTaskIndex", $data);
-        }
-        else if($auth_id == ADMIN_USER_TYPE)
-        {
-            $data['users_task'] = User::getList();
         } 
         return view($this->moduleViewName.".index", $data); 
     }
@@ -129,11 +143,14 @@ class AssignTasksController extends Controller
      */
     public function create()
     {
-        $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$ADD_ASSIGN_TASK);
-        
-        if($checkrights) 
+        $curr_user_id = \Auth::guard('admins')->user()->id;
+        if($curr_user_id == RAVI_GAJERA || $curr_user_id == KISHAN_LASHKARI)
         {
-            return $checkrights;
+            $checkrights='';
+        }
+        else
+        {
+            $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$ADD_ASSIGN_TASK);
         }
         
         $data = array();
@@ -163,11 +180,14 @@ class AssignTasksController extends Controller
      */
     public function store(Request $request)
     {
-        $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$ADD_ASSIGN_TASK);
-        
-        if($checkrights) 
+        $curr_user_id = \Auth::guard('admins')->user()->id;
+        if($curr_user_id == RAVI_GAJERA || $curr_user_id == KISHAN_LASHKARI)
         {
-            return $checkrights;
+            $checkrights='';
+        }
+        else
+        {
+            $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$ADD_ASSIGN_TASK);
         }
 
         $data = array();
@@ -220,6 +240,7 @@ class AssignTasksController extends Controller
                     $Taskpriority = isset($priority[$i]) ? $priority[$i] : '';
 
                     $obj->user_id = $user_id;
+                    $obj->assing_to_id = $curr_user_id;
                     $obj->project_id = $projectId;
                     $obj->title = $taskTitle;
                     $obj->description = $description[$i]; 
@@ -281,7 +302,7 @@ class AssignTasksController extends Controller
                     $params["to"]=$user_name->email;
                     $params["subject"] = $subject;
                     $params["body"] = $returnHTML;
-                    //sendHtmlMail($params); 
+                    sendHtmlMail($params); 
                 }
             } 
             session()->flash('success_message', $msg);                    
@@ -371,8 +392,7 @@ class AssignTasksController extends Controller
         return view($this->moduleViewName.'.edit', $data);
     }
     public function SaveComment(Request $request)
-    {  
-
+    {
         $status1 = 1;
         $msg = "Comment Saved";
         $data = array();
@@ -427,7 +447,7 @@ class AssignTasksController extends Controller
                 if($assignTaskTile)
                 {
                     $title = ucfirst($assignTaskTile->title);
-                    $status = ucfirst($assignTaskTile->$status);
+                    $status = $assignTaskTile->$status;
                 } 
                 // send email
                 $subject = "Reports PHPdots: Assign Task";
@@ -442,9 +462,9 @@ class AssignTasksController extends Controller
                 $message['status'] = $assign->status;
                 $message['link'] = $link;
                 
-            echo    $returnHTML = view('emails.comment_task_temp',$message)->render();
-            die();
-                $ccEmails[] = 'rinkal.shiroya@phpdots.com'; 
+                $returnHTML = view('emails.comment_task_temp',$message)->render();
+
+                $ccEmails[] = 'jitendra.rathod@phpdots.com'; 
                 $params["to"]=$user_nm->email;
                 $params["ccEmails"] = $ccEmails;
                 $params["subject"] = $subject;
@@ -456,63 +476,6 @@ class AssignTasksController extends Controller
             }
         }
             return ['status' => $status1, 'msg' => $msg, 'data' => '', 'goto' =>''];
-        /*$data = array();
-        $data['user_id'] = $request->user_id;
-        $data['assing_task_id'] = $request->assing_task_id;
-        $data['task_due_date'] = date("Y-m-d",strtotime($request->task_due_date));
-        $data['task_priority'] = $request->task_priority;
-        $data['comment_by_user_id'] = \Auth::guard('admins')->user()->id;
-        $data['comments'] = $request->comments;
-        $data['task_status'] = $request->task_status;
-
-        $assign = AssignTask::find($request->assing_task_id);
-        if($assign){
-            $assign->user_id = $request->user_id;
-            $assign->priority = $request->task_priority;
-            $assign->status = $request->task_status;
-            $assign->due_date = date("Y-m-d",strtotime($request->task_due_date));
-            $assign->save();
-        }
-        if(TaskComment::create($data)){
-
-            $user_nm = User::find($request->user_id);
-            $assignTaskTile = AssignTask::find($request->assing_task_id);
-            $firstname = $lastname = $title = $status = '';
-            if($user_nm){
-                $firstname = ucfirst($user_nm->firstname);
-                $lastname = ucfirst($user_nm->lastname);
-            }
-            if($assignTaskTile)
-            {
-                $title = ucfirst($assignTaskTile->title);
-                $$status = ucfirst($assignTaskTile->$status);
-            }
-            // send email
-            $subject = "Reports PHPdots: Assign Task";
-            
-            $link = url('/')."/assign-tasks/".$request->assing_task_id.'/edit';
-
-            $message = array();             
-            $message['firstname'] = $firstname;
-            $message['lastname'] = $lastname;  
-            $message['title'] = $title;  
-            $message['comments'] = $request->comments; 
-            $message['status'] = $status; 
-            $message['link'] = $link;                 
-            
-            $returnHTML = view('emails.comment_task_temp',$message)->render();
-
-            $ccEmails[] = 'jitendra.rathod@phpdots.com'; 
-            $params["to"]=$user_nm->email;
-            $params["ccEmails"] = $ccEmails;
-            $params["subject"] = $subject;
-            $params["body"] = $returnHTML;
-            sendHtmlMail($params);
-
-            session()->flash('success_message', 'Comment Saved!');  
-            return ['status' => '1', 'msg' => 'Comment Saved', 'data' => '', 'goto' =>'']; 
-        }*/
-            //return ['status' => '0', 'msg' => 'Something is wrong!', 'data' => '', 'goto' =>''];  
     }
 
     /**
