@@ -26,15 +26,11 @@ else
                     {!! Form::select('search_client', [''=>'Search Client'] + $clients, Request::get("search_client"), ['class' => 'form-control','id'=>'client_id']) !!}
                 </div> 
                 <div class="col-md-4">
-                    <label class="control-label">Project</label>
-                    {!! Form::select('search_project', [''=>'Search Project'] + $projects, Request::get("search_project"), ['class' => 'form-control','id'=>'project_id']) !!}
-                </div> 
-                <div class="clearfix">&nbsp;</div>
-                <div class="col-md-4">
                     <label class="control-label">Month</label>
                     {!! Form::select('search_task_date',['' => 'All'] + $task_data,$search_task_date,['class' => 'form-control','id'=>'task_date_id'] ) !!}
                 </div>
-                <div class="col-md-4">              
+                <div class="clearfix">&nbsp;</div>  
+                <div class="col-md-12">              
                 <div class="row" align="center"> 
                     <input type="hidden" name="is_total" id="is_total"/>
                     <input type="submit" class="btn blue mTop25" value="Search"/>

@@ -50,10 +50,10 @@ class AdminActionController extends Controller
 
         $data = array();        
         $data['page_title'] = "Manage Admin Actions"; 
-
         $data['add_url'] = route($this->moduleRouteText.'.create');
         $data['btnAdd'] = \App\Models\Admin::isAccess(\App\Models\Admin::$ADD_ADMIN_LOG_ACTIONS);
 
+        $data = customSession($this->moduleRouteText,$data);
         return view($this->moduleViewName.".index", $data);         
     }
 
@@ -78,6 +78,7 @@ class AdminActionController extends Controller
         $data['action_params'] = 0;
         $data['buttonText'] = "Save";
         $data["method"] = "POST"; 
+        $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
 
         return view($this->moduleViewName.'.add', $data);
     }
@@ -97,10 +98,11 @@ class AdminActionController extends Controller
             return $checkrights;
         }
         
+        $data = array();
         $status = 1;
         $msg = $this->addMsg;
-        $data = array();
-        
+        $goto = $this->list_url;
+
         $validator = Validator::make($request->all(), [
             'description' => 'required|min:2',            
         ]);
@@ -138,7 +140,7 @@ class AdminActionController extends Controller
             session()->flash('success_message', $msg);
         }
         
-        return ['status' => $status, 'msg' => $msg, 'data' => $data];        
+        return ['status' => $status, 'msg' => $msg, 'data' => $data,'goto' => $goto];
     }
 
     /**
@@ -183,6 +185,7 @@ class AdminActionController extends Controller
         $data['action_params'] = $formObj->id;
         $data['method'] = "PUT";
         $data["action_show_hidde"] = 1;   
+        $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
 
         return view($this->moduleViewName.'.add', $data);
     }
@@ -205,10 +208,12 @@ class AdminActionController extends Controller
 
         $model = $this->adminAction->find($id);
 
+        $data = array();        
         $status = 1;
         $msg = $this->updateMsg;
-        $data = array();        
-        
+        $goto = session()->get($this->moduleRouteText.'_goto');
+        if(empty($goto)){  $goto = $this->list_url;  }
+
         $validator = Validator::make($request->all(), [
             'description' => 'required|min:2',                 
             'id' => 'required|unique:admin_actions,id,'.$id,                 
@@ -257,7 +262,7 @@ class AdminActionController extends Controller
             session()->flash('success_message', $msg);
         }
         
-        return ['status' => $status, 'msg' => $msg, 'data' => $data];        
+        return ['status' => $status, 'msg' => $msg, 'data' => $data,'goto' => $goto];
     }
 
     /**
@@ -282,6 +287,8 @@ class AdminActionController extends Controller
             {             
                 $backUrl = $request->server('HTTP_REFERER');
                 $modelObj->delete();
+                $goto = session()->get($this->moduleRouteText.'_goto');
+                if(empty($goto)){  $goto = $this->list_url;  }
                 session()->flash('success_message', $this->deleteMsg); 
 
                 //store logs detail
@@ -294,7 +301,7 @@ class AdminActionController extends Controller
                                         
                 $logs=\App\Models\AdminLog::writeadminlog($params); 
 
-                return redirect($backUrl);
+                return redirect($goto);
             } 
             catch (Exception $e) 
             {
@@ -326,21 +333,24 @@ class AdminActionController extends Controller
                 return view("admin.partials.action",
                     [
                         'currentRoute' => $this->moduleRouteText,
-                        'row' => $row,                                 
+                        'row' => $row,
                         'isEdit' => \App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_ADMIN_LOG_ACTIONS),
                         'isDelete' => \App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_ADMIN_LOG_ACTIONS),
-                                                     
                     ]
                 )->render();
             })                
             ->filter(function ($query) 
             {
                 $search_text = request()->get("search_text");                                      
-
+                $searchData = array();
+                customDatatble($this->moduleRouteText);
                 if(!empty($search_text))
                 {
                     $query = $query->where('description', 'LIKE', '%'.$search_text.'%');
+                    $searchData['search_text'] = $search_text;
                 }
+                $goto = \URL::route($this->moduleRouteText.'.index', $searchData);
+                \session()->put($this->moduleRouteText.'_goto',$goto);
             })
             ->make(true);        
     }        

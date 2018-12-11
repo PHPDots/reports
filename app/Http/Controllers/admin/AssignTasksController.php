@@ -5,6 +5,7 @@ namespace App\Http\Controllers\admin;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 use Validator;
 use Datatables;
 use App\modells\AdminLog;
@@ -45,8 +46,14 @@ class AssignTasksController extends Controller
      */
     public function index(Request $request)
     {
-        $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$LIST_ASSIGN_TASK);
-        
+        $id = \Auth::guard('admins')->user()->id;
+        if($id == RAVI_GAJERA || $id == KISHAN_LASHKARI){
+            $checkrights='';
+        }
+        else
+        {
+            $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$LIST_ASSIGN_TASK);
+        }
         if($checkrights) 
         {
             return $checkrights;
@@ -58,6 +65,13 @@ class AssignTasksController extends Controller
         $data['add_url'] = route($this->moduleRouteText.'.create');
         $data['btnAdd'] = \App\Models\Admin::isAccess(\App\Models\Admin::$ADD_ASSIGN_TASK);
 
+        $id = \Auth::guard('admins')->user()->id;
+        if($id == RAVI_GAJERA || $id == KISHAN_LASHKARI)
+        {
+            $data['add_url'] = route($this->moduleRouteText.'.create');
+            $data['btnAdd'] = '1';
+        }
+
         $data['users'] = User::where('status',1)
         ->where('user_type_id', '!=', CLIENT_USER)
         ->where('id', '!=' ,'1')
@@ -66,13 +80,18 @@ class AssignTasksController extends Controller
 
         $data['projects'] = \App\Models\Project::getList();
 
-        $auth_id = \Auth::guard('admins')->user()->user_type_id;
+        $auth_id = \Auth::guard('admins')->user()->user_type_id; 
+        $id = \Auth::guard('admins')->user()->id;
         
         $changeStatus = $request->get("changeStatus");
         $changeID = $request->get('changeID');
 
 
-        if($auth_id == NORMAL_USER || $auth_id == TRAINEE_USER)
+        if($auth_id == ADMIN_USER_TYPE || $id == RAVI_GAJERA || $id == KISHAN_LASHKARI)
+        {
+            $data['users_task'] = User::getList();
+        } 
+        else if($auth_id == NORMAL_USER || $auth_id == TRAINEE_USER)
         {             
             $data['users_task']=''; 
             $viewName = $this->moduleViewName.".index";
@@ -81,10 +100,6 @@ class AssignTasksController extends Controller
                 $this->changeStatus($changeID);
             }
                 return view($this->moduleViewName.".assignUserTaskIndex", $data);
-        }
-        else if($auth_id == ADMIN_USER_TYPE)
-        {
-            $data['users_task'] = User::getList();
         } 
         return view($this->moduleViewName.".index", $data); 
     }
@@ -129,11 +144,14 @@ class AssignTasksController extends Controller
      */
     public function create()
     {
-        $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$ADD_ASSIGN_TASK);
-        
-        if($checkrights) 
+        $curr_user_id = \Auth::guard('admins')->user()->id;
+        if($curr_user_id == RAVI_GAJERA || $curr_user_id == KISHAN_LASHKARI)
         {
-            return $checkrights;
+            $checkrights='';
+        }
+        else
+        {
+            $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$ADD_ASSIGN_TASK);
         }
         
         $data = array();
@@ -163,11 +181,14 @@ class AssignTasksController extends Controller
      */
     public function store(Request $request)
     {
-        $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$ADD_ASSIGN_TASK);
-        
-        if($checkrights) 
+        $curr_user_id = \Auth::guard('admins')->user()->id;
+        if($curr_user_id == RAVI_GAJERA || $curr_user_id == KISHAN_LASHKARI)
         {
-            return $checkrights;
+            $checkrights='';
+        }
+        else
+        {
+            $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$ADD_ASSIGN_TASK);
         }
 
         $data = array();
@@ -220,6 +241,7 @@ class AssignTasksController extends Controller
                     $Taskpriority = isset($priority[$i]) ? $priority[$i] : '';
 
                     $obj->user_id = $user_id;
+                    $obj->assing_to_id = $curr_user_id;
                     $obj->project_id = $projectId;
                     $obj->title = $taskTitle;
                     $obj->description = $description[$i]; 
@@ -281,7 +303,7 @@ class AssignTasksController extends Controller
                     $params["to"]=$user_name->email;
                     $params["subject"] = $subject;
                     $params["body"] = $returnHTML;
-                    //sendHtmlMail($params); 
+                    sendHtmlMail($params); 
                 }
             } 
             session()->flash('success_message', $msg);                    
@@ -376,13 +398,23 @@ class AssignTasksController extends Controller
         $msg = "Comment Saved";
         $data = array();
 
-        $validator = Validator::make($request->all(), [
-            'user_id' => 'required|exists:'.TBL_USERS.',id',
-            'task_status' => ['required', Rule::in([0,1])], 
-            'task_priority' => ['required', Rule::in([0,1,2])],
-            'task_due_date' => 'required',
-            'comments' => 'required|min:15',
-        ]);
+        $auth = Auth::guard('admins')->user()->user_type_id;
+        if(!empty($auth) && $auth == 1){
+            $validator = Validator::make($request->all(), [
+                'user_id' => 'required|exists:'.TBL_USERS.',id',
+                'task_status' => ['required', Rule::in([0,1])], 
+                'task_priority' => ['required', Rule::in([0,1,2])],
+                'task_due_date' => 'required',
+                'comments' => 'required|min:15',
+            ]);
+        }else{
+           $validator = Validator::make($request->all(), [
+                'user_id' => 'required|exists:'.TBL_USERS.',id',
+                'task_status' => ['required', Rule::in([0,1])], 
+                'task_due_date' => 'required',
+                'comments' => 'required|min:15',
+            ]); 
+        }
         if ($validator->fails())
         {
              $messages = $validator->messages();
@@ -409,8 +441,10 @@ class AssignTasksController extends Controller
             $assign = AssignTask::find($request->assing_task_id);
 
             if($assign){
-                $assign->user_id = $request->user_id;
-                $assign->priority = $request->task_priority;
+                if(!empty($auth) && $auth == 1){
+                    $assign->priority = $request->task_priority;
+                }
+                $assign->user_id = $request->user_id; 
                 $assign->status = $request->task_status;
                 $assign->due_date = date("Y-m-d",strtotime($request->task_due_date));
                 $assign->save();
@@ -625,7 +659,7 @@ class AssignTasksController extends Controller
                         'currentRoute' => $this->moduleRouteText,
                         'row' => $row,
                         'isEditHistory' => \App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_ASSIGN_TASK),
-                        'isDelete' => \App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_ASSIGN_TASK),
+                        'isAssignDelete' => \App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_ASSIGN_TASK),
                         'assign_task_done' =>\App\Models\Admin::isAccess(\App\Models\Admin::$CHANGE_ASSIGN_TASK_STATUS),
                     ]
                 )->render();

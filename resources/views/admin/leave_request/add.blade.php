@@ -11,7 +11,6 @@ else
 
 @section('styles')
  
-
 @endsection
 <?php
 $auth_id = Auth::guard('admins')->user()->id;
@@ -35,7 +34,6 @@ $auth_id = Auth::guard('admins')->user()->id;
                            {!! Form::model($formObj,['method' => $method,'files' => true, 'route' => [$action_url,$action_params],'class' => 'sky-form form form-group', 'id' => 'main-frm1']) !!} 
                            
                                 <div class="row">
-                                    
                                     <div class="col-md-4">
                                         <label class="control-label">User <span class="required">*</span></label>                                        
                                         {!! Form::select('user_id',[''=>'Select User Name']+$users,$user_id,['class' => 'form-control', 'data-required' => false,'id'=>'country_list']) !!}
@@ -82,16 +80,15 @@ $auth_id = Auth::guard('admins')->user()->id;
                                     <div class="col-md-12">
                                         <input type="submit" value="Save" class="btn btn-success pull-right" />
                                     </div>
-                                </div>                                
+                                </div>
                             {!! Form::close() !!}
                         </div>
                     </div>
-                </div>                 
+                </div>
             </div>
         </div>
     </div>
-</div>            
-
+</div>
 
 @endsection
 
@@ -129,7 +126,7 @@ $auth_id = Auth::guard('admins')->user()->id;
                         $.bootstrapGrowl("Internal server error !", {type: 'danger', delay: 4000});
                     }
                 });
-            }            
+            }
             return false;
         });
     });

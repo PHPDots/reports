@@ -55,12 +55,11 @@ class SoftwareLicenseConntroller extends Controller
 		}
         $data = array();        
         $data['page_title'] = "Manage Software Licenses";
-
         $data['add_url'] = route($this->moduleRouteText.'.create');
         $data['btnAdd'] = \App\Models\Admin::isAccess(\App\Models\Admin::$ADD_SOFTWARE_LICENSE);
-
         $data = customSession($this->moduleRouteText,$data, 100);
-        return view($this->moduleViewName.".index", $data);  
+
+       return view($this->moduleViewName.".index", $data);  
     }
 
     /**
@@ -262,7 +261,7 @@ class SoftwareLicenseConntroller extends Controller
             {
                 $msg .= $message . "<br />";
             }
-        }
+        }         
         else
         {
             $input = $request->all();
@@ -314,7 +313,7 @@ class SoftwareLicenseConntroller extends Controller
                 if(empty($goto)){  $goto = $this->list_url;  }
                 session()->flash('success_message', $this->deleteMsg); 
 
-                //store logs detail
+                    //store logs detail
                     $params=array();
                     
                     $params['adminuserid']  = \Auth::guard('admins')->id();
@@ -371,7 +370,7 @@ class SoftwareLicenseConntroller extends Controller
                 if(!empty($row->created_at))          
                     return date("j M, Y h:i:s A",strtotime($row->created_at));
                 else
-                    return '-';
+                    return '-';    
             })->rawColumns(['action'])             
             
             ->filter(function ($query) 
@@ -396,10 +395,10 @@ class SoftwareLicenseConntroller extends Controller
                 if($search_type == "net banking" || $search_type == "CC")
                 {
                     $query = $query->where("payment_type", $search_type);
-                }
+                }                
                     $searchData['search_type'] = $search_type;
-                $goto = \URL::route($this->moduleRouteText.'.index', $searchData);
-                \session()->put($this->moduleRouteText.'_goto',$goto);
+                    $goto = \URL::route($this->moduleRouteText.'.index', $searchData);
+                    \session()->put($this->moduleRouteText.'_goto',$goto);
             })
             ->make(true);        
     }

@@ -45,7 +45,6 @@ class FixTask extends Model
             $query = $query->where(TBL_FIX_TASKS.".invoice_status", $search_status);
         }
             $searchData['search_status'] = $search_status;
-
             $goto = \URL::route('fix-tasks.index', $searchData);
             \session()->put('fix-tasks_goto',$goto);
 

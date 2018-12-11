@@ -66,6 +66,8 @@
             processing: true,
             serverSide: true,
             searching: false,
+            pageLength: '{{ $length }}',
+            displayStart: '{{ $start }}',
             ajax: {
                 "url": "{!! route($moduleRouteText.'.data') !!}",
                 "data": function (data)
@@ -73,7 +75,7 @@
                     data.search_text = $("#search-frm input[name='search_text']").val();
                 }
             },
-            "order": [['0', "desc"]],
+            "order": [[ "{{ $orderClm }}", "{{ $orderDir }}" ]],
             columns: [
                 {data: 'id', name: 'id'},
                 {data: 'title', name: 'title'},

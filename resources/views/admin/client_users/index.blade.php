@@ -16,7 +16,7 @@
                     <div class="caption">
                         <i class="fa fa-list"></i>{{ $page_title }}    
                     </div>
-
+                  
                     @if($btnAdd)
                         <a class="btn btn-default pull-right btn-sm mTop5" href="{{ $add_url }}">Add New</a>
                     @endif                     
@@ -34,16 +34,16 @@
                                <th width="10%">Created At</th>
                                <th width="5%" data-orderable="false">Action</th>
                             </tr>
-                        </thead>                                         
+                        </thead>
                         <tbody>
                         </tbody>
                     </table>                                              
                 </div>
-            </div>              
+            </div>
         </div>
     </div>
 </div>
-
+       
 @endsection
 
 @section('styles')
@@ -52,7 +52,7 @@
 
 @section('scripts')
     <script type="text/javascript">
-
+    
     $(document).ready(function(){
 
         $("#search-frm").submit(function(){
@@ -83,12 +83,12 @@
                     data.search_status = $("#search-frm select[name='search_status']").val();
                 }
             },
-			lengthMenu:
+            lengthMenu:
               [
                 [25,50,100,150,200],
                 [25,50,100,150,200]
               ],
-            "order": [[ "{{ $orderClm }}", "{{ $orderDir }}" ]],
+            "order": [[ "{{ $orderClm }}", "{{ $orderDir }}" ]],   
             columns: [
                 { data: 'id', name: 'id' },
                 { data: 'client', name: '{{ TBL_CLIENT }}.name' },
@@ -96,9 +96,9 @@
                 { data: 'email', name: 'email' },
                 { data: 'status', name: 'status' },
                 { data: 'created_at', name: 'created_at' },
-                { data: 'action', orderable: false, searchable: false}           
+                { data: 'action', orderable: false, searchable: false}
             ]
-        });        
+        });
     });
     </script>
 @endsection

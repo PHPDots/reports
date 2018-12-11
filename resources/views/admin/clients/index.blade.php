@@ -7,6 +7,7 @@
     <div class="container">
 
         <div class="">
+            
             @include($moduleViewName.".search")           
 
             <div class="clearfix"></div>    
@@ -15,10 +16,10 @@
                     <div class="caption">
                         <i class="fa fa-list"></i>{{ $page_title }}    
                     </div>
-
+                  
                     @if($btnAdd)
                         <a class="btn btn-default pull-right btn-sm mTop5" href="{{ $add_url }}">Add New</a>
-                    @endif
+                    @endif                     
 
                 </div>
                 <div class="portlet-body">                    
@@ -41,7 +42,7 @@
         </div>
     </div>
 </div>
-
+          
 @endsection
 
 @section('styles')
@@ -64,23 +65,22 @@
             processing: true,
             serverSide: true,
             searching: false,
-            stateSave: true,
-            //pageLength: '{{ $length }}',
-           // displayStart: '{{ $start }}',
+            pageLength: '{{ $length }}',
+            displayStart: '{{ $start }}',
             ajax: {
                 "url": "{!! route($moduleRouteText.'.data') !!}",
-                "data": function ( data )
+                "data": function ( data ) 
                 {
                     data.search_name = $("#search-frm input[name='search_name']").val();
                     data.search_email = $("#search-frm input[name='search_email']").val();
-                },
+                }
             },
             lengthMenu:
               [
                 [25,50,100,200],
                 [25,50,100,200]
               ],
-           // "order": [[ "{{ $orderClm }}", "{{ $orderDir }}" ]],
+            "order": [[ "{{ $orderClm }}", "{{ $orderDir }}" ]],  
             columns: [
                 { data: 'id', name: 'id' },
                 { data: 'name', name: 'name' },

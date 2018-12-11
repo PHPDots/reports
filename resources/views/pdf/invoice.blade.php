@@ -128,7 +128,7 @@ td { border: 1px solid #ddd; padding: 0.5em; }
               <td>9.00%</td>
               <td align="right">{{$invoices->sgst_amount}}</td>
             </tr>
-          <?php } 
+          <?php }
           if($invoices->require_igst == 1){
           ?>
             <tr>

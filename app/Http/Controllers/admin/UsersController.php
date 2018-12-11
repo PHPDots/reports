@@ -24,9 +24,9 @@ class UsersController extends Controller
         $module = "List Users";
         $this->module = $module;
 
-        $this->adminAction= new AdminAction;
+        $this->adminAction= new AdminAction; 
         
-        $this->modelObj = new User();
+        $this->modelObj = new User();  
 
         $this->addMsg = $module . " has been added successfully!";
         $this->updateMsg = $module . " has been updated successfully!";
@@ -57,6 +57,7 @@ class UsersController extends Controller
         {
             $goto = session()->get($this->moduleRouteText.'_goto');
             if(empty($goto)){  $goto = $this->list_url;  }
+
             $user_id = $request->get("changeID");   
             $status = $request->get("changeStatus");
 
@@ -71,7 +72,7 @@ class UsersController extends Controller
                         $status = 0;
 
                     $request->status = $status;
-                    $request->save();
+                    $request->save();            
 
                         session()->flash('success_message', "Status has been changed successfully.");
                         return redirect($goto);
@@ -87,7 +88,6 @@ class UsersController extends Controller
 
         $data = array();
         $data['page_title'] = "Manage Users"; 
-
         $data['add_url'] = route($this->moduleRouteText.'.create');
         $data['btnAdd'] = \App\Models\Admin::isAccess(\App\Models\Admin::$ADD_USERS);
         $data["types"] = \App\Models\UserType::pluck('title','id')->all();
@@ -121,6 +121,7 @@ class UsersController extends Controller
         $data['blood_groups'] = ['A+'=>'A+','B+'=>'B+','O+'=>'O+','AB+'=>'AB+','AB-'=>'AB-','A-'=>'A-','B-'=>'B-','O-'=>'O-'];
         $data["users_type"] = \App\Models\UserType::pluck('title','id')->all();
         $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
+
         return view($this->moduleViewName.'.add', $data);
     }
 
@@ -153,7 +154,7 @@ class UsersController extends Controller
             'address' => 'required|min:2',            
             'phone' => 'required|max:15',
             'status' => ['required', Rule::in([0,1])],
-            'is_add_task' => ['required', Rule::in([0,1])],
+			'is_add_task' => ['required', Rule::in([0,1])],
             'image' => 'image|max:4000',
             'joining_date' => 'required',
             'blood_group' => ['required', Rule::in(['A+','B+','O+','AB+','AB-','A-','B-','O-'])],
@@ -161,9 +162,9 @@ class UsersController extends Controller
             'account_no' => 'required|numeric',
             'bank_nm' => 'required',
             'ifsc_code' => 'required',
-            'dob' => 'required',
-            'designation' => 'required',
-            'salary' => 'min:0|numeric',
+			'dob' => 'required',
+			'designation' => 'required',
+			'salary' => 'min:0|numeric',
             'is_salary_generate' => Rule::in([0,1]),
         ]);
         
@@ -244,7 +245,7 @@ class UsersController extends Controller
                 $user->adhar_num = $adhar_num;
                 $user->designation = $designation;
                 $user->is_add_task = $is_add_task;
-				$user->relieving_date = $relieving_date;
+                $user->relieving_date = $relieving_date;
                 if(\Auth::guard('admins')->user()->id == SUPER_ADMIN_ID){
                     $user->salary = $salary;
 				    $user->is_salary_generate = $is_salary_generate;
@@ -291,7 +292,7 @@ class UsersController extends Controller
                             $document->save();
                         }
                     }
-                }
+                }   
                 
                 $id = $user->id;
                 
@@ -332,8 +333,7 @@ class UsersController extends Controller
                 $msg = "Password and confirm password not matched.";
             }
         }
-        
-        return ['status' => $status, 'msg' => $msg, 'data' => $data, 'goto' => $goto];       
+        return ['status' => $status, 'msg' => $msg, 'data' => $data, 'goto' => $goto];
     }
 
     /**
@@ -366,19 +366,20 @@ class UsersController extends Controller
         if(!$formObj)
         {
             abort(404);
-        }   
+        }
 
         $data = array();
         $data['formObj'] = $formObj;
         $data['page_title'] = "Edit ".$this->module;
         $data['buttonText'] = "Update";
         $data['action_url'] = $this->moduleRouteText.".update";
-        $data['action_params'] = $formObj->id;        
+        $data['action_params'] = $formObj->id;
         $data['method'] = "PUT";
         $data["show_image"] ='1'; 
         $data['blood_groups'] = ['A+'=>'A+','B+'=>'B+','O+'=>'O+','AB+'=>'AB+','AB-'=>'AB-','A-'=>'A-','B-'=>'B-','O-'=>'O-'];
         $data["users_type"] = \App\Models\UserType::pluck('title','id')->all();
         $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
+
         return view($this->moduleViewName.'.add', $data);   
     }
 
@@ -404,7 +405,7 @@ class UsersController extends Controller
 
         // $model = $this->modelObj->find($id);
 
-        $data = array();        
+        $data = array();
         $status = 1;
         $msg = $this->updateMsg;
         $goto = session()->get($this->moduleRouteText.'_goto');
@@ -536,9 +537,9 @@ class UsersController extends Controller
             $model->pan_num = $pan_num;
             $model->adhar_num = $adhar_num;
             $model->designation = $designation;
-            $model->is_add_task = $is_add_task;
-			$model->relieving_date = $relieving_date;
+			$model->is_add_task = $is_add_task;
             $model->balance_paid_leave = $balance_paid_leave;
+            $model->relieving_date = $relieving_date;
             if(\Auth::guard('admins')->user()->id == SUPER_ADMIN_ID){
                 $model->salary = $salary;
                 $model->is_salary_generate = $is_salary_generate;
@@ -557,7 +558,6 @@ class UsersController extends Controller
 
                 $logs=\App\Models\AdminLog::writeadminlog($params);         
         }
-        
         return ['status' => $status,'msg' => $msg, 'data' => $data, 'goto' => $goto];               
     }
 
@@ -594,7 +594,7 @@ class UsersController extends Controller
                 $modelObj->delete();
                 session()->flash('success_message', $this->deleteMsg); 
 
-                    //store logs detail
+                //store logs detail
                     $params=array();
                     
                     $params['adminuserid']  = \Auth::guard('admins')->id();
@@ -634,8 +634,8 @@ class UsersController extends Controller
 
 
         return Datatables::eloquent($model)
-
-            ->addColumn('action', function(User $row) {
+               
+            ->addColumn('action', function(User $row) {                
 
                 return view("admin.partials.action",
                     [
@@ -655,7 +655,7 @@ class UsersController extends Controller
                         return '<a class="btn btn-xs btn-danger">Inactive</a>';
             })->rawColumns(['status','action'])
                             
-            ->filter(function ($query)
+            ->filter(function ($query) 
             {
                 $search_start_date = request()->get("search_start_date");
                 $search_end_date = request()->get("search_end_date");
@@ -693,8 +693,8 @@ class UsersController extends Controller
                     if(count($idArr)>0)
                     {
                         $query = $query->whereIn(TBL_USERS.".id",$idArr);
-                    }
-                    $searchData['search_id'] = $search_id;
+                        $searchData['search_id'] = $search_id;
+                    } 
                 } 
                 if(!empty($search_fnm))
                 {
@@ -722,8 +722,10 @@ class UsersController extends Controller
                 }
                     $searchData['search_status'] = $search_status;
                     $goto = \URL::route($this->moduleRouteText.'.index', $searchData);
-                \session()->put($this->moduleRouteText.'_goto',$goto);
+                    \session()->put($this->moduleRouteText.'_goto',$goto);
             })
             ->make(true);
-	}    
+	}
+	 
+    
 }

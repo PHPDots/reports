@@ -327,7 +327,7 @@ $('#net_pay_words').val(str);
                 minimumInputLength: 2,
                 width: null
             });
-        $('#main-frm1').submit(function () {
+    $('#main-frm1').submit(function () {
             
             if ($(this).parsley('isValid'))
             {

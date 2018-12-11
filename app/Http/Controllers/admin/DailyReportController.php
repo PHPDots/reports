@@ -215,14 +215,14 @@ class DailyReportController extends Controller
     }
   }
 	public function cronLeaveCalculate(Request $request)
-    {
+  {
     $msg = 'Leave calculated successfully !';
     if($request->get('fromcron') == 1)
     {
-        $last_month_start =  date("Y-m-d", strtotime("first day of this month"));
-        $last_month_end =  date("Y-m-d", strtotime("last day of this month"));
+      $last_month_start =  date("Y-m-d", strtotime("first day of this month"));
+      $last_month_end =  date("Y-m-d", strtotime("last day of this month"));
 
-        $user_details = User::whereIn('user_type_id',[1,3])
+      $user_details = User::whereIn('user_type_id',[1,3])
                           ->whereNotIn('id',[10,1])
                           ->where('status',1)
                           ->get();
@@ -238,13 +238,13 @@ class DailyReportController extends Controller
         $current_balance_leave = $user->balance_paid_leave;
         if(!$leave_log)
         {
-            if(!empty($user) && $leave_days > 0)
+            if(!empty($user) && $leave_days>0)
             {
                 $type = 'debit';
                 $days = $leave_days;
 
                 $new_balance_leave = $current_balance_leave - $leave_days;
-        
+            
                 if($new_balance_leave < 0)
                 {
                     $new_balance_leave = 0;
@@ -264,31 +264,31 @@ class DailyReportController extends Controller
                 $log->save();
 
                 $leave_log = new \App\Models\LeaveMonthlyLog();
-            
+                
                 $leave_log->user_id = $user->id;    
                 $leave_log->month = date("m", strtotime($last_month_start));    
                 $leave_log->year = date("Y", strtotime($last_month_start));    
-                $leave_log->leave_taken = $leave_days;
+                $leave_log->leave_taken = $leave_days;    
                 $leave_log->balance_leave = $new_balance_leave;    
-                $leave_log->save();
+                $leave_log->save();    
             }
             else
             {
                 $leave_log = new \App\Models\LeaveMonthlyLog();
-
-                $leave_log->user_id = $user->id;
+                
+                $leave_log->user_id = $user->id;    
                 $leave_log->month = date("m", strtotime($last_month_start));    
                 $leave_log->year = date("Y", strtotime($last_month_start));    
                 $leave_log->leave_taken = $leave_days;    
                 $leave_log->balance_leave = $current_balance_leave;    
-                $leave_log->save();
+                $leave_log->save();  
             }
-            // Leave Deduct Cal
+          // Leave Deduct Cal
             $deductLeave = LeaveEntitlement::where('user_id',$user->id)->where('is_run',0)
-                            ->where('type','debit')
-                            ->where('month',date("m", strtotime($last_month_start)))
-                            ->where('year',date("Y", strtotime($last_month_start)))
-                            ->sum('leave_day');
+                        ->where('type','debit')
+                        ->where('month',date("m", strtotime($last_month_start)))
+                        ->where('year',date("Y", strtotime($last_month_start)))
+                        ->sum('leave_day');
 
             if($deductLeave > 0)
             {
@@ -376,8 +376,8 @@ class DailyReportController extends Controller
 				$leave->year = $this_year;
 				$leave->remark = $remark;
 				$leave->leave_day = $leave_day;
-				$leave->save();
-                				
+				$leave->save();			  	
+				
             	$remark = 'added from leave entitlement cron';
             	LeaveEmtitlementLog::addBalancePaidLeave($user->id,$remark,$leave_day);
           	}
@@ -396,6 +396,7 @@ class DailyReportController extends Controller
 	public function cronTaskNotificationss(Request $request )
 	{
 		$fromcron = $request->get('fromcron');
+		exit;
 	if(!empty($fromcron) && $fromcron == 1){
 		//Task Query
         //$today =  date("Y-m-d");
@@ -531,7 +532,7 @@ class DailyReportController extends Controller
         }
 		}
     }
-    //daily users report
+
 	public function cronGeneral(Request $request )
 	{
 		/*$params["to"]= "kishan.lashkari@phpdots.com";
@@ -666,7 +667,6 @@ class DailyReportController extends Controller
       exit;
 
 	}
-    //client reports
     public function cron(Request $request){
 		
 		if($request->get('fromcron') == 1){
@@ -690,8 +690,10 @@ class DailyReportController extends Controller
             ';
 
       $rows = \DB::select($sql);
+
       // Get Admin Emails
       $admin_emails = User::getAdminEmails();
+
 
       $user_id = 0;
 	  $client_id = 0;
@@ -700,11 +702,11 @@ class DailyReportController extends Controller
 
 	  if(count($rows) > 0 ) {
 		  
-		//$updateSQL = "UPDATE tasks SET report_sent = 1, report_sent_date = NOW();";  
-		//\DB::update($updateSQL);  
+		$updateSQL = "UPDATE tasks SET report_sent = 1, report_sent_date = NOW();";  
+		\DB::update($updateSQL);  
 		  
         foreach ($rows as $task_detail) {
-            
+          # code...
           if(!empty($client_id) && !empty($user_id) && ($user_id!=$task_detail->user_id || $client_id!=$task_detail->client_id))
           {
 
@@ -722,7 +724,7 @@ class DailyReportController extends Controller
         // echo "<pre>";print_r($report_data);
 
         foreach ($report_data as $user_id => $user_report) 
-        {
+        {                   
 
           $i = 1;
 
@@ -784,10 +786,15 @@ class DailyReportController extends Controller
                           ->pluck("email")
                           ->toArray();
 
-            $toEmails = array_merge($clientUsers,$admin_emails);                
-            echo "Send Emails To:<br/>";
-            echo "<pre>";
-            print_r($toEmails);
+          $toEmails = array_merge($clientUsers,$admin_emails);                
+          echo "Send Emails To:<br />";
+          echo "<pre>";
+          print_r($toEmails);
+          echo "<pre>";
+          echo "HTML";
+
+
+
 
             $table .= "<p>Thanks & Regards,<br />".$empName."</p>";
             $subject = "Daily Report - (Hr-".$totalHours.") - ".date("j M, Y");
@@ -811,26 +818,22 @@ class DailyReportController extends Controller
 			$params["from_name"] = $empName;  
             $params["body"] = "<html><body>".$table."</body></html>";
             
-            // if($from_email != 'mayur.devmurari@phpdots.com')
+
+            //echo $table;
+
             if(!empty($selectedUsers) && is_array($selectedUsers))
             {
                 if(in_array($from_user_id, $selectedUsers))
                 {
-                    //sendHtmlMail($params);
-                    echo $table;
+                    sendHtmlMail($params);
+                    //echo $table;
                 }
 
             }else
             {
-                echo $table;
-                //sendHtmlMail($params);
+                sendHtmlMail($params);
             }
-
-            //echo $table;
-          }          
-
-
-
+          } 
         }
 		  }
 

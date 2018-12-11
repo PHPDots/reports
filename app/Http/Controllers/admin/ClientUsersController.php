@@ -51,7 +51,6 @@ class ClientUsersController extends Controller
         }
         $data = array();        
         $data['page_title'] = "Manage Client Users";
-
         $data['add_url'] = route($this->moduleRouteText.'.create');
         $data['btnAdd'] = \App\Models\Admin::isAccess(\App\Models\Admin::$ADD_CLIENT_USER);
         $data['clients'] = Client::pluck("name","id")->all();
@@ -244,7 +243,7 @@ class ClientUsersController extends Controller
         $msg = $this->updateMsg;
         $goto = session()->get($this->moduleRouteText.'_goto');
         if(empty($goto)){  $goto = $this->list_url;  }
-        
+
         $validator = Validator::make($request->all(), [
            'client_id'=>'required|exists:'.TBL_CLIENT.',id',
             'name' => 'required',
@@ -387,7 +386,7 @@ class ClientUsersController extends Controller
 
                 return redirect($goto);
             } 
-            catch (Exception $e)
+            catch (Exception $e) 
             {
                 session()->flash('error_message', $this->deleteErrorMsg);
                 return redirect($this->list_url);
@@ -417,9 +416,9 @@ class ClientUsersController extends Controller
                 return view("admin.partials.action",
                     [
                         'currentRoute' => $this->moduleRouteText,
-                        'row' => $row,                                 
+                        'row' => $row,
                         'isEdit' =>\App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_CLIENT_USER),
-                        'isDelete' => \App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_CLIENT_USER),                                                  
+                        'isDelete' => \App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_CLIENT_USER),
                     ]
                 )->render();
             })
@@ -438,12 +437,12 @@ class ClientUsersController extends Controller
             })->rawColumns(['action','status'])             
             
             ->filter(function ($query) 
-            {
+            {                              
                 $search_name = request()->get("search_name");                                
                 $search_email = request()->get("search_email");
                 $search_client = request()->get("search_client");
                 $search_status = request()->get("search_status");
-                
+
                 $searchData = array();
                 customDatatble($this->moduleRouteText);
 
@@ -466,10 +465,10 @@ class ClientUsersController extends Controller
                 {
                     $query = $query->where(TBL_CLIENT_USER.".status", $search_status);
                 }
-                $searchData['search_status'] = $search_status;
-                $goto = \URL::route($this->moduleRouteText.'.index', $searchData);
-                \session()->put($this->moduleRouteText.'_goto',$goto);
+                    $searchData['search_status'] = $search_status;
+                    $goto = \URL::route($this->moduleRouteText.'.index', $searchData);
+                    \session()->put($this->moduleRouteText.'_goto',$goto);
             })
-            ->make(true);
+            ->make(true);        
     }
 }

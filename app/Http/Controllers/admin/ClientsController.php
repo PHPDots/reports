@@ -12,7 +12,6 @@ use App\Models\ClientUser;
 use App\Models\ClientEmployee;
 use App\Models\User;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Input;
 use App\Models\SendMailUser;
 
 class ClientsController extends Controller
@@ -25,16 +24,16 @@ class ClientsController extends Controller
         $this->list_url = route($this->moduleRouteText.".index");
 
         $module = "Client";
-        $this->module = $module;
+        $this->module = $module;  
 
         $this->adminAction= new AdminAction; 
         
-        $this->modelObj = new Client();
+        $this->modelObj = new Client();  
 
         $this->addMsg = $module . " has been added successfully!";
         $this->updateMsg = $module . " has been updated successfully!";
         $this->deleteMsg = $module . " has been deleted successfully!";
-        $this->deleteErrorMsg = $module . " can not deleted!";
+        $this->deleteErrorMsg = $module . " can not deleted!";       
 
         view()->share("list_url", $this->list_url);
         view()->share("moduleRouteText", $this->moduleRouteText);
@@ -46,7 +45,7 @@ class ClientsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
         $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$LIST_CLIENT);
         
@@ -54,13 +53,13 @@ class ClientsController extends Controller
         {
             return $checkrights;
         }
-        $data = array();
+        $data = array();        
         $data['page_title'] = "Manage Clients";
         $data['add_url'] = route($this->moduleRouteText.'.create');
-        $data['btnAdd'] = \App\Models\Admin::isAccess(\App\Models\Admin::$ADD_CLIENT);        
+        $data['btnAdd'] = \App\Models\Admin::isAccess(\App\Models\Admin::$ADD_CLIENT);
         $data = customSession($this->moduleRouteText,$data);
-        
-        return view($this->moduleViewName.".index", $data);
+
+        return view($this->moduleViewName.".index", $data);         
     }
 
     /**
@@ -83,7 +82,7 @@ class ClientsController extends Controller
         $data['action_params'] = 0;
         $data['buttonText'] = "Save";
         $data["method"] = "POST";
-		$data['users'] = \DB::table(TBL_USERS)->orderBy("name","ASC")->where('status',1)->get();
+		$data['users'] = \DB::table(TBL_USERS)->orderBy("name","ASC")->get();
 		$data["currency"] = ['in_rs'=>'In Rs.','in_usd'=>'In USD'];
         $data['list_tags'] = [];
         $data['sendMailUsers'] = \DB::table(TBL_USERS)->orderBy("name","ASC")->where('status',1)->whereNull('client_user_id')->where('id','!=',1)->get();
@@ -106,13 +105,12 @@ class ClientsController extends Controller
         if($checkrights) 
         {
             return $checkrights;
-        }
-
+        }      
         $data = array();
         $status = 1;
         $msg = $this->addMsg;
         $goto = $this->list_url;
-        
+
         $validator = Validator::make($request->all(), [
             'email' => 'required|email|unique:'.TBL_CLIENT.',email',
             'name' => 'required|min:2',
@@ -148,13 +146,12 @@ class ClientsController extends Controller
                 $status = 0;
                 $msg = 'Please Select atleast one user';
                 return ['status' => $status, 'msg' => $msg, 'data' => $data, 'goto' => $goto];
-            } 
+            }
             $input = $request->all();
             $input['send_email'] = isset($input['send_email']) ? 1:0;
-            //$input['send_email_type'] = isset($input['send_email_type']) ? 1:0;
             $obj = $this->modelObj->create($input);
-            $id = $obj->id;
-
+            $id = $obj->id; 
+			
 			$users = $request->get('users');
 
             if(is_array($users))
@@ -167,6 +164,7 @@ class ClientsController extends Controller
                         $employee->save();
                 }   
             }
+
             $send_email = isset($input['send_email']) ? 1:0;
             $send_email_type = $request->get('send_mail_type');
             $sendMailUsers = $request->get('sendMailUsers');
@@ -197,10 +195,8 @@ class ClientsController extends Controller
 
             session()->flash('success_message', $msg);
 
-        }
-        
-        return ['status' => $status, 'msg' => $msg, 'data' => $data,'goto' => $goto];        
-
+        }   
+        return ['status' => $status, 'msg' => $msg, 'data' => $data,'goto' => $goto];
     }
 
     /**
@@ -221,7 +217,7 @@ class ClientsController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
-    {
+    {    
         $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$EDIT_CLIENT);
         
         if($checkrights) 
@@ -239,6 +235,7 @@ class ClientsController extends Controller
         $data['formObj'] = $formObj;
         $data['page_title'] = "Edit ".$this->module;
         $data['buttonText'] = "Update";
+
         $data['action_url'] = $this->moduleRouteText.".update";
         $data['action_params'] = $formObj->id;
         $data['method'] = "PUT";
@@ -248,7 +245,7 @@ class ClientsController extends Controller
         $data['sendMailUsers'] = \DB::table(TBL_USERS)->orderBy("name","ASC")->whereNull('client_user_id')->where('id','!=',1)->get();
         $data['list_sendMailUsers'] = $formObj->getSendMailUsers(1);
         $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
-        
+
         return view($this->moduleViewName.'.add', $data);
     }
 
@@ -264,20 +261,19 @@ class ClientsController extends Controller
 		$client_id = $id;
         $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$EDIT_CLIENT);
         
-        if($checkrights)
+        if($checkrights) 
         {
             return $checkrights;
-        }
+        } 
 
         $model = $this->modelObj->find($id);
 
+        $data = array();
         $status = 1;
         $msg = $this->updateMsg;
         $goto = session()->get($this->moduleRouteText.'_goto');
         if(empty($goto)){  $goto = $this->list_url;  }
 
-        $data = array();
-        
         $validator = Validator::make($request->all(), [
             'email' => 'required|email|unique:'.TBL_CLIENT.',email,'.$id,
             'name'     => 'required|min:2',
@@ -321,12 +317,11 @@ class ClientsController extends Controller
             }
             $input = $request->all();
             $input['send_email'] = isset($input['send_email']) ? 1:0;
-            $input['send_email_type'] = isset($input['send_mail_type']) ? 1:0;
             $model->update($input);
 			
 			// delete old records
             \DB::table(TBL_CLIENT_EMPLOYEE)->where('client_id',$id)->delete();
-            \DB::table(TBL_SEND_MAIL_USERS)->where('client_id',$id)->delete();             
+            \DB::table(TBL_SEND_MAIL_USERS)->where('client_id',$id)->delete();
 
             if($request->has('users'))
             {
@@ -342,6 +337,7 @@ class ClientsController extends Controller
                     }
                 }  
             }
+
             $send_email = isset($input['send_email']) ? 1:0;
             $send_email_type = $request->get('send_mail_type');
             $sendMailUsers = $request->get('sendMailUsers');
@@ -399,9 +395,9 @@ class ClientsController extends Controller
 				\DB::table(TBL_CLIENT_EMPLOYEE)->where('client_id',$id)->delete(); 
                 $client = ClientUser::where('client_id',$id);
                 $client->delete();
-                $backUrl = $request->server('HTTP_REFERER');
                 $goto = session()->get($this->moduleRouteText.'_goto');
                 if(empty($goto)){  $goto = $this->list_url;  }
+                $backUrl = $request->server('HTTP_REFERER');
                 $modelObj->delete();
                 session()->flash('success_message', $this->deleteMsg); 
 
@@ -445,7 +441,7 @@ class ClientsController extends Controller
                 if(!empty($row->created_at))          
                     return date("j M, Y h:i:s A",strtotime($row->created_at));
                 else
-                    return '-';
+                    return '-';    
             })
 			->editColumn('client_type' , function ($row)
             {
@@ -460,7 +456,7 @@ class ClientsController extends Controller
                 return view("admin.partials.action",
                     [
                         'currentRoute' => $this->moduleRouteText,
-                        'row' => $row,
+                        'row' => $row, 
                         'isEdit' => \App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_CLIENT),
                         'isDelete' =>\App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_CLIENT),
 						'viewInvoice' =>\App\Models\Admin::isAccess(\App\Models\Admin::$LIST_INVOICE),
@@ -468,15 +464,15 @@ class ClientsController extends Controller
                 )->render();
             })->rawColumns(['action','created_at','client_type'])
             ->filter(function ($query) {
+
                 $search_name = request()->get("search_name");
                 $search_email = request()->get("search_email");
                 $search_phone = request()->get("search_phone");
                 $search_city = request()->get("search_city");
-                $search_state = request()->get("search_state");
-
+                $search_state = request()->get("search_state");                                         
                 $searchData = array();
                 customDatatble($this->moduleRouteText);
-                
+
                 if(!empty($search_name))
                 {
                     $query = $query->where('name', 'LIKE', '%'.$search_name.'%');
@@ -501,7 +497,6 @@ class ClientsController extends Controller
                 }
                 $goto = \URL::route($this->moduleRouteText.'.index', $searchData);
                 \session()->put($this->moduleRouteText.'_goto',$goto);
-
-            })->make(true);
+            })->make(true);        
     }
 }

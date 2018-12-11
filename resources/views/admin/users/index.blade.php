@@ -19,9 +19,9 @@
                     </div>
                     @if($btnAdd)
                         <a class="btn btn-default pull-right btn-sm mTop5" href="{{ $add_url }}">Add New</a>
-                    @endif
+                    @endif        
                 </div>
-                <div class="portlet-body">
+                <div class="portlet-body">                    
                     <table class="table table-bordered table-striped table-condensed flip-content" id="server-side-datatables">
                         <thead>
                             <tr>
@@ -43,7 +43,7 @@
         </div>
     </div>
 </div>
-
+      
 @endsection
 
 @section('styles')
@@ -66,17 +66,18 @@
             return false;
         });
 
+
         $.fn.dataTableExt.sErrMode = 'throw';
 
         var oTableCustom = $('#server-side-datatables').DataTable({
             processing: true,
             serverSide: true,
-            searching: false,            
+            searching: false,
             pageLength: '{{ $length }}',
             displayStart: '{{ $start }}',
             ajax: {
                 "url": "{!! route($moduleRouteText.'.data') !!}",
-                "data": function ( data )
+                "data": function ( data ) 
                 {
                     data.search_start_date = $("#search-frm input[name='search_start_date']").val();
                     data.search_end_date = $("#search-frm input[name='search_end_date']").val();
@@ -88,7 +89,7 @@
                     data.search_status = $("#search-frm select[name='search_status']").val();
                 }
             },
-			lengthMenu:
+            lengthMenu:
               [
                 [25,50,100,150,200],
                 [25,50,100,150,200]

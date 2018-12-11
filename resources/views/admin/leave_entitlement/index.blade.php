@@ -29,20 +29,19 @@
                                <th width="10%">Month</th>
                                <th width="10%">Year</th>
                                <th width="15%">Leave Type</th>
-								<th width="5%">Day</th>
-								<th width="15%">Remark</th>
+							   <th width="5%">Day</th>
+							   <th width="15%">Remark</th>
                                <th width="15%">Created At</th>
                             </tr>
                         </thead>
                         <tbody>
                         </tbody>
-                    </table>                                              
+                    </table>
                 </div>
-            </div>              
+            </div>
         </div>
     </div>
 </div>
-
 @endsection
 
 @section('styles')

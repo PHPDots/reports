@@ -16,35 +16,35 @@
                     <div class="portlet-body">
                         <div class="form-body">
                            {!! Form::model($formObj,['method' => $method,'files' => true, 'route' => [$action_url,$action_params],'class' => 'sky-form form form-group', 'id' => 'main-frm1']) !!} 
-                                <div class="row">
+                                <div class="row">                                
                                     <div class="col-md-12">
-                                        <label class="control-label">Title: <span class="required">*</span></label>
+                                        <label class="control-label">Title: <span class="required">*</span></label>                                        
                                         {!! Form::text('title',null,['class' => 'form-control', 'data-required' => true,'placeholder' => 'Enter Title']) !!}
-                                    </div>
+                                    </div>                                                 
                                 </div>
                                 <div class="clearfix">&nbsp;</div>
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <label class="control-label">URL: <span class="required">*</span></label>
+                                        <label class="control-label">URL: <span class="required">*</span></label>                                        
                                         {!! Form::text('url',null,['class' => 'form-control', 'data-required' => true,'placeholder' => 'Enter URL']) !!}
-                                    </div>
+                                    </div>                                                 
                                 </div>
                                 <div class="clearfix">&nbsp;</div>
                                 <div class="row">
                                     <div class="col-md-12">
                                         <label class="control-label">Download Link:</label>
                                         {!! Form::text('download_link',null,['class' => 'form-control', 'data-required' => false,'placeholder' => 'Enter Link']) !!}
-                                    </div>
+                                    </div>                                                 
                                 </div>
                                 <div class="clearfix">&nbsp;</div>
                                 <div class="row">                                
                                     <div class="col-md-12">
                                         <label class="control-label">License Key:<span class="required">*</span></label>
                                         {!! Form::text('license_key',null,['class' => 'form-control', 'data-required' => true,'placeholder' => 'Enter License Key']) !!}
-                                    </div>
+                                    </div>                                                 
                                 </div>
                                 <div class="clearfix">&nbsp;</div>
-                                <div class="row">
+                                <div class="row">                                
                                     <div class="col-md-6">
                                         <label class="control-label">Payment Type:</label>
                                         {!! Form::select('payment_type',[''=>'Select','CC'=>'CC','net banking'=>'Net Banking'],null,['class' => 'form-control', 'data-required' => false]) !!}
@@ -115,6 +115,7 @@
             }            
             return false;
         });
+
     });
 
 </script>

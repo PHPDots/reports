@@ -86,7 +86,7 @@ function openView($id){
 }
 		
     $(document).ready(function(){
-		    $("#month_id").select2({
+		$("#month_id").select2({
             placeholder: "Search Month",
             allowClear: true,
             minimumInputLength: 2,

@@ -21,16 +21,16 @@ class Task extends Model
 	public static function listFilter($query)
     {
         $search_start_date = request()->get("search_start_date");
-        $search_end_date = request()->get("search_end_date");
+        $search_end_date = request()->get("search_end_date");                                
         $search_id = request()->get("search_id");
 		$search_task_date = request()->get("search_task_date");
-        $search_project = request()->get("search_project");
-        $search_title = request()->get("search_title");
-        $search_status = request()->get("search_status");
+        $search_project = request()->get("search_project");                                
+        $search_title = request()->get("search_title");                                
+        $search_status = request()->get("search_status");                            
         $search_user = request()->get("search_user");
         $search_client = request()->get("search_client");
-        $search_hour = request()->get("search_hour");
-        $search_hour_op = request()->get("search_hour_op");
+        $search_hour = request()->get("search_hour");                                
+        $search_hour_op = request()->get("search_hour_op");                                
         $search_min = request()->get("search_min");
         $search_min_op = request()->get("search_min_op");
 		$is_download = request()->get("isDownload");
@@ -40,12 +40,12 @@ class Task extends Model
 
         if(!empty($search_hour) && empty($search_min))
         {
-            $search_min ='0.00';
+            $search_min ='0.00';   
         }
         else if(empty($search_hour) && !empty($search_min))
         {
             $search_hour = '0.00';
-        }
+        } 
         if (!empty($search_start_date)){
 
             $from_date=$search_start_date.' 00:00:00';
@@ -97,7 +97,7 @@ class Task extends Model
             $searchData['search_hour_op'] = $search_hour_op;
         }
         if (!empty($search_min)) {
-            $query = $query->where(TBL_TASK.".min", $search_min_op, $search_min);
+               $query = $query->where(TBL_TASK.".min", $search_min_op, $search_min);
             $searchData['search_min'] = $search_min;
             $searchData['search_min_op'] = $search_min_op;
         }
@@ -115,12 +115,12 @@ class Task extends Model
         {
             $query = $query->limit(1000)->get();
         }
-        
         if(\Auth::guard('admins')->user()->user_type_id == ADMIN_USER_TYPE)
         {
             $goto = \URL::route('tasks.index', $searchData);
             \session()->put('tasks_goto',$goto);
         }
+
         return $query;
     }
 	public static function halfLeaveUsers($yesterday)

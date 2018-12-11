@@ -155,8 +155,7 @@ class ClientMonthlyReportsController extends Controller
                 ->join(TBL_USERS,TBL_TASK.".user_id","=",TBL_USERS.".id")
                 ->join(TBL_PROJECT,TBL_TASK.".project_id","=",TBL_PROJECT.".id")
                 ->join(TBL_CLIENT,TBL_PROJECT.".client_id","=",TBL_CLIENT.".id")
-                ->groupBy(TBL_TASK.".user_id")
-                ->groupBy(TBL_TASK.".project_id")
+                ->groupBy(TBL_TASK.".user_id") 
                 ->groupBy(TBL_PROJECT.".client_id")
                 ->groupBy(\DB::raw("(DATE_FORMAT(".TBL_TASK.".task_date,'%Y-%m'))")); 
 

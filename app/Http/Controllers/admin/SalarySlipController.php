@@ -79,7 +79,7 @@ class SalarySlipController extends Controller
 			
             $data['users'] = User::pluck("name","id")->all();
             $viewName = $this->moduleViewName . ".index";        
-        }
+        }    
         $data = customSession($this->moduleRouteText,$data);
         return view($viewName, $data);  
     }
@@ -129,28 +129,28 @@ class SalarySlipController extends Controller
             return Redirect('/dashboard');
         }
         $data =array();
-        $user_id = $request->get('user_id');
         $joining_date = '';
         $workingDays = 0;
         $leave_taken = 0;
         $balance_leave = 0;
 
+        $user_id = $request->get('user_id');
         $userSetail = User::find($user_id);
-        if(!empty($userSetail)){
-            $data['account_no'] = $userSetail->account_no;
-            $data['name'] = $userSetail->name;
-            $data['bank_nm'] = $userSetail->bank_nm;
-            $data['joining_date'] = $userSetail->joining_date;
-            $data['pan_num'] = $userSetail->pan_num;
-            $data['designation'] = $userSetail->designation;
+		if(!empty($userSetail)){
+			$data['account_no'] = $userSetail->account_no;
+			$data['name'] = $userSetail->name;
+			$data['bank_nm'] = $userSetail->bank_nm;
+			$data['joining_date'] = $userSetail->joining_date;
+			$data['pan_num'] = $userSetail->pan_num;
+			$data['designation'] = $userSetail->designation;
             $joining_date = $userSetail->joining_date;
-        }
-        $month = $request->get('month');
+		}
+		$month = $request->get('month');
         $year = $request->get('year');
         $month_year = $year.'-'.$month;
         
         $working_days = \App\Custom::countworkingDays($month_year);
-
+        
         //Calculate Joining date wise working days
         $joining_month = date('Y-m',strtotime($joining_date));
         $current_month = date('Y-m');
@@ -158,6 +158,7 @@ class SalarySlipController extends Controller
         {
             $working_days = \App\Custom::countworkingDaysFromJoinigDate($joining_date);
         }
+
         //Get user monthly leave
         $user_leave_days =  \App\Custom::getUserMonthlyLeaveTaken($user_id,$month,$year);
         $leave_taken = $user_leave_days['leave_taken'];
@@ -167,6 +168,7 @@ class SalarySlipController extends Controller
         $data['leave_taken'] = $leave_taken;
         $data['balance_leave'] = $balance_leave;
 		return $data; 
+
     }
     /**
      * Store a newly created resource in storage.
@@ -238,7 +240,7 @@ class SalarySlipController extends Controller
             {
                 $msg .= $message . "<br />";
             }
-        }
+        }         
         else
         {
             $input = $request->all();
@@ -335,6 +337,7 @@ class SalarySlipController extends Controller
         $data['formObj'] = $formObj;
         $data['page_title'] = "Edit ".$this->module;
         $data['buttonText'] = "Update";
+
         $data['action_url'] = $this->moduleRouteText.".update";
         $data['action_params'] = $formObj->id;
         $data['method'] = "PUT";
@@ -377,7 +380,7 @@ class SalarySlipController extends Controller
         $msg = $this->updateMsg;
         $goto = session()->get($this->moduleRouteText.'_goto');
         if(empty($goto)){  $goto = $this->list_url;  }
-        
+
         $validator = Validator::make($request->all(), [
             'user_id' => 'required|exists:'.TBL_USERS.',id',
             'ctc' => 'required|numeric|min:2',
@@ -472,7 +475,6 @@ class SalarySlipController extends Controller
 
                 $logs=\App\Models\AdminLog::writeadminlog($params);         
         }
-        
         return ['status' => $status,'msg' => $msg, 'data' => $data, 'goto' => $goto];               
     }
 
@@ -503,7 +505,7 @@ class SalarySlipController extends Controller
         if($modelObj) 
         {
             try 
-            {
+            {             
                 $backUrl = $request->server('HTTP_REFERER');
                 $modelObj->delete();
                 $goto = session()->get($this->moduleRouteText.'_goto');
@@ -584,12 +586,12 @@ class SalarySlipController extends Controller
                 if(!empty($row->created_at))          
                     return date("j M, Y h:i:s A",strtotime($row->created_at));
                 else
-                    return '-';    
-            })->rawColumns(['action'])
+                    return '-';
+            })->rawColumns(['action'])             
             
-            ->filter(function ($query)
-            {
-                $query = SalarySlip::listFilter($query);
+            ->filter(function ($query) 
+            {                              
+                 $query = SalarySlip::listFilter($query);
             });
             $data = $data->with('net_total',$net_total);
 
@@ -804,7 +806,7 @@ class SalarySlipController extends Controller
                     return ['status' => $status, 'msg' => $msg];       
                 }
                 //Get Working Days
-                $working_days = \App\Custom::countworkingDays($month_year);
+                $working_days = \App\Custom::countworkingDays($month_year);          
             }
             if(is_array($users) && !empty($users))
             {
@@ -851,7 +853,7 @@ class SalarySlipController extends Controller
                                     $joining_date = $user_data->joining_date;
                                     $working_days = \App\Custom::countworkingDaysFromJoinigDate($joining_date);
                                 }
-
+                                
                                 //Calculate Leave Deduction
                                 $leaves = $leave_taken - $balance_leave; 
                                 if($leaves > 0)
@@ -860,6 +862,8 @@ class SalarySlipController extends Controller
 
                                     $leave_deduction = round(($user_salary * ($working_days-$user_month_days))/$working_days);
                                 }
+
+
                                 //Left Total 
                                 $left_top_total = round($basic_salary) + round($hra) + round($conveyance_allowance) + round($telephone_allowance) + round($medical_allowance) + round($uniform_allowance);
                             
@@ -932,16 +936,16 @@ class SalarySlipController extends Controller
                                 $params["from"] = 'reports.phpdots@gmail.com';
                                 $params["from_name"] = 'Reports PHPdots';  
                                 $params["body"] = $returnHTML;
-                                //sendHtmlMail($params);
+                                sendHtmlMail($params);
                                 
                                 //store logs detail
-                                $params=array();
+                                $params=array();    
 
                                 $params['adminuserid']  = \Auth::guard('admins')->id();
                                 $params['actionid']     = $this->adminAction->ADD_SALARY_SLIP;
                                 $params['actionvalue']  = $salary_id;
                                 $params['remark']       = "Add Salary Slip::".$salary_id;
-                                //\App\Models\AdminLog::writeadminlog($params);
+                                \App\Models\AdminLog::writeadminlog($params);
             
                                 $i++;
                             }
@@ -960,4 +964,5 @@ class SalarySlipController extends Controller
         }
         return ['status' => $status, 'msg' => $msg];
     }
+    
 }

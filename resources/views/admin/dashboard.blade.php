@@ -22,6 +22,7 @@ $monday = date('D');
 <div class="page-content">
     <div class="container">
         <div class="page-content-inner">
+             
             <div class="row">
             @if(Auth::guard('admins')->user()->user_type_id == 1)
                 @if(!empty($pending_leave))
@@ -42,7 +43,7 @@ $monday = date('D');
                                             <th width="10%">From Date</th>
                                             <th width="10%">To Date</th>
                                             <th width="5%">Days</th>
-											<th width="20%">Discription</th>
+                                            <th width="20%">Discription</th>
                                             <th width="10%">Status</th>
                                         </tr>
                                     </thead>
@@ -206,7 +207,8 @@ $monday = date('D');
                         </div>
                     </div>
                 </div>
-				@endif
+                @endif
+                
                 @if(!empty($userOnLeaves))
                 <div class=" ">
                     <div class="portlet" style="margin-bottom: 0px">
@@ -229,7 +231,7 @@ $monday = date('D');
                     </div>    
                 </div>
                 @endif
-            @endif
+            @endif	 
             </div>
         </div>
     </div>
@@ -277,22 +279,22 @@ $monday = date('D');
             }else{
                 var id = $('#reject_action').attr('data');
                 var status = 2;
-                var leave_url = "{{url('/leave-request/status') }}";
+                var leave_url = "{{asset('leave-request/status') }}";
                 $.ajax({
                     type: "GET",
                     url: leave_url,
                     data:{leave_id:id, status:status, reason:reason},
                     success: function (result)
-                    {
+                {
                     if (result.flag == 1)
                         {
                             $.bootstrapGrowl(result.msg, {type: 'success',delay: 4000});
                             setTimeout(function(){
-                                window.location = "{{url('/dashboard')}}";
+                                window.location = "{{asset('/dashboard')}}";
                                 //window.location.reload();
                             },3000);
                         }
-                    }
+                }
             });
             }
 			return false;
@@ -304,7 +306,7 @@ $monday = date('D');
 
             var id = $(this).attr('data');
             var status = 1;
-            var leave_url = "{{url('/leave-request/status') }}";
+            var leave_url = "{{asset('leave-request/status') }}";
             $.ajax({
             type: "GET",
                 url: leave_url,
@@ -315,7 +317,7 @@ $monday = date('D');
                     {
                         $.bootstrapGrowl(result.msg, {type: 'success',delay: 4000});
                         setTimeout(function(){
-                            window.location = "{{url('/dashboard')}}";
+                            window.location = "{{asset('/dashboard')}}";
                         },3000);
                     }
                 }
@@ -406,7 +408,7 @@ $monday = date('D');
 
             var start_date =  start_date.getFullYear() + "-"+(start_date.getMonth()+1) +"-"+start_date.getDate() + ' '+start_date.toString().split(' ')[4];
 
-            var urlAction = "{{url('dashboard/calendar') }}";
+            var urlAction = "{{asset('dashboard/calendar') }}";
             $('.working_days').html('Loading...');
             $.ajax({
                 type: "GET",
@@ -420,6 +422,5 @@ $monday = date('D');
                 }
             });
         }
-       
     </script>
 @endsection

@@ -22,12 +22,10 @@
                 <div class="portlet-body">                    
                     <table class="table table-striped table-bordered table-hover table-checkable order-column" id="server-side-datatables">
                         <thead>
-                            <tr>
-                               <th width="2%">ID</th>
-                               <th>User Name</th>  
-                               <th width="15%">Client Name</th>  
-                               <th width="15%">Project Name</th>  
-                               <th width="10%">Hours</th>  
+                            <tr> 
+                               <th style="text-align: left; padding: 15px;" >User Name</th>  
+                               <th width="40%">Client Name</th>  
+                               <th width="5%">Hours</th>  
                                <th width="10%">Month</th>  
                             </tr>
                         </thead>                                         
@@ -42,7 +40,13 @@
 @endsection
 
 @section('styles')
-  
+<style type="text/css">
+    .table-checkable tr>td:first-child, .table-checkable tr>th:first-child {
+    text-align: left; 
+    max-width: 50px;
+    min-width: 40px;
+    padding-left: 16px; 
+</style>
 @endsection
 
 @section('scripts')
@@ -101,10 +105,9 @@
             },
             "order": [[ '0', "desc" ]],
             columns: [
-                { data: 'id', name: 'id' },
+                //{ data: 'id', name: 'id' },
                 { data: 'user_name', name: 'user_id' },
-                { data: 'client_name', name: '{{ TBL_CLIENT }}.name' },
-                { data: 'project_name', name: 'project_name' },
+                { data: 'client_name', name: '{{ TBL_CLIENT }}.name' }, 
                 { data: 'hours', name: 'total_time' },
                 { data: 'task_date', name: 'task_date' }
             ],

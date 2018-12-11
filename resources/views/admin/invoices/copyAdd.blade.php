@@ -3,7 +3,7 @@
 @endsection
 
 <?php
-        $today =date("d-M-y");
+    $today =date("d-M-y");
 ?>
 @section('content')
 <div class="page-content">
@@ -196,7 +196,7 @@
             var sgst_amount = parseInt(sgst_amount);
             $('#cgst_amount').val(cgst_amount);
             $('#sgst_amount').val(sgst_amount); 
-            var gst_total = cgst_amount + sgst_amount;      
+        var gst_total = cgst_amount + sgst_amount;      
         }
         if(is_gst == 0)
         {

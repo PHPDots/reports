@@ -47,17 +47,17 @@
                                     </div>
                                 </th>
                                <th width="5%">ID</th>
-                               <th width="15%">Client Name</th>
-                               <th width="20%">Tasks</th>
-                               <th width="10%">Date</th>
-                               <th width="15%">Assigned by</th>
+                               <th width="10%">Client Name</th>
+                               <th width="15%">Tasks</th>
+                               <th width="10%"># Date
+                                            <br/> # Created At</th>
+                               <th width="5%">Assigned by</th>
                                <th width="5%"># Hours
-                                            <br/># Fix 
-                                            <br/># Rate</th>
+                                <br/># Fix 
+                                <br/># Rate</th>
                                <th width="5%">Total</th>
-                               <th width="5%">Invoice Status</th>
-                               <th width="5%">Created At</th>
-                               <th width="5%" data-orderable="false">Action</th>
+                               <th width="5%">Status</th>
+                               <th width="10%" data-orderable="false">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -142,7 +142,7 @@
             return false;
         });
 
-		$("#client_id").select2({
+        $("#client_id").select2({
                 placeholder: "Search Client Name",
                 allowClear: true,
                 minimumInputLength: 2,
@@ -166,7 +166,7 @@
                     data.search_status = $("#search-frm select[name='search_status']").val();
                 }
             },
-			lengthMenu:
+            lengthMenu:
               [
                 [25,50,100,150,200],
                 [25,50,100,150,200]
@@ -182,7 +182,6 @@
                 { data: 'hour', name: 'hour' },
                 { data: 'total', name: 'fix' },
                 { data: 'invoice_status', name: 'invoice_status' },
-                { data: 'created_at', name: 'created_at' },
                 { data: 'action', orderable: false, searchable: false},
             ]
         });

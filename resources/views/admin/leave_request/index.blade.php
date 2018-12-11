@@ -16,7 +16,7 @@
             <div class="portlet box green">
                 <div class="portlet-title">
                     <div class="caption">
-                        <i class="fa fa-list"></i>{{ $page_title }}    
+                        <i class="fa fa-list"></i>{{ $page_title }}   
                     </div>
                   
                     @if($btnAdd)
@@ -29,8 +29,8 @@
                         <thead>
                             <tr>
                                <th width="5%">ID</th>                                    
-                               <th width="20%">Username<br/><i style="color: blue; font-size: 10px">Created By</i></th>
-                               <th width="15%">From Date</th>
+                               <th width="20%">Username<br/><i style="color: blue; font-size: 10px">Created By</i></th>                           
+                               <th width="15%">From Date</th>                           
                                <th width="15%">To Date</th>
                                <th width="5%">Days</th>
                                <th width="20%">Leave Description</th>
@@ -41,13 +41,13 @@
                         </thead>
                         <tbody>
                         </tbody>
-                    </table>                                              
+                    </table>
                 </div>
             </div>
         </div>
     </div>
 </div>
-   
+
 <div class="modal fade" id="leave_reject" role="dialog">
     <div class="modal-dialog">  
       <!-- Modal content-->
@@ -66,12 +66,11 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         </div>
-      </div>      
+      </div>
     </div>
 </div>
 
 @endsection
-
 
 @section('scripts')
     <script type="text/javascript">
@@ -89,7 +88,7 @@
             if(reason == ''){
                 alert('please enater valid reason!');
                 return false;
-            }else{                        
+            }else{
                 var id = $('#reject_action').attr('data');                        
                 var status = 2;
                 var leave_url="{{ url('leave-request/status') }}";  
@@ -119,7 +118,7 @@
             $text = 'Are you sure you want to reject the request?';
             if (confirm($text))
             {
-                jQuery('#leave_reject').modal();
+                jQuery('#leave_reject').modal();  
             }
             return false;
         });
@@ -196,9 +195,8 @@
                     data.search_end_leave = $("#search-frm input[name='search_end_leave']").val();
                     data.search_id = $("#search-frm input[name='search_id']").val();
 					data.search_month = $("#search-frm select[name='search_month']").val();
-
                 }
-            },            
+            },
             "order": [[ "{{ $orderClm }}", "{{ $orderDir }}" ]],
             columns: [
                 { data: 'id', name: 'id' },
@@ -210,9 +208,8 @@
                 { data: 'status', name: 'status' },
                 { data: 'created_at', name: 'created_at' },
                 { data: 'action', orderable: false, searchable: false}
-            ],
-            
-        }); 
+            ],  
+        });
 
         /*var data = oTableCustom.buttons.exportData( {
             columns: ':id'

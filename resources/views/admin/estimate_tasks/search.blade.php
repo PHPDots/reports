@@ -5,7 +5,7 @@
         </div>
         <div class="tools">
             <a href="javascript:;" class="expand"> </a>
-        </div>
+        </div>                    
     </div>
     <div class="portlet-body" style="display: none">  
         <form id="search-frm">

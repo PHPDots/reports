@@ -14,14 +14,13 @@
                     <label class="control-label">Title</label>
                     <input type="text" value="{{ \Request::get("search_title") }}" class="form-control" name="search_title" />
                 </div>
-
                 <div class="col-md-3">
                     <label class="control-label">Status</label>
                     <select name="search_status" class="form-control">
-                        <option value="all" {!! \Request::get("search_status") == "all" ? 'selected="selected"':'' !!}>All</option>                        
-                        <option value="1" {!! \Request::get("search_status") == "1" ? 'selected="selected"':'' !!}>Active</option>                        
-                        <option value="0" {!! \Request::get("search_status") == "0" ? 'selected="selected"':'' !!}>Inactive</option>                        
-                    </select>
+                        <option value="all" {!! \Request::get("search_status") == "all" ? 'selected="selected"':'' !!}>All</option>
+                        <option value="1" {!! \Request::get("search_status") == "1" ? 'selected="selected"':'' !!}>Active</option>
+                        <option value="0" {!! \Request::get("search_status") == "0" ? 'selected="selected"':'' !!}>Inactive</option>
+                    </select>                                                                 
                 </div>
 				@if(!empty($clients))
                 <div class="col-md-4">
@@ -34,8 +33,8 @@
                     <input type="submit" class="btn blue mTop25" value="Search"/>
                     &nbsp;
                     <a href="{{ $list_url }}" class="btn red mTop25">Reset</a>
-                </div>
-            </div>
+                </div>                                   
+            </div>                
         </form>
     </div>
-</div>
+</div>      

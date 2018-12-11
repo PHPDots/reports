@@ -7,7 +7,7 @@
     <div class="container">
 
         <div class="">
-            
+
             @include($moduleViewName.".search")           
 
             <div class="clearfix"></div>    
@@ -16,7 +16,7 @@
                     <div class="caption">
                         <i class="fa fa-list"></i>{{ $page_title }}    
                     </div>
-                  
+
                     @if($btnAdd)
                         <a class="btn btn-default pull-right btn-sm mTop5" href="{{ $add_url }}">Add New</a>
                     @endif                     
@@ -26,9 +26,9 @@
                     <table class="table table-bordered table-striped table-condensed flip-content" id="server-side-datatables">
                         <thead>
                             <tr>
-                               <th width="5%">ID</th>                                    
-                               <th width="40%">Title</th>                           
-                               <th width="20%">Created At</th>                           
+                               <th width="5%">ID</th>
+                               <th width="40%">Title</th>
+                               <th width="20%">Created At</th>
                                <th width="5%" data-orderable="false">Action</th>
                             </tr>
                         </thead>                                         
@@ -40,7 +40,7 @@
         </div>
     </div>
 </div>
-
+       
 @endsection
 
 @section('styles')
@@ -52,7 +52,6 @@
     
 
     $(document).ready(function(){
-
 
         $("#search-frm").submit(function(){
             oTableCustom.draw();
@@ -72,13 +71,14 @@
                 "data": function ( data ) 
                 {
                     data.search_title = $("#search-frm input[name='search_title']").val();
+                 
                 }
             },
             lengthMenu:[
                     [25,50,100,200],
                     [25,50,100,200]
                 ],
-            "order": [[ "{{ $orderClm }}", "{{ $orderDir }}" ]],    
+            "order": [[ "{{ $orderClm }}", "{{ $orderDir }}" ]],   
             columns: [
                 { data: 'id', name: 'id' },
                 { data: 'title', name: 'title' },

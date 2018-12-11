@@ -1,7 +1,7 @@
 <div class="portlet box blue">
     <div class="portlet-title">
         <div class="caption">
-            <i class="fa fa-search"></i>Advance Search  {{ \Request::get("search_type") }}
+            <i class="fa fa-search"></i>Advance Search 
         </div>
         <div class="tools">
             <a href="javascript:;" class="expand"> </a>
@@ -28,6 +28,7 @@
                     <label class="control-label">FirstName</label>
                     <input type="text" value="{{ \Request::get("search_fnm") }}" class="form-control" name="search_fnm" />
                 </div>
+                                   
             </div>
             <div class="clearfix">&nbsp;</div>
             <div class="row">
@@ -62,5 +63,5 @@
                 </div> 
             </div>                
         </form>
-    </div>
+    </div>    
 </div>

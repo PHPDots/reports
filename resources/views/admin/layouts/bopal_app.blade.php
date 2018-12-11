@@ -51,14 +51,11 @@
             @yield('styles')        
     </head>
     <body class="page-container-bg-solid page-boxed">
-
-
         @if(\Auth::guard("admins")->check())
             @include('admin.includes.header')
         @else
             @include('admin.includes.bopal_header')
         @endif
-
 
         <!-- BEGIN CONTAINER -->
         <div class="page-container">

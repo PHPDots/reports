@@ -97,7 +97,7 @@
             columns: [
                 { data: 'user_name', name: '{{ TBL_USERS }}.name' },
                 { data: 'task_date', name: 'task_date' },
-                { data: 'hours', orderable: false, searchable: false}
+                { data: 'hours', orderable: false, searchable: false}             
             ]
         });
     });

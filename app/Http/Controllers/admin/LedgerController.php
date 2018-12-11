@@ -55,6 +55,7 @@ class LedgerController extends Controller
         $data['add_url'] = route($this->moduleRouteText.'.create');
         $data['btnAdd'] = \App\Models\Admin::isAccess(\App\Models\Admin::$ADD_LEDGER);
         $data['members'] = Member::getaddledgerMembers();
+        $data['back_url']='multiple-account';
         return view($this->moduleViewName.".index", $data); 
 
     }
@@ -87,7 +88,6 @@ class LedgerController extends Controller
     }
     public function data(Request $request)
     {
-
         $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$LEDGER_LIST);
         
         if($checkrights) 
@@ -124,6 +124,7 @@ class LedgerController extends Controller
             })
             ->make(true); 
 
-    }    
+    }
+    
     
 }

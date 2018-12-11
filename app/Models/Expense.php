@@ -44,7 +44,7 @@ class Expense extends Model
             $searchData['search_title'] = $search_title;
         }
         if (!empty($search_amount)) {
-            $query = $query->where(TBL_EXPENSES.".amount", $search_amount);
+            $query = $query->where(TBL_EXPENSES.".amount", $search_hour_op, $search_amount);
             $searchData['search_amount'] = $search_amount;
         }  
         if (!empty($start_expense_date)) {
@@ -65,6 +65,8 @@ class Expense extends Model
         }
             $goto = \URL::route('expense.index', $searchData);
             \session()->put('expense_goto',$goto);
+
         return $query;
     }
+
 }

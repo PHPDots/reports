@@ -6,7 +6,7 @@
 @endif
 
 @if(isset($isEditHistory) && $isEditHistory)
-<a href="{{ route($currentRoute.'.edit',['id' => $row->id]) }}" class="btn btn-xs btn-primary" title="edit history">
+<a href="{{ route($currentRoute.'.edit',['id' => $row->id]) }}" class="btn btn-sm btn-primary" title="edit history">
     <i class="fa fa-history"></i>
 </a>         
 @endif
@@ -16,10 +16,15 @@
     <i class="fa fa-trash-o"></i>
 </a>          
 @endif
+@if(isset($isAssignDelete) && $isAssignDelete)
+<a data-id="{{ $row->id }}" href="{{ route($currentRoute.'.destroy',['id' => $row->id]) }}" class="btn btn-sm btn-danger btn-delete-record" title="delete">
+    <i class="fa fa-trash-o"></i>
+</a>          
+@endif
 
 @if(isset($assign_task_done) && $assign_task_done)
 	@if($row->status == 0)
-		<a class="btn btn-xs btn-success accepted" title="Change Status To Done" href="{{ route($currentRoute.'.index',['changeID' => $row->id, 'changeStatus' => 1]) }}" onclick="return confirm('Are you sure ?');">
+		<a class="btn btn-sm btn-success accepted" title="Change Status To Done" href="{{ route($currentRoute.'.index',['changeID' => $row->id, 'changeStatus' => 1]) }}" onclick="return confirm('Are you sure ?');">
 		    <i class="fa fa-check-circle-o"></i>
 		</a>
 	

@@ -121,14 +121,14 @@ $user_id =$formObj->id;
                                 <div class="clearfix">&nbsp;</div>
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <label class="control-label">Designation <span class="required">*</span></label>
+                                        <label class="control-label">Designation <span class="required">*</span></label>                                        
                                         {!! Form::text('designation',null,['class' => 'form-control', 'data-required' => true,'placeholder'=>'Enter Designation']) !!}
                                     </div>
 									<div class="col-md-6">
-                                        <label class="control-label">Is Require To Add Tasks: <span class="required">*</span></label>
+                                        <label class="control-label">Is Require To Add Tasks: <span class="required">*</span></label>                            
                                         {!! Form::select('is_add_task',['1'=>'Yes','0'=>'No'],null,['class' => 'form-control', 'data-required' => true]) !!}
                                     </div>
-
+                                    
                                 </div>
 								 <?php if(!empty($formObj->id)){ ?>
                                 <div class="clearfix">&nbsp;</div>
@@ -176,7 +176,7 @@ $user_id =$formObj->id;
                                     <div class="col-md-6">
                                         <label class="control-label">Salary</label>  
                                         {!! Form::text('salary',null,['class' => 'form-control','placeholder'=>'Enter User Salary']) !!}
-                                    </div>  
+                                    </div>
                                     <div class="col-md-6">
                                         <label class="control-label">&nbsp;</label>  
                                         <div class="md-checkbox">
@@ -185,8 +185,8 @@ $user_id =$formObj->id;
                                                 <span></span>
                                                 <span class="check" style="z-index: 1;"></span>
                                                 <span class="box" ></span>
-                                                Is add for generate all users salary slip list_url?
-                                                </label>
+                                                Is add for generate all users salary slip list?
+                                            </label>
                                         </div>
                                     </div>
                                 </div>
@@ -280,7 +280,7 @@ legend.scheduler-border
                         if (result.status == 1)
                         {
                             $.bootstrapGrowl(result.msg, {type: 'success', delay: 4000});
-                            window.location = result.goto;    
+                            window.location = result.goto;
                         }
                         else
                         {

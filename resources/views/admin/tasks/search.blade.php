@@ -1,6 +1,6 @@
 <?php
 $search_task_date = \Request::get("search_task_date");
-if(isset($search_task_date))
+if(!empty($search_task_date))
     $search_task_date = $search_task_date;
 else
     $search_task_date = date('Y-m',strtotime('first day of this month')); 
@@ -27,7 +27,7 @@ else
                 </div>
                 <div class="col-md-4">
                     <label class="control-label">Task Date</label>
-                    {!! Form::select('search_task_date',['' => 'All'] + $task_data,$search_task_date,['class' => 'form-control','id'=>'task_date_id'] ) !!}
+                    {!! Form::select('search_task_date',['' => 'All'] + $task_data, $search_task_date,['class' => 'form-control','id'=>'task_date_id'] ) !!}
                 </div>
                 <div class="col-md-4">
                     <label class="control-label">Project</label>
@@ -85,7 +85,7 @@ else
                         <option value="all" {!! \Request::get("search_status") == "all" ? 'selected="selected"':'' !!}>All</option>
                         <option value="1" {!! \Request::get("search_status") == "1" ? 'selected="selected"':'' !!}>Completed</option>
                         <option value="0" {!! \Request::get("search_status") == "0" ? 'selected="selected"':'' !!}>In Progress</option>
-                    </select>
+                    </select>                                                                 
                 </div>
                 @if(!empty($users))
                 <div class="col-md-4">
@@ -107,8 +107,8 @@ else
                     <input type="hidden" name="is_total" id="is_total"/>
                     <input type="submit" class="btn blue mTop25" value="Search"/>
                     <a href="{{ $list_url }}" class="btn red mTop25">Reset</a>
-                </div>
-            </div>
+                </div>                                   
+            </div>                
         </form>
     </div>
 </div>

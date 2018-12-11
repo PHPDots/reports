@@ -40,6 +40,7 @@ class UserTaskHRReportController extends Controller
         $data['months'] = getMonths();
         $data['years'] = getYear();
         $data = customSession($this->moduleRouteText,$data,100);
+
         return view($this->moduleViewName.".index", $data);
     }
 
@@ -54,7 +55,7 @@ class UserTaskHRReportController extends Controller
             $model = Task::select(TBL_TASK.".task_date as task_date",TBL_USERS.".name as user_name",\DB::raw('SUM(total_time) as hours'))
                 ->join(TBL_USERS,TBL_TASK.".user_id","=",TBL_USERS.".id")
                 ->groupBy('user_id')
-                ->groupBy('task_date')
+                ->groupBy(\DB::raw("DATE_FORMAT(tasks.task_date,'%Y-%m-%d')"))
                 ->orderBy('task_date','desc');
 
             $data = \Datatables::eloquent($model)

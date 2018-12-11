@@ -83,7 +83,7 @@ $bred_crumb_array = array(
                         </div>
                         <!-- END WIDGET THUMB -->
                     </div>
-                @endforeach               
+                @endforeach
             </div>
             @endif
             <div class="row">
@@ -115,7 +115,7 @@ $bred_crumb_array = array(
         </div>
     </div>
     @endsection
-    @section('styles')
+    @section('styles')      
     @endsection
     @section('scripts') 
 

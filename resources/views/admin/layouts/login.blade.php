@@ -14,7 +14,7 @@
         <link href="{{ asset("themes/admin/")}}/assets/global/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
         <link href="{{ asset("themes/admin/")}}/assets/global/plugins/simple-line-icons/simple-line-icons.min.css" rel="stylesheet" type="text/css" />
         <link href="{{ asset("themes/admin/")}}/assets/global/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-        <link href="{{ asset("themes/admin/")}}/assets/global/plugins/uniform/css/uniform.default.css" rel="stylesheet" type="text/css" />
+        <!-- <link href="{{ asset("themes/admin/")}}/assets/global/plugins/uniform/css/uniform.default.css" rel="stylesheet" type="text/css" /> -->
         <link href="{{ asset("themes/admin/")}}/assets/global/plugins/bootstrap-switch/css/bootstrap-switch.min.css" rel="stylesheet" type="text/css" />
         <!-- END GLOBAL MANDATORY STYLES -->
         <!-- BEGIN PAGE LEVEL PLUGINS -->
@@ -67,7 +67,7 @@
         <script src="{{ asset("themes/admin/")}}/assets/global/plugins/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js" type="text/javascript"></script>
         <script src="{{ asset("themes/admin/")}}/assets/global/plugins/jquery-slimscroll/jquery.slimscroll.min.js" type="text/javascript"></script>
         <script src="{{ asset("themes/admin/")}}/assets/global/plugins/jquery.blockui.min.js" type="text/javascript"></script>
-        <script src="{{ asset("themes/admin/")}}/assets/global/plugins/uniform/jquery.uniform.min.js" type="text/javascript"></script>
+        <!-- <script src="{{ asset("themes/admin/")}}/assets/global/plugins/uniform/jquery.uniform.min.js" type="text/javascript"></script> -->
         <script src="{{ asset("themes/admin/")}}/assets/global/plugins/bootstrap-switch/js/bootstrap-switch.min.js" type="text/javascript"></script>
         <!-- END CORE PLUGINS -->
         <!-- BEGIN PAGE LEVEL PLUGINS -->

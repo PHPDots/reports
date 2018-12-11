@@ -59,6 +59,7 @@ class DocumentController extends Controller
         $data['users'] = User::where('status',1)->pluck("name","id")->all();
         $data["document"] = \App\Models\DocumentsType::pluck("title","id")->all();
         $data = customSession($this->moduleRouteText,$data);
+
         return view($this->moduleViewName.".index", $data);
     }
 
@@ -128,7 +129,7 @@ class DocumentController extends Controller
             {
                 $msg .= $message . "<br />";
             }
-        }          
+        }
         else
         {   
             $user_id = $request->get("user_id");
@@ -160,12 +161,11 @@ class DocumentController extends Controller
             $params['actionid']     = $this->adminAction->ADD_EMP_DOCUMENT ;
             $params['actionvalue']  = $id;
             $params['remark']       = "Add Users Documents::".$id;
-                                    
+
             $logs= \App\Models\AdminLog::writeadminlog($params);
-            
-            session()->flash('success_message', $msg);                    
+
+            session()->flash('success_message', $msg);
         }
-        
         return ['status' => $status, 'msg' => $msg, 'data' => $data, 'goto' => $goto];       
     }
 
@@ -247,10 +247,10 @@ class DocumentController extends Controller
         ]);
 
         // check validations 
-        if ($validator->fails()) 
+        if ($validator->fails())
         {
             $messages = $validator->messages();
-            
+
             $status = 0;
             $msg = "";
             
@@ -258,29 +258,29 @@ class DocumentController extends Controller
             {
                 $msg .= $message . "<br />";
             }
-        }          
+        }
         else
-        {   
+        {
             $user_id = $request->get("user_id");
             $doc_type_id = $request->get("doc_type_id");            
             $filename = $request->file("filename"); 
-            
+
                 $destinationPath = public_path().'/uploads/users/'.$user_id.'/docs/';    
-            
+
                    $doc_name =$filename->getClientOriginalName();              
                    $extension =$filename->getClientOriginalExtension();
                    $doc_name=md5($doc_name);
                    $file_name= $doc_name.'.'.$extension;
                    $file =$filename->move($destinationPath,$file_name);
 
-                    $model->filename = $file_name;
-                    $model->user_id = $user_id;
+                    $model->filename = $file_name;                
+                    $model->user_id = $user_id;               
                     $model->doc_type_id = $doc_type_id;
                     $model->update(); 
             
             //store logs detail
-            $params=array();
-
+            $params=array();    
+                                    
             $params['adminuserid']  = \Auth::guard('admins')->id();
             $params['actionid']     = $this->adminAction->EDIT_EMP_DOCUMENT;
             $params['actionvalue']  = $id;
@@ -290,7 +290,6 @@ class DocumentController extends Controller
             
             session()->flash('success_message', $msg);                    
         }
-        
         return ['status' => $status, 'msg' => $msg, 'data' => $data, 'goto' => $goto];
     }
 
@@ -322,7 +321,6 @@ class DocumentController extends Controller
         $employess->delete();
         $goto = session()->get($this->moduleRouteText.'_goto');
         if(empty($goto)){  $goto = $this->list_url;  }
-
         return redirect($goto);
     }
 
@@ -362,7 +360,7 @@ class DocumentController extends Controller
                 if(!empty($row->created_at))          
                     return date("j M, Y h:i:s A",strtotime($row->created_at));
                 else
-                    return '-';
+                    return '-';    
             })->rawColumns(['status','action','filename'])             
             
             ->filter(function ($query) 

@@ -40,7 +40,6 @@ class UserTaskReportsController extends Controller
         $data = array();        
         $data['page_title'] = "Manage Not Added Task Report";
         $data['users'] = User::whereNull('client_user_id')->pluck('name','id')->all();
-        $data = customSession($this->moduleRouteText,$data,100);
         return view($this->moduleViewName.".index", $data);         
     }
 
@@ -136,17 +135,14 @@ class UserTaskReportsController extends Controller
                 else
                     return '-';    
             })
-
+             
             ->rawColumns(['task_date','created_at'])
           
-            ->filter(function ($query)
+            ->filter(function ($query) 
             {
                 $search_user = request()->get("search_user");
                 $search_start_date = request()->get("search_start_date");
                 $search_end_date = request()->get("search_end_date");
-
-                $searchData = array();
-                customDatatble($this->moduleRouteText);
 
                 if (!empty($search_start_date)) {
 
@@ -154,7 +150,6 @@ class UserTaskReportsController extends Controller
                     $convertFromDate = $from_date;
 
                     $query = $query->where(TBL_TASK_REPORT . ".task_date", ">=", addslashes($convertFromDate));
-                    $searchData['search_start_date'] = $search_start_date;
                 }
                 if (!empty($search_end_date)) {
 
@@ -162,18 +157,14 @@ class UserTaskReportsController extends Controller
                     $convertToDate = $to_date;
 
                     $query = $query->where(TBL_TASK_REPORT . ".task_date", "<=", addslashes($convertToDate));
-                    $searchData['search_end_date'] = $search_end_date;
                 }
                 if (!empty($search_user)) {
                     $query = $query->where(TBL_TASK_REPORT . ".user_id", $search_user);
-                    $searchData['search_user'] = $search_user;
                 }
-                $goto = \URL::route($this->moduleRouteText.'.index', $searchData);
-                \session()->put($this->moduleRouteText.'_goto',$goto);
             });
             
             $data = $data->make(true);
 
-            return $data;
+            return $data;        
     }
 }

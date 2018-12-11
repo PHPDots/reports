@@ -69,7 +69,7 @@
         </div>        
 
 
-        @include('admin.includes.footer')
+        @include('admin.includes.footer')                     
 
         {!! Form::open(['method' => 'DELETE','id' => 'global_delete_form']) !!}
         {!! Form::hidden('id', 0,['id' => 'delete_id']) !!}
@@ -119,6 +119,7 @@
         <link href="{{ asset('/') }}/thirdparty/fancybox/jquery.fancybox.css" rel="stylesheet">
 		<!-- Select2 js -->
         <script src="{{ asset("themes/admin/assets/")}}/global/plugins/select2/js/select2.full.min.js" type="text/javascript"></script>
+
 
     <script type="text/javascript">
     $(document).ready(function () {

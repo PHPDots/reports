@@ -53,7 +53,7 @@ class LeaveEntitlementController extends Controller
         $data["years"] = ['2016'=>'2016','2017'=>'2017','2018'=>'2018','2019'=>'2019','2020'=>'2020','2021'=>'2021','2022'=>'2022','2023'=>'2023','2024'=>'2024','2025'=>'2025','2026'=>'2026','2027'=>'2027','2028'=>'2028','2029'=>'2029','2030'=>'2030'];
         $data = customSession($this->moduleRouteText,$data,100);
 
-        return view($this->moduleViewName.".index", $data);
+        return view($this->moduleViewName.".index", $data);         
     }
 
     public function data(Request $request)
@@ -92,7 +92,7 @@ class LeaveEntitlementController extends Controller
                     if($row->month == 10)$month = 'October';
                     if($row->month == 11)$month = 'November';
                     if($row->month == 12)$month = 'December';
-                return $month;    
+                return $month;
             })
             ->editColumn('leave_type', function($row){
                 $html = '';
@@ -217,8 +217,8 @@ class LeaveEntitlementController extends Controller
             'month' => ['required',Rule::in(['01','02','03','04','05','06','07','08','09','10','11','12'])],
             'user_id' => 'required|exists:'.TBL_USERS.',id',
             'year' => ['required',Rule::in(['2016','2017','2018','2019','2020','2021','2022','2023','2024','2025','2026','2027','2028','2029','2030'])],
-            'leave_day' => ['required',Rule::in(['1','0.5'])],
-			'type' => ['required',Rule::in(['credit','debit'])],
+			'leave_day' => ['required',Rule::in(['1','0.5'])],
+            'type' => ['required',Rule::in(['credit','debit'])],
         ]);
         if ($validator->fails())
         {
@@ -237,8 +237,8 @@ class LeaveEntitlementController extends Controller
             $user_id = $request->get('user_id');
             $month = $request->get('month');
             $year = $request->get('year');
-            $leave_day = $request->get('leave_day');
-			$type = $request->get('type');
+			$leave_day = $request->get('leave_day');
+            $type = $request->get('type');
             $remark = $request->get('remark');
 			if(!empty($remark))
                 $remark = $request->get('remark');
@@ -255,9 +255,8 @@ class LeaveEntitlementController extends Controller
             $leave->month = $month;
             $leave->year = $year;
             $leave->remark = $remark;
-            $leave->leave_day = $leave_day;
-			$leave->type = $type;
-            $leave->leave_type = $leave_type;
+			$leave->leave_day = $leave_day;
+            $leave->leave_type = 1;
             $leave->save();
 
 			$remark = 'added from leave entitlement add form';
@@ -272,7 +271,7 @@ class LeaveEntitlementController extends Controller
             $params['adminuserid']  = \Auth::guard('admins')->id();
             $params['actionid']     = $this->adminAction->ADD_LEAVE_ENTITLEMENT;
             $params['actionvalue']  = $id;
-            $params['remark']       = "Add Leave entitlement::".$id;
+            $params['remark']       = "Add Leave Entitlement::".$id;
                                     
             $logs= \App\Models\AdminLog::writeadminlog($params);
             

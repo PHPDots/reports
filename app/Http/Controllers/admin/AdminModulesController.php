@@ -51,10 +51,9 @@ class AdminModulesController extends Controller
 
         $data = array();        
         $data['page_title'] = "Manage Admin Modules";
-
         $data['add_url'] = route($this->moduleRouteText.'.create');
         $data['btnAdd'] = \App\Models\Admin::isAccess(\App\Models\Admin::$ADD_ADMIN_MODULES);                  
-        
+        $data = customSession($this->moduleRouteText,$data);
         return view($this->moduleViewName.".index", $data);         
     }
 
@@ -79,7 +78,7 @@ class AdminModulesController extends Controller
         $data['action_params'] = 0;
         $data['buttonText'] = "Save";
         $data["method"] = "POST";
-   
+        $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
         return view($this->moduleViewName.'.add', $data);
     }
 
@@ -98,10 +97,11 @@ class AdminModulesController extends Controller
             return $checkrights;
         }     
 
+        $data = array();
         $status = 1;
         $msg = $this->addMsg;
-        $data = array();
-        
+        $goto = $this->list_url;
+
         $validator = Validator::make($request->all(), [
             'title' => 'required|min:2',
             'order_index' => 'required|numeric'            
@@ -139,7 +139,7 @@ class AdminModulesController extends Controller
             session()->flash('success_message', $msg);
         }
         
-        return ['status' => $status, 'msg' => $msg, 'data' => $data];        
+        return ['status' => $status, 'msg' => $msg, 'data' => $data,'goto'=>$goto];        
     }
 
     /**
@@ -183,7 +183,7 @@ class AdminModulesController extends Controller
         $data['action_params'] = $formObj->id;
         $data['method'] = "PUT";
         $data["action_show_hidde"] = 1;
-      
+        $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
         return view($this->moduleViewName.'.add', $data);
     }
 
@@ -205,10 +205,12 @@ class AdminModulesController extends Controller
 
         $model = $this->modelObj->find($id);
 
+        $data = array();        
         $status = 1;
         $msg = $this->updateMsg;
-        $data = array();        
-        
+        $goto = session()->get($this->moduleRouteText.'_goto');
+        if(empty($goto)){  $goto = $this->list_url;  }
+
         $validator = Validator::make($request->all(), [
             'title' => 'required|min:2',
             'order_index' => 'required|numeric',
@@ -250,7 +252,7 @@ class AdminModulesController extends Controller
             session()->flash('success_message', $msg);
         }
         
-        return ['status' => $status, 'msg' => $msg, 'data' => $data];       
+        return ['status' => $status, 'msg' => $msg, 'data' => $data,'goto'=>$goto];       
     }
 
     /**
@@ -276,6 +278,8 @@ class AdminModulesController extends Controller
             {             
                 $backUrl = $request->server('HTTP_REFERER');
                 $modelObj->delete();
+                $goto = session()->get($this->moduleRouteText.'_goto');
+                if(empty($goto)){  $goto = $this->list_url;  }
                 session()->flash('success_message', $this->deleteMsg); 
 
                 //store logs detail
@@ -288,7 +292,7 @@ class AdminModulesController extends Controller
                 
                 $logs=\App\Models\AdminLog::writeadminlog($params);  
 
-                return redirect($backUrl);
+                return redirect($goto);
             } 
             catch (Exception $e) 
             {
@@ -322,18 +326,23 @@ class AdminModulesController extends Controller
                         'currentRoute' => $this->moduleRouteText,
                         'row' => $row, 
                         'isEdit' =>\App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_ADMIN_MODULES),
-                        'isDelete' =>\App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_ADMIN_MODULES),                                                       
+                        'isDelete' =>\App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_ADMIN_MODULES),
                     ]
                 )->render();
             })
             ->filter(function ($query) {
                 
-                $search_text = request()->get("search_text");                                         
+                $search_text = request()->get("search_text");
+                $searchData = array();
+                customDatatble($this->moduleRouteText);
 
                 if(!empty($search_text))
                 {
                     $query = $query->where('title', 'LIKE', '%'.$search_text.'%');
-                }                                                       
+                    $searchData['search_text'] = $search_text;
+                }
+                    $goto = \URL::route($this->moduleRouteText.'.index', $searchData);
+                    \session()->put($this->moduleRouteText.'_goto',$goto);
             })->make(true);        
     }        
 }

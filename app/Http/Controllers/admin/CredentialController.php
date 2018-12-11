@@ -386,8 +386,8 @@ class CredentialController extends Controller
 		$data['share_users'] = \DB::table(TBL_USERS)->orderBy("name","ASC")->where('id','!=',\Auth::guard('admins')->user()->id)->get();
         $data['list_users'] =$formObj->getUsers(1);
 		$data['modes'] = ['Default'=>'Default','Active'=>'Active','Passive'=>'Passive'];
+		
         $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
-
         return view($this->moduleViewName.'.edit', $data);
     }
 
@@ -409,9 +409,9 @@ class CredentialController extends Controller
 
         $model = $this->modelObj->find($id);
         
+        $data = array();
         $status = 1;
         $msg = $this->updateMsg;
-        $data = array();
         $goto = session()->get($this->moduleRouteText.'_goto');
         if(empty($goto)){  $goto = $this->list_url;  }
 
@@ -467,6 +467,7 @@ class CredentialController extends Controller
             $environment = $request->get('environment');
 			$key_file_password = $request->get('key_file_password');
 		 	$mode = $request->get('mode');
+
 
                 if(!empty($key_file))
                 {
@@ -577,9 +578,7 @@ class CredentialController extends Controller
             session()->flash('success_message', $msg);                    
             
         }
-        
-        return ['status' => $status, 'msg' => $msg, 'data' => $data, 'goto' => $goto];              
-    
+        return ['status' => $status, 'msg' => $msg, 'data' => $data, 'goto' => $goto];
     }
 
     /**
@@ -610,9 +609,9 @@ class CredentialController extends Controller
                     $destinationPath = public_path().'/uploads/project_credentials'.$key_file;          
                     //unlink($destinationPath);
                 }
+                $modelObj->delete();
                 $goto = session()->get($this->moduleRouteText.'_goto');
                 if(empty($goto)){  $goto = $this->list_url;  }
-                $modelObj->delete();
                 session()->flash('success_message', $this->deleteMsg); 
 
                 //store logs detail
@@ -747,7 +746,7 @@ class CredentialController extends Controller
         $auth_id = \Auth::guard('admins')->id();
         $model = Credential::select(TBL_CREDENTIAL.".*",TBL_PROJECT.".title as project_name")
                 ->join(TBL_PROJECT,TBL_PROJECT.".id","=",TBL_CREDENTIAL.".project_id") 
-                ->leftJoin(TBL_SHARE_USER,TBL_SHARE_USER.".credential_id","=",TBL_CREDENTIAL.".id")
+                ->leftJoin(TBL_SHARE_USER,TBL_SHARE_USER.".credential_id","=",TBL_CREDENTIAL.".id")               
                 ->where(TBL_CREDENTIAL.".created_by",$auth_id)
                 ->orWhere(TBL_SHARE_USER.".user_id",$auth_id)
                 ;
@@ -763,11 +762,11 @@ class CredentialController extends Controller
                     $deleteFlag = \App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_PROJECT_CREDENTIAL);
                     $editFlag= \App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_PROJECT_CREDENTIAL);
                 }                
-
+                    
                 return view("admin.partials.action",
                     [
                         'currentRoute' => $this->moduleRouteText,
-                        'row' => $row,
+                        'row' => $row,                                 
                         'isView' =>\App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_PROJECT_CREDENTIAL),
                         'isEdit' => $editFlag,
                         'isDelete' => $deleteFlag,
@@ -783,7 +782,7 @@ class CredentialController extends Controller
             })->rawColumns(['action'])
             
             ->filter(function ($query) 
-            {
+            {                              
                 $search_project = request()->get("search_project");                                
                 $search_protocol = request()->get("search_protocol");
                 $search_env = request()->get("search_env");
