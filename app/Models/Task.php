@@ -177,7 +177,11 @@ class Task extends Model
                 ])
                 ->join(TBL_USERS,TBL_USERS.".id","=",TBL_TASK.".user_id")
                 ->where(TBL_TASK.'.task_date','LIKE',"%".$yesterday."%");
-
+        $auth_id = \Auth::guard('admins')->user()->user_type_id;
+        if($auth_id == TEAM_LEADER){
+            $department_id = \Auth::guard('admins')->user()->department_id;
+            $query = $query->where(TBL_USERS.".department_id",$department_id);
+        }
         if(count($notUsers) > 0)
         {
             $query = $query->whereNotin(TBL_USERS.".id",$notUsers);
@@ -196,7 +200,11 @@ class Task extends Model
                     return $query->select(TBL_TASK.'.user_id')->from(TBL_TASK)
                     ->where(TBL_TASK.'.task_date','LIKE',"%".$yesterday."%");
                 });
-         
+        $auth_id = \Auth::guard('admins')->user()->user_type_id;
+        if($auth_id == TEAM_LEADER){
+            $department_id = \Auth::guard('admins')->user()->department_id;
+            $query = $query->where(TBL_USERS.".department_id",$department_id);
+        }
         if(count($fullLeaveUsers) > 0)
         {
             $query = $query->whereNotin(TBL_USERS.".id",$fullLeaveUsers);
@@ -224,8 +232,14 @@ class Task extends Model
                     ->where(TBL_TASK.'.task_date','LIKE',"%".$yesterday."%")
                     ->whereIn(TBL_USERS.".id",$users)
                     ->having('total','<','4')
-                    ->groupBy(TBL_TASK.'.user_id')
-                    ->get();            
+                    ->groupBy(TBL_TASK.'.user_id');
+
+                    $auth_id = \Auth::guard('admins')->user()->user_type_id;
+                    if($auth_id == TEAM_LEADER){
+                        $department_id = \Auth::guard('admins')->user()->department_id;
+                        $below_four_hour = $below_four_hour->where(TBL_USERS.".department_id",$department_id);
+                    }          
+                    $department_id=$department_id->get();  
         }    
 
         return $below_four_hour;
