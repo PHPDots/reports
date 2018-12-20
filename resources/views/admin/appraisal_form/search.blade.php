@@ -22,8 +22,12 @@
                         <option value="">All</option>                        
                         <option value="0" {!! \Request::get("search_submit") == "0" ? 'selected="selected"':'' !!}>No</option>                        
                         <option value="1" {!! \Request::get("search_submit") == "1" ? 'selected="selected"':'' !!}>Yes</option>                        
-                    </select>                                                                 
-                </div>              
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="control-label">Year</label>
+                    <input type="text" name="search_year" class="form-control" value="{{date('Y')}}">
+                </div>
             </div>
                 <div class="row" align="center">                     
                     <input type="submit" class="btn blue mTop25" value="Search"/>

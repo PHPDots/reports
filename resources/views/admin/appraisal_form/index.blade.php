@@ -113,6 +113,7 @@ function openView($id){
                 {
                   data.search_name = $("#search-frm select[name='search_name']").val();
                   data.search_submit = $("#search-frm select[name='search_submit']").val();
+                  data.search_year = $("#search-frm input[name='search_year']").val();
                 }
             },
             lengthMenu:
