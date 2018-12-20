@@ -130,15 +130,19 @@ $user_id =$formObj->id;
                                     </div>
                                     
                                 </div>
-								 <?php if(!empty($formObj->id)){ ?>
                                 <div class="clearfix">&nbsp;</div>
                                 <div class="row">
+								 <?php if(!empty($formObj->id)){ ?>
                                     <div class="col-md-6">
                                         <label class="control-label">Balance Paid Leave: <span class="required">*</span></label>  
                                         {!! Form::text('balance_paid_leave',null,['class' => 'form-control', 'data-required' => false]) !!}
                                     </div>
-                                </div>
                                 <?php } ?>
+                                    <div class="col-md-6">
+                                        <label class="control-label">Department <span class="required">*</span></label>                                        
+                                        {!! Form::select('department_id',['' => 'Select Department ']+$departments,null,['class' => 'form-control', 'data-required' => true]) !!}
+                                    </div>
+                                </div>
                                 <div class="clearfix">&nbsp;</div>
                                 <div class="row">
                                     <div class="col-md-4">

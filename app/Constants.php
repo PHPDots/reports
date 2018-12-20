@@ -53,6 +53,7 @@ define("CURRENCY_USD","60");
 //User Types
 define("NORMAL_USER","3");
 define("ADMIN_USER_TYPE","1");
+define("TEAM_LEADER","2");
 define("CLIENT_USER","4");
 define("OTP_COUNTER",3);
 define("OFFER_LETTER_ID",6);
@@ -78,4 +79,5 @@ define("PENALTY_RATE", 10);
 define("LOAN_EMI", 10);
 define("MONTHLY_INSTALLMENT", 300);
 define("TBL_LOAN", "bb_loan");
+define("TBL_DEPARTMENT", "departments");
 

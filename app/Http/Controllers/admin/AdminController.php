@@ -136,8 +136,51 @@ class AdminController extends Controller
 
         $viewName = "dashboard";
         }
-        if($auth_id == NORMAL_USER || $auth_id == TRAINEE_USER)
+        if($auth_id == NORMAL_USER || $auth_id == TRAINEE_USER || $auth_id == TEAM_LEADER)
         {
+            if($auth_id == TEAM_LEADER){
+                $department_id = \Auth::guard('admins')->user()->department_id;
+                //User Leave
+                $pending_leave = LeaveRequest::select(TBL_LEAVE_REQUEST.".*",TBL_USERS.".name as username",TBL_USERS.".image as image")
+                    ->join(TBL_USERS,TBL_USERS.".id","=",TBL_LEAVE_REQUEST.".user_id")
+                    ->where(TBL_LEAVE_REQUEST.'.status',0)
+                    ->where(TBL_USERS.".department_id",$department_id)
+                    ->get();
+
+                $user_leave = LeaveDetail::select(TBL_LEAVE_DETAIL.".*",TBL_USERS.".name as username",TBL_LEAVE_REQUEST.'.from_date as from_date',TBL_LEAVE_REQUEST.'.to_date as to_date',TBL_USERS.".image as image" )
+                        ->join(TBL_LEAVE_REQUEST,TBL_LEAVE_REQUEST.".id","=",TBL_LEAVE_DETAIL.".leave_id")
+                        ->join(TBL_USERS,TBL_USERS.".id","=",TBL_LEAVE_REQUEST.".user_id")
+                        ->where(TBL_LEAVE_REQUEST.'.status',1)
+                        ->where(TBL_LEAVE_DETAIL.'.date','LIKE',"%".$this_month."%") 
+                        ->where(TBL_USERS.".department_id",$department_id)
+                        ->groupBy(TBL_LEAVE_DETAIL.'.leave_id')
+                        ->get();
+
+                $data['pending_leave'] = $pending_leave;
+                $data['user_leave'] = $user_leave;
+            //Admin yesterday Task Details
+                $halfLeaveUsers = Task::halfLeaveUsers($yesterday);
+                $fullLeaveUsers = Task::fullLeaveUsers($yesterday);
+                
+            //yesterday on holiday
+                $yesterday_holiday = Task::yesterdayHoliday($yesterday);
+                $data['yesterday_holiday']= $yesterday_holiday;
+            
+            //Admin Not Added
+                $daily_tasks = Task::NotAdded($fullLeaveUsers,$yesterday);
+                $data['daily_tasks']= $daily_tasks;
+
+            //Admin Below 8 hours Details
+                $below_eight_hour = Task::BelowEightHrs($halfLeaveUsers,$yesterday);
+
+            // Admin Below 4 hours Details
+                $below_four_hour = Task::BelowFourHrs($halfLeaveUsers,$yesterday);
+
+                $final_belows = Task::final_belows($below_eight_hour,$below_four_hour);
+                $data['daily_tasks_hours'] = $final_belows;
+            
+                $data['yesterday_leave'] = LeaveRequest::yesterdayOnLeave(); 
+            }
         //User Leave
             $data['auth_user_leave'] = Custom::usertotalleave($auth_user);        
             $user_month_leave = Custom::usermothleave($auth_user,$this_month);

@@ -5,14 +5,15 @@ $bred_crumb_array = array(
     'Home' => url('backend'),
     'Dashboard' => '',
 );
+$monday = date('D');
 ?>
 @section('content')
 <!-- BEGIN PAGE CONTENT BODY -->
 <div class="page-content">
     <div class="container">
         <div class="page-content-inner">
-            @if(Auth::guard('admins')->user()->user_type_id == NORMAL_USER || Auth::guard('admins')->user()->user_type_id == TRAINEE_USER)
-            <div class="row">                
+            @if(Auth::guard('admins')->user()->user_type_id == NORMAL_USER || Auth::guard('admins')->user()->user_type_id == TRAINEE_USER || Auth::guard('admins')->user()->user_type_id ==TEAM_LEADER)
+            <div class="row">   
                 <a href="{{route('leave-request.create')}}">
                     <div class="col-md-3">
                         <!-- BEGIN WIDGET THUMB -->
@@ -84,11 +85,93 @@ $bred_crumb_array = array(
                         <!-- END WIDGET THUMB -->
                     </div>
                 @endforeach
+                @if($monday != 'Mon' && $yesterday_holiday == 0)
+                    <div class="portlet">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="fa fa-bell-o"></i>YESTERDAY TASKS </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="col-md-6">
+                                        <span><h4><b>Not Added</b></h4></span>
+                                        <div class="table-scrollable">
+                                            <table class="table table-striped table-bordered table-advance table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th width="20%"> ID </th>
+                                                        <th width="80%"> User </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @if(count($daily_tasks)>0)
+                                                    <?php $i=1; ?>
+                                                    @foreach($daily_tasks as $daily_task)
+                                                    <tr>
+                                                        <td>{{ $i }}</td>
+                                                        <td>{{ $daily_task->name}}</td>
+                                                    </tr>
+                                                    <?php $i++; ?>
+                                                    @endforeach
+                                                    @else
+                                                    <tr><td colspan="2"><center>No Record Found</center></td></tr>
+                                                    @endif
+                                                </tbody>
+                                            </table>
+                                        </div>    
+                                    </div>
+                                    <div class="col-md-6">
+                                        <span><h4><b>Below 9 Hours</b></h4></span>
+                                        <div class="table-scrollable">
+                                            <table class="table table-striped table-bordered table-advance table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th width="20%"> ID </th>
+                                                        <th width="80%"> User </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @if(count($daily_tasks_hours)>0)
+                                                    <?php $i=1;?>
+                                                    @foreach($daily_tasks_hours as $daily_tasks_hour => $hour)
+                                                    <tr>
+                                                        <td>{{ $i }}</td>
+                                                        <td>
+                                                        @php
+                                                        $date = date("Y-m-d",strtotime($hour['date']));
+                                                        $user = $hour['user_id'];
+                                                        @endphp
+                                                            <a href='{{ asset("/tasks?search_start_date=$date&search_end_date=$date&search_status=all&search_user=$user") }}' target="_blank">
+                                                            {{ $hour['name'] }}
+                                                            [<span style="color: blue">
+                                                                {{ $hour['total'] }} Hr ]
+                                                                    @if($hour['below'] == 4)
+                                                                        [ Half ]
+                                                                    @endif
+                                                            </span>
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                    <?php $i++; ?>
+                                                    @endforeach
+                                                    @else
+                                                    <tr><td colspan="2"><center>Record Not Found</center></td></tr>
+                                                    @endif
+                                                </tbody>
+                                            </table>
+                                        </div>    
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
             </div>
             @endif
             <div class="row">
              
-            @if(Auth::guard('admins')->user()->user_type_id == NORMAL_USER || Auth::guard('admins')->user()->user_type_id == TRAINEE_USER)
+            @if(Auth::guard('admins')->user()->user_type_id == NORMAL_USER || Auth::guard('admins')->user()->user_type_id == TRAINEE_USER || Auth::guard('admins')->user()->user_type_id ==TEAM_LEADER)
                 @if($userOnHoliday)
                     <div class="col-md-12">
                         <div class="portlet" style="margin-bottom: 0px">

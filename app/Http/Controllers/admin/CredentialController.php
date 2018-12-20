@@ -61,7 +61,7 @@ class CredentialController extends Controller
 		$data['types'] = ['FTP'=>'FTP','CPANEL'=>'CPANEL','SSH'=>'SSH','ADMIN/WP-ADMIN'=>'ADMIN/WP-ADMIN','FRONT-END'=>'FRONT-END','HOSTING'=>'HOSTING','EXTRA'=>'EXTRA'];
         $data['environment'] = ['Live'=>'Live','Dev'=>'Dev'];
 		 
-		if($auth_id == NORMAL_USER){
+		if($auth_id == NORMAL_USER || $auth_id == TEAM_LEADER){
             $viewName = $this->moduleViewName.".userIndex";
         }
 		if($auth_id == CLIENT_USER){

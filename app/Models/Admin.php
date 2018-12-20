@@ -178,6 +178,10 @@ class Admin extends Authenticatable
     public static $CLIENT_WISE_MONTHY_REPORT = 133;
     public static $EMPLOYEE_WISE_MONTHY_REPORT = 134;
  
+    public static $LIST_DEPARTMENT = 135; 
+    public static $ADD_DEPARTMENT = 136; 
+    public static $EDIT_DEPARTMENT = 137; 
+    public static $DELETE_DEPARTMENT = 138;
     /**
      * check page acces permissions
      *          

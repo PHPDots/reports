@@ -62,7 +62,7 @@ class EstimatedTaskController extends Controller
 
         $auth_id = \Auth::guard('admins')->user()->user_type_id;
 
-        if($auth_id == NORMAL_USER){
+        if($auth_id == NORMAL_USER || $auth_id == TEAM_LEADER){
             $data['users']='';
             $viewName = $this->moduleViewName.".userIndex";
         }else{
