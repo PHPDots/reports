@@ -163,7 +163,7 @@ $monday = date('D');
                                     </div>    
                                 </div>
                                 <div class="col-md-6">
-                                    <span><h4><b>Below 9 Hours</b></h4></span>
+                                    <span><h4><b>Below {{FULL_DAY_HR}} Hours</b></h4></span>
                                     <div class="table-scrollable">
                                         <table class="table table-striped table-bordered table-advance table-hover">
                                             <thead>
@@ -187,7 +187,7 @@ $monday = date('D');
                                                         {{ $hour['name'] }}
                                                         [<span style="color: blue">
                                                             {{ $hour['total'] }} Hr ]
-                                                                @if($hour['below'] == 4)
+                                                                @if($hour['below'] == HALF_DAY_HR)
                                                                     [ Half ]
                                                                 @endif
                                                         </span>

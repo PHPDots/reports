@@ -864,9 +864,6 @@ class DailyReportController extends Controller
     public function cronDepartment(request $request){
         if($request->get('fromcron') == 1){
             $date = date("Y-m-d");
-            $date= '2018-12-17';
-            //echo '<pre>';
-            //print_r($leader_dep_id);
             
             // Get Tasks
             $sql = "
@@ -961,10 +958,8 @@ class DailyReportController extends Controller
 
                         $data =array();
                         $data['body']= $table;
-                        // if($from_email != 'mayur.devmurari@phpdots.com')
                         sendHtmlMail($params);
                         $returnHTML = view('emails.index',$data)->render();
-                        //echo $returnHTML;
                     }
                 }
             }

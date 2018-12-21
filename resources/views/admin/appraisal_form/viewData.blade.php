@@ -114,7 +114,7 @@
 		</div>
 		<hr />
 		<div class="row static-info">
-			<div class="col-md-12"> <b>Expected Salary (Year - 2018) </b></div>
+			<div class="col-md-12"> <b>Expected Salary (Year - 2019) </b></div>
 			<div class="col-md-12"> {{$appraisal->expected_salary}}</div>
 		</div>
 		<hr />

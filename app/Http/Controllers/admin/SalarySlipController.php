@@ -71,12 +71,12 @@ class SalarySlipController extends Controller
         } else {
 		//Check Admin Type
         $auth_id = \Auth::guard("admins")->user()->id;
+        $authUser = \Auth::guard("admins")->user();
         $auth_user =  superAdmin($auth_id);
-        if($auth_user == 0) 
+        if($auth_user == 0 && $authUser->user_type_id != ACCOUNT_USER) 
         {
             return Redirect('/dashboard');
         }
-			
             $data['users'] = User::pluck("name","id")->all();
             $viewName = $this->moduleViewName . ".index";        
         }    
@@ -541,8 +541,9 @@ class SalarySlipController extends Controller
     {
 		//Check Admin Type
         $auth_id = \Auth::guard("admins")->user()->id;
+        $authUser = \Auth::guard("admins")->user();
         $auth_user =  superAdmin($auth_id);
-        if($auth_user == 0) 
+        if($auth_user == 0 && $authUser->user_type_id != ACCOUNT_USER) 
         {
             return Redirect('/dashboard');
         }
@@ -657,7 +658,8 @@ class SalarySlipController extends Controller
 
     function download_salary_slip(Request $request) 
     {
-		$auth_id = \Auth::guard('admins')->id();
+        $auth_id = \Auth::guard('admins')->id();
+		$authUser = \Auth::guard('admins')->user();
         $slip_id = $request->get('slip_id');
         $slip_detail = SalarySlip::select(TBL_SALARY_SLIP.".*",TBL_USERS.".firstname as firstname",TBL_USERS.".lastname as lastname",TBL_USERS.".name as user_name")
                     ->join(TBL_USERS,TBL_USERS.".id","=",TBL_SALARY_SLIP.".user_id")
@@ -667,7 +669,7 @@ class SalarySlipController extends Controller
 		
 		 $auth_user =  superAdmin($auth_id);
 		
-		if(($slip_detail && $slip_detail->user_id == $auth_id) || $auth_user == 1)
+		if(($slip_detail && $slip_detail->user_id == $auth_id) || $auth_user == 1 || $authUser->user_type_id == ACCOUNT_USER)
 		{
 			$empName = ucfirst($slip_detail->firstname)."_".ucfirst($slip_detail->lastname);
 			$date = $empName.'_'.$slip_detail->month.'_'.$slip_detail->year;
@@ -685,7 +687,8 @@ class SalarySlipController extends Controller
     }
 	public function viewData(Request $request)
     {
-		$auth_id = \Auth::guard('admins')->id();
+        $auth_id = \Auth::guard('admins')->id();
+		$authUser = \Auth::guard('admins')->user();
 		
         $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$LIST_SALARY_SLIP);
         
@@ -707,7 +710,7 @@ class SalarySlipController extends Controller
 		
         $auth_user =  superAdmin($auth_id);
 		
-		if(($slip_detail && $slip_detail->user_id == $auth_id) || $auth_user == 1)
+		if(($slip_detail && $slip_detail->user_id == $auth_id) || $auth_user == 1 || $authUser->user_type_id == ACCOUNT_USER)
 		{
 			$data['slip'] = $slip_detail;	
 			return view("pdf.salary_slip", $data);

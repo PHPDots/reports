@@ -137,7 +137,11 @@ class AdminAction extends Model
 
     public $ADD_ASSIGN_TASK = 90; 
     public $EDIT_ASSIGN_TASK = 91; 
-    public $DELETE_ASSIGN_TASK = 92; 
+    public $DELETE_ASSIGN_TASK = 92;
+
+    public $ADD_DEPARTMENT = 92; 
+    public $EDIT_DEPARTMENT = 92; 
+    public $DELETE_DEPARTMENT = 92; 
 
      
 }

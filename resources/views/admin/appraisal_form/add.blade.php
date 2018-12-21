@@ -142,7 +142,7 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td><b> Expected Salary (Year - 2018) </td>
+                                    <td><b> Expected Salary (Year - 2019) </td>
                                     <td> {!! Form::number('expected_salary',null,['class' => 'form-control','data-required'=>true,'placeholder'=>'Type Expected Salary','id'=>'expected_salary']) !!}
                                     </td>
                                 </tr>

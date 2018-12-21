@@ -106,7 +106,7 @@ class UserTypesController extends Controller
         $goto = $this->list_url;
 
         $validator = Validator::make($request->all(), [
-            'title' => 'required|min:2|unique:'.TBL_USER_TYPES.',title',
+            'title' => 'required|min:2|unique:'.TBL_ADMIN_USER_TYPES.',title',
         ]);
         if ($validator->fails())
         {
@@ -211,7 +211,7 @@ class UserTypesController extends Controller
         if(empty($goto)){  $goto = $this->list_url;  }
 
         $validator = Validator::make($request->all(), [            
-            'title' => 'required|min:2|unique:'.TBL_USER_TYPES.',title,'.$id,
+            'title' => 'required|min:2|unique:'.TBL_ADMIN_USER_TYPES.',title,'.$id,
         ]);
         
         // check validations

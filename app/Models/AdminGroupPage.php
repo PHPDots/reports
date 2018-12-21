@@ -56,7 +56,7 @@ class AdminGroupPage extends Model {
     }
 
     public function GetAdminUser() {
-        $result = \DB::table(TBL_USER_TYPES)
+        $result = \DB::table(TBL_ADMIN_USER_TYPES)
                 ->select(\DB::raw("title,id"))
                 ->pluck('title','id')
                 ->toArray();

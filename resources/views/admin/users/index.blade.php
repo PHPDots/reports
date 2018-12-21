@@ -97,7 +97,7 @@
             "order": [[ "{{ $orderClm }}", "{{ $orderDir }}" ]],
             columns: [
                 { data: 'id', name: 'id' },
-                { data: 'user_type', name: '{{TBL_USER_TYPES}}.title' },
+                { data: 'user_type', name: '{{TBL_ADMIN_USER_TYPES}}.title' },
                 { data: 'firstname', name: 'firstname' },
                 { data: 'lastname', name: 'lastname' },
                 { data: 'email', name: 'email' },

@@ -151,7 +151,7 @@ class UsersController extends Controller
             'email' => 'required|email|unique:'.TBL_USERS.',email',
             'password' => 'required|min:4|same:password',            
             'confirm_password' => 'required|min:4|same:password',            
-            'user_type_id' => 'required|exists:'.TBL_USER_TYPES.',id',           
+            'user_type_id' => 'required|exists:'.TBL_ADMIN_USER_TYPES.',id',           
             'address' => 'required|min:2',            
             'phone' => 'required|max:15',
             'status' => ['required', Rule::in([0,1])],
@@ -420,7 +420,7 @@ class UsersController extends Controller
             'firstname' => 'required|min:2',
             'lastname' => 'required|min:2',
             'email' => 'required|email|unique:'.TBL_USERS.',email,'.$id,
-            'user_type_id' => 'required|exists:'.TBL_USER_TYPES.',id',         
+            'user_type_id' => 'required|exists:'.TBL_ADMIN_USER_TYPES.',id',         
             'address' => 'required|min:2',            
             'phone' => 'required|max:15',
             'status' => ['required', Rule::in([0,1])],
@@ -637,8 +637,8 @@ class UsersController extends Controller
         }
         $auth_id = \Auth::guard('admins')->user()->id;
 
-        $model = User::select(TBL_USERS.".*",TBL_USER_TYPES.".title as user_type")
-                ->join(TBL_USER_TYPES,TBL_USERS.".user_type_id","=",TBL_USER_TYPES.".id");
+        $model = User::select(TBL_USERS.".*",TBL_ADMIN_USER_TYPES.".title as user_type")
+                ->join(TBL_ADMIN_USER_TYPES,TBL_USERS.".user_type_id","=",TBL_ADMIN_USER_TYPES.".id");
 
 
         return Datatables::eloquent($model)

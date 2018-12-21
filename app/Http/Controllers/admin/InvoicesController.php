@@ -83,9 +83,10 @@ class InvoicesController extends Controller
             $viewName = $this->moduleViewName.".clientIndex";
         }else{
 			//Check Admin Type
-			$auth_id = \Auth::guard("admins")->user()->id;
+            $auth_id = \Auth::guard("admins")->user()->id;
+			$authUser = \Auth::guard("admins")->user();
 			$auth_user =  superAdmin($auth_id);
-			if($auth_user == 0) 
+			if($auth_user == 0 && $authUser->user_type_id != ACCOUNT_USER) 
 			{
 				return Redirect('/dashboard');
 			}
@@ -657,8 +658,9 @@ class InvoicesController extends Controller
     {
 		//Check Admin Type
         $auth_id = \Auth::guard("admins")->user()->id;
+        $authUser = \Auth::guard("admins")->user();
         $auth_user =  superAdmin($auth_id);
-        if($auth_user == 0) 
+        if($auth_user == 0 && $authUser->user_type_id != ACCOUNT_USER) 
         {
             return Redirect('/dashboard');
         }
@@ -829,6 +831,7 @@ class InvoicesController extends Controller
      function download_invoice(Request $request) 
     {
         $auth_id = \Auth::guard('admins')->user()->id;
+        $authUser = \Auth::guard('admins')->user();
         $auth_user =  superAdmin($auth_id);
 
         $invoice_id = $request->get('invoice_id');
@@ -847,7 +850,7 @@ class InvoicesController extends Controller
                 $client_type = $client_user->client_id;
             }			
 			
-			if(($invoices && $invoices->client_id == $client_type) || superadmin($auth_id))	
+			if(($invoices && $invoices->client_id == $client_type) || superadmin($auth_id) || $authUser->user_type_id == ACCOUNT_USER)	
             {
                 $name = $invoices->invoice_date;
                 $data['invoices'] = $invoices;
@@ -872,6 +875,7 @@ class InvoicesController extends Controller
             return $checkrights;
         }
         $auth_id = \Auth::guard('admins')->user()->id;
+        $authUser = \Auth::guard('admins')->user();
         $auth_user =  superAdmin($auth_id); 
         
         $invoice_id = $request->get('invoice_id');
@@ -891,7 +895,7 @@ class InvoicesController extends Controller
                 $client_type = $client_user->client_id;
             }
            
-           	if(($invoices && $invoices->client_id == $client_type) || $auth_user == 1)
+           	if(($invoices && $invoices->client_id == $client_type) || $auth_user == 1 || $authUser->user_type_id == ACCOUNT_USER)
             {    
                 $data['invoices'] = $invoices;
                 $data['invoice_details'] = $invoice_details;

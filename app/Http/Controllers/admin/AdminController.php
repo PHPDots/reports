@@ -28,6 +28,7 @@ class AdminController extends Controller
     public function index(Request $request)
     {                          
         $data = array();
+        $viewName = "newDashboard";
         $this_month = date('Y-m',strtotime('first day of this month')); 
         $today =  date("Y-m-d",strtotime("today"));
         $yesterday =  date("Y-m-d",strtotime("yesterday"));
@@ -43,7 +44,7 @@ class AdminController extends Controller
                 ->get()
 				->toArray();
 		 
-		$calendar_leave = array();
+		  $calendar_leave = array();
 
             $i =0;
             foreach ($user_holidays as $key => $value) {
@@ -55,7 +56,7 @@ class AdminController extends Controller
                 $calendar_leave [$i]['status'] = ''; 
                 $i++;
             }		
-
+            $data['userOnLeaves'] = $calendar_leave;
     //Working Days
         $this_month_days = date("t");
         $first = date('Y-m-d',strtotime('first day of this month')); 
@@ -140,24 +141,7 @@ class AdminController extends Controller
         {
             if($auth_id == TEAM_LEADER){
                 $department_id = \Auth::guard('admins')->user()->department_id;
-                //User Leave
-                $pending_leave = LeaveRequest::select(TBL_LEAVE_REQUEST.".*",TBL_USERS.".name as username",TBL_USERS.".image as image")
-                    ->join(TBL_USERS,TBL_USERS.".id","=",TBL_LEAVE_REQUEST.".user_id")
-                    ->where(TBL_LEAVE_REQUEST.'.status',0)
-                    ->where(TBL_USERS.".department_id",$department_id)
-                    ->get();
-
-                $user_leave = LeaveDetail::select(TBL_LEAVE_DETAIL.".*",TBL_USERS.".name as username",TBL_LEAVE_REQUEST.'.from_date as from_date',TBL_LEAVE_REQUEST.'.to_date as to_date',TBL_USERS.".image as image" )
-                        ->join(TBL_LEAVE_REQUEST,TBL_LEAVE_REQUEST.".id","=",TBL_LEAVE_DETAIL.".leave_id")
-                        ->join(TBL_USERS,TBL_USERS.".id","=",TBL_LEAVE_REQUEST.".user_id")
-                        ->where(TBL_LEAVE_REQUEST.'.status',1)
-                        ->where(TBL_LEAVE_DETAIL.'.date','LIKE',"%".$this_month."%") 
-                        ->where(TBL_USERS.".department_id",$department_id)
-                        ->groupBy(TBL_LEAVE_DETAIL.'.leave_id')
-                        ->get();
-
-                $data['pending_leave'] = $pending_leave;
-                $data['user_leave'] = $user_leave;
+                
             //Admin yesterday Task Details
                 $halfLeaveUsers = Task::halfLeaveUsers($yesterday);
                 $fullLeaveUsers = Task::fullLeaveUsers($yesterday);
