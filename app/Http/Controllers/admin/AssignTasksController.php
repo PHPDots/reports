@@ -5,6 +5,7 @@ namespace App\Http\Controllers\admin;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 use Validator;
 use Datatables;
 use App\modells\AdminLog;
@@ -397,13 +398,23 @@ class AssignTasksController extends Controller
         $msg = "Comment Saved";
         $data = array();
 
-        $validator = Validator::make($request->all(), [
-            'user_id' => 'required|exists:'.TBL_USERS.',id',
-            'task_status' => ['required', Rule::in([0,1])], 
-            'task_priority' => ['required', Rule::in([0,1,2])],
-            'task_due_date' => 'required',
-            'comments' => 'required|min:15',
-        ]);
+        $auth = Auth::guard('admins')->user()->user_type_id;
+        if(!empty($auth) && $auth == 1){
+            $validator = Validator::make($request->all(), [
+                'user_id' => 'required|exists:'.TBL_USERS.',id',
+                'task_status' => ['required', Rule::in([0,1])], 
+                'task_priority' => ['required', Rule::in([0,1,2])],
+                'task_due_date' => 'required',
+                'comments' => 'required|min:15',
+            ]);
+        }else{
+           $validator = Validator::make($request->all(), [
+                'user_id' => 'required|exists:'.TBL_USERS.',id',
+                'task_status' => ['required', Rule::in([0,1])], 
+                'task_due_date' => 'required',
+                'comments' => 'required|min:15',
+            ]); 
+        }
         if ($validator->fails())
         {
              $messages = $validator->messages();
@@ -430,8 +441,10 @@ class AssignTasksController extends Controller
             $assign = AssignTask::find($request->assing_task_id);
 
             if($assign){
-                $assign->user_id = $request->user_id;
-                $assign->priority = $request->task_priority;
+                if(!empty($auth) && $auth == 1){
+                    $assign->priority = $request->task_priority;
+                }
+                $assign->user_id = $request->user_id; 
                 $assign->status = $request->task_status;
                 $assign->due_date = date("Y-m-d",strtotime($request->task_due_date));
                 $assign->save();
@@ -646,7 +659,7 @@ class AssignTasksController extends Controller
                         'currentRoute' => $this->moduleRouteText,
                         'row' => $row,
                         'isEditHistory' => \App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_ASSIGN_TASK),
-                        'isDelete' => \App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_ASSIGN_TASK),
+                        'isAssignDelete' => \App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_ASSIGN_TASK),
                         'assign_task_done' =>\App\Models\Admin::isAccess(\App\Models\Admin::$CHANGE_ASSIGN_TASK_STATUS),
                     ]
                 )->render();

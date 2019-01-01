@@ -322,7 +322,7 @@ $('#net_pay_words').val(str);
                 minimumInputLength: 2,
                 width: null
             });
-        $('#main-frm1').submit(function () {
+    $('#main-frm1').submit(function () {
             
             if ($(this).parsley('isValid'))
             {
@@ -411,8 +411,4 @@ $('#net_pay_words').val(str);
     }
 </script>
 
-    <script src="{{ asset("themes/admin/assets/")}}/global/plugins/select2/js/select2.full.min.js" type="text/javascript"></script>
-    <script src="{{ asset("themes/admin/assets/")}}/assets/global/plugins/select2/js/select2.full.min.js" type="text/javascript"></script>
-    <script src="{{ asset("themes/admin/assets/")}}/global/plugins/bootstrap-wizard/jquery.bootstrap.wizard.min.js" type="text/javascript"></script>
-    <script src="{{ asset("themes/admin/assets/")}}/pages/scripts/form-wizard.min.js" type="text/javascript"></script>
-    @endsection
+@endsection

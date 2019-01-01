@@ -34,8 +34,7 @@ class Client extends Model
         else
         {
             return $query;        
-        }             
-        
+        }
     }
     function getSendMailUsers($onlyIDS = 0)
     {

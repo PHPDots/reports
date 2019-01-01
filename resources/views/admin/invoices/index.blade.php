@@ -1,5 +1,22 @@
 @extends('admin.layouts.app')
 
+@section('styles')
+
+<style type="text/css">
+.amount-box
+{
+    border: solid;
+    border-width:1px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-right: 5px;
+    padding-left: 5px;
+    margin-top: 5px;
+    border-color: #adadad;
+}
+</style>
+@endsection
+
 
 @section('content')
 
@@ -12,9 +29,16 @@
             @include($moduleViewName.".search") 
 
             <div class="clearfix"></div> 
-             <a class="btn btn-default pull-right">
+             <span class="amount-box pull-right">
               Total Amounts: <span id="overall-amounts"> 0 </span>
-            </a> 
+            </span>
+            <span class="amount-box pull-right" style="margin-right: 5px;">
+              Total Unpaid: <span id="overall-unpaid"> 0 </span>
+            </span>
+            <span class="amount-box pull-right" style="margin-right: 5px;">
+              Total Paid: <span id="overall-paid"> 0 </span>
+            </span>
+			
             <div class="clearfix">&nbsp;</div>  
             <div class="portlet box green">
                 <div class="portlet-title">
@@ -31,21 +55,21 @@
                             <tr>
                                <th width="5%">ID</th>
                                <th width="15%">Invoice</th>
-                               <th width="10%">CLient Name</th>
+                               <th width="15%">CLient Name</th>
                                <th width="5%">Amount</th>
-                               <th width="5%">GST</th>
+								               <th width="5%">GST</th>
                                <th width="5%">Total Amount</th>
 							                 <th width="5%">Invoice Date</th>
                                <th width="5%">Status</th>
-                               <th width="5%">Created At</th>
+                               <th width="10%">Created At</th>
                                <th width="25%" data-orderable="false">Action</th>
                             </tr>
                         </thead>
                         <tbody>
                         </tbody>
-                    </table>
+                    </table>                                              
                 </div>
-            </div>
+            </div>              
         </div>
     </div>
 </div>
@@ -82,13 +106,11 @@
             {!! Form::open(['route'=>['invoices.change_paymet_status'],'method' => 'POST','id'=>'payment_form'])!!}
 
               <label class="control-label">Payment Status:<span class="required">*</span></label>
-              {!! Form::select('payment_status',[1=>'Full',0=>'Patials'],null,['class'=>'form-group form-control','data-required' => true,'id'=>'payment_status_id'])!!}
-
-              <div id="partial_amt_div" style="display: none;">
+              {!! Form::select('payment_status',[1=>'Full',0=>'Partials'],null,['class'=>'form-group form-control','data-required' => true,'id'=>'payment_status_id'])!!}
+			       <div id="partial_amt_div" style="display: none;">
               <label class="control-label">Patials Amount:<span class="required">*</span></label>
               {!! Form::text('partial_amount',null,['placeholder'=>'Enter Patials Amount','class'=>'form-group form-control']) !!}
               </div>
-
               <label class="control-label">Amount:<span class="required">*</span></label>
               {!! Form::text('amount',null,['placeholder'=>'Enter Amount','class'=>'form-group form-control','required'=>'required']) !!}
 
@@ -157,14 +179,13 @@ function openPaymentModel($id)
   $("#payment_form input[name='invoice_id']").val($id);
 }
     $(document).ready(function(){
-      $('#payment_status_id').on('change',function(){
+		$('#payment_status_id').on('change',function(){
         var status_val = $('#payment_status_id').val();
           if(status_val == 1)
             $('#partial_amt_div').hide();
           else
             $('#partial_amt_div').show();
       });
-
 		$('#payment_form').submit(function () {
           $('#AjaxLoaderDiv').fadeIn('slow');
           $('#payment_submit').attr('disabled',true);
@@ -228,18 +249,20 @@ function openPaymentModel($id)
                     data.search_start_date = $("#search-frm input[name='search_start_date']").val();
                     data.search_end_date = $("#search-frm input[name='search_end_date']").val();
                     data.search_invoice_no = $("#search-frm input[name='search_invoice_no']").val();
-					          data.search_month = $("#search-frm select[name='search_month']").val();
+					data.search_month = $("#search-frm select[name='search_month']").val();
                     data.search_client_name = $("#search-frm select[name='search_client_name']").val();
                     data.search_status = $("#search-frm select[name='search_status']").val();
-					          data.search_id = $("#search-frm input[name='search_id']").val();
-					          data.search_c_type = $("#search-frm select[name='search_c_type']").val();
+					data.search_id = $("#search-frm input[name='search_id']").val();
+					data.search_c_type = $("#search-frm select[name='search_c_type']").val();
                 },
             dataSrc: function(response){
                     $("#overall-amounts").html(response.amounts);
+					          $("#overall-paid").html(response.total_paid_amt);
+                    $("#overall-unpaid").html(response.total_unpaid_amt);
                     $("#is_total").val(response.amounts);
                     return response.data;
                 }
-            },
+            },            
             "order": [[ "{{ $orderClm }}", "{{ $orderDir }}" ]],
             columns: [
                 { data: 'id', name: 'id' },
@@ -253,7 +276,7 @@ function openPaymentModel($id)
                 { data: 'created_at', name: 'created_at' },
                 { data: 'action', orderable: false, searchable: false}
             ]
-        });
+        });        
     });
     </script>
 @endsection

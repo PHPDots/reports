@@ -257,10 +257,10 @@ class HolidaysController extends Controller {
         if(empty($goto)){  $goto = $this->list_url;  }
 
         $validator = Validator::make($request->all(), [
-            'status' => ['required', Rule::in([0, 1])],
-            'from_date' => 'required',
-            'to_date' => 'required',
-            'holiday_title' => 'required|min:5',
+                    'status' => ['required', Rule::in([0, 1])],
+                    'from_date' => 'required',
+                    'to_date' => 'required',
+                    'holiday_title' => 'required|min:5',
         ]);
 
         // check validations
@@ -320,7 +320,9 @@ class HolidaysController extends Controller {
 
                     $detail->holiday_id = $holiday_id;
                     $detail->date = $date;
+
                     $detail->save();
+
                 }
             }
                 //store logs detail
@@ -359,9 +361,9 @@ class HolidaysController extends Controller {
                 $holiData->delete();
                 
                 $backUrl = $request->server('HTTP_REFERER');
+                $modelObj->delete();
                 $goto = session()->get($this->moduleRouteText.'_goto');
                 if(empty($goto)){  $goto = $this->list_url;  }
-                $modelObj->delete();
                 session()->flash('success_message', $this->deleteMsg);
 
                 //store logs detail
@@ -397,34 +399,34 @@ class HolidaysController extends Controller {
         $model = Holiday::query();
 
         return \Datatables::eloquent($model)
-            ->addColumn('action', function(Holiday $row) {
-                return view("admin.partials.action", [
-                    'currentRoute' => $this->moduleRouteText,
-                    'row' => $row,
-                    'isEdit' => \App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_HOLIDAYS),
-                    'isDelete' => \App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_HOLIDAYS),
-                ])->render();
-            })
-                        
-            ->editColumn('created_at', function($row) {
+                ->addColumn('action', function(Holiday $row) {
+                    return view("admin.partials.action", [
+                                'currentRoute' => $this->moduleRouteText,
+                                'row' => $row,
+                                'isEdit' => \App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_HOLIDAYS),
+                                'isDelete' => \App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_HOLIDAYS),
+                                    ]
+                            )->render();
+                })
+                
+                ->editColumn('created_at', function($row) {
 
-                if (!empty($row->created_at))
-                    return date("j M, Y h:i:s A", strtotime($row->created_at));
-                else
-                    return '-';
-            })
-            ->editColumn('status', function ($row) {
-                if ($row->status == 1){
-                    $html = "<a class='btn btn-xs btn-success'>Active</a><br/>";
-                    return $html;
-                }
-                else{
-                    $html ='<a class="btn btn-xs btn-danger">In Active</a><br/>';
-                    return $html;
-                }
-            })
-                        
-            ->rawColumns(['created_at', 'action', 'status'])
+                    if (!empty($row->created_at))
+                        return date("j M, Y h:i:s A", strtotime($row->created_at));
+                    else
+                        return '-';
+                })
+                 ->editColumn('status', function ($row) {
+                    if ($row->status == 1){
+                        $html = "<a class='btn btn-xs btn-success'>Active</a><br/>";
+                        return $html;
+                    }
+                    else{
+                        $html ='<a class="btn btn-xs btn-danger">In Active</a><br/>';
+                        return $html;
+                    }
+                })
+                ->rawColumns(['created_at', 'action', 'status', 'to_date'])
                 ->filter(function ($query) {
                     $search_start_date = request()->get("search_start_date");
                     $search_end_date = request()->get("search_end_date");
@@ -444,7 +446,6 @@ class HolidaysController extends Controller {
 
                         $query = $query->where(TBL_HOLIDAYS . ".created_at", ">=", addslashes($convertFromDate));
                         $searchData['search_start_date'] = $search_start_date;
-
                     }
                     if (!empty($search_end_date)) {
 

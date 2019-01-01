@@ -54,7 +54,7 @@ class ProjectsController extends Controller
 
         $data['add_url'] = route($this->moduleRouteText.'.create');
         $data['btnAdd'] = \App\Models\Admin::isAccess(\App\Models\Admin::$ADD_PROJECT);
-
+		
 		$auth_id = \Auth::guard('admins')->user()->user_type_id;
         if($auth_id == CLIENT_USER){
             $data['clients']='';
@@ -123,9 +123,9 @@ class ProjectsController extends Controller
             'title' => 'required|min:2|unique:'.TBL_PROJECT.',title',
             'status' => ['required', Rule::in([0,1])],
             'client_id' => 'required|exists:'.TBL_CLIENT.',id',
-            //'send_email' => ['required', Rule::in([0,1])],
+            //'send_email' => Rule::in([1]),
         ]);
-        if ($validator->fails())
+        if ($validator->fails())         
         {
             $messages = $validator->messages();
             
@@ -136,7 +136,7 @@ class ProjectsController extends Controller
             {
                 $msg .= $message . "<br />";
             }
-        }
+        }         
         else
         {
             $input = $request->all();
@@ -151,7 +151,7 @@ class ProjectsController extends Controller
             $params['actionid']     = $this->adminAction->ADD_PROJECT ;
             $params['actionvalue']  = $id;
             $params['remark']       = "Add Project::".$id;
-
+                                    
             $logs= \App\Models\AdminLog::writeadminlog($params);
             
             session()->flash('success_message', $msg);                    
@@ -317,7 +317,7 @@ class ProjectsController extends Controller
             {
                 $msg .= $message . "<br />";
             }
-        }
+        }         
         else
         {
             $input = $request->all();
@@ -334,7 +334,6 @@ class ProjectsController extends Controller
 
                 $logs=\App\Models\AdminLog::writeadminlog($params);         
         }
-        
         return ['status' => $status,'msg' => $msg, 'data' => $data, 'goto' => $goto];               
     }
 
@@ -357,11 +356,11 @@ class ProjectsController extends Controller
         if($modelObj) 
         {
             try 
-            {
+            {             
                 $backUrl = $request->server('HTTP_REFERER');
+                $modelObj->delete();
                 $goto = session()->get($this->moduleRouteText.'_goto');
                 if(empty($goto)){  $goto = $this->list_url;  }
-                $modelObj->delete();
                 session()->flash('success_message', $this->deleteMsg); 
 
                 //store logs detail
@@ -372,7 +371,7 @@ class ProjectsController extends Controller
                     $params['actionvalue']  = $id;
                     $params['remark']       = "Delete Project::".$id;
 
-                    $logs=\App\Models\AdminLog::writeadminlog($params);
+                    $logs=\App\Models\AdminLog::writeadminlog($params);    
 
                 return redirect($goto);
             } 
@@ -414,7 +413,7 @@ class ProjectsController extends Controller
                 )->render();
             })
             ->editColumn('status', function ($row) {
-                $html = '';
+                    $html = '';
                     if ($row->status == 1){
                         $html .=  "<a class='btn btn-xs btn-success'>Active</a>";
                         if($row->send_email == 1)
@@ -427,7 +426,7 @@ class ProjectsController extends Controller
             })
             ->editColumn('created_at', function($row){
                 
-                if(!empty($row->created_at))
+                if(!empty($row->created_at))          
                     return date("j M, Y",strtotime($row->created_at));
                 else
                     return '-';    
@@ -435,7 +434,7 @@ class ProjectsController extends Controller
             
             ->filter(function ($query) 
             {                              
-                $search_title = request()->get("search_title");
+                $search_title = request()->get("search_title");                                
                 $search_status = request()->get("search_status");
                 $search_client = request()->get("search_client");
 
@@ -451,16 +450,16 @@ class ProjectsController extends Controller
                 {
                     $query = $query->where(TBL_PROJECT.".status", $search_status);
                 }
+                    $searchData['search_status'] = $search_status;
                 if(!empty($search_client))
                 {
                     $query = $query->where(TBL_PROJECT.".client_id", $search_client);
                     $searchData['search_client'] = $search_client;
-                }                   
-                    $searchData['search_status'] = $search_status;
+                }
                     $goto = \URL::route($this->moduleRouteText.'.index', $searchData);
                     \session()->put($this->moduleRouteText.'_goto',$goto);
             })
-            ->make(true);
+            ->make(true);        
     }
 	public function clientData(Request $request)
     {

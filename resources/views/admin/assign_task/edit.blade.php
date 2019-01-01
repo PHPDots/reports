@@ -118,7 +118,7 @@ else
                             <div class="form-group">
                                 <label>Due date</label> 
 
-                                {!! Form::text('task_due_date',null,['class' => 'task_due_date input-group form-control date-picker  data-date-format="dd/mm/yyyy" ', 'data-required' => true,'id'=>'','placeholder'=>'Due Date']) !!}
+                                {!! Form::text('task_due_date',null,['class' => 'task_due_date input-group form-control date-picker  data-date-format="dd/mm/yyyy" ', 'data-required' => false,'id'=>'','placeholder'=>'Due Date']) !!}
                             </div>
                         </div>
                         @if(!empty($auth) && $auth == 3)

@@ -5,25 +5,25 @@
 <!-- BEGIN PAGE CONTENT BODY -->
 <div class="page-content">
     <div class="container">
-          <div class="">
-            
-            @include($moduleViewName.".search")
 
-			   <div class="clearfix"></div>
+        <div class="">
+            
+            @include($moduleViewName.".search")           
+			<div class="clearfix"></div>
             <a class="btn btn-default pull-right">
               Total Net Pay: <span id="overall-netpay"> 0 </span>
             </a>
-            <div class="clearfix"></div>
+            <div class="clearfix"></div>    
             <div class="portlet box green">
                 <div class="portlet-title">
                     <div class="caption">
-                        <i class="fa fa-list"></i>{{ $page_title }}
+                        <i class="fa fa-list"></i>{{ $page_title }}    
                     </div>
-
+                  
                     @if($btnAdd)
                         <a class="btn btn-default pull-right btn-sm mTop5" href="{{ $add_url }}">Add New</a>
 						<a class="btn btn-default btn-sm mTop5 pull-right" style="margin-right: 10px;" href="{{ route('salaryslipForAll') }}">Add For All</a>
-                    @endif
+                    @endif                     
 
                 </div>
                 <div class="portlet-body">                    
@@ -37,15 +37,15 @@
                                <th width="15%">Created At</th>
                                <th width="10%" data-orderable="false">Action</th>
                             </tr>
-                        </thead>
+                        </thead>                                         
                         <tbody>
                         </tbody>
-                    </table>
+                    </table>                                              
                 </div>
             </div>
         </div>
     </div>
-</div>
+</div> 
 <div class="modal fade bs-modal-lg" id="slip_view" role="dialog" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
     
@@ -64,6 +64,7 @@
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         </div>
       </div>
+      
     </div>
 </div>
 @endsection
@@ -100,19 +101,7 @@ function openView($id){
 		
 		
     $(document).ready(function(){
-        $("#month_id").select2({
-                placeholder: "Search Month",
-                allowClear: true,
-                minimumInputLength: 2,
-                width: null
-        });
-        $("#year_id").select2({
-                placeholder: "Search Year",
-                allowClear: true,
-                minimumInputLength: 2,
-                width: null
-        });
-		    $("#user_id").select2({
+		$("#user_id").select2({
                 placeholder: "Search User Name",
                 allowClear: true,
                 minimumInputLength: 2,
@@ -158,7 +147,7 @@ function openView($id){
                 { data: 'month', name: 'month' },
 				        { data: 'net_pay', name: 'net_pay' },
                 { data: 'created_at', name: 'created_at' },
-                { data: 'action', orderable: false, searchable: false}
+                { data: 'action', orderable: false, searchable: false}             
             ]
         });
     });

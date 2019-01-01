@@ -50,17 +50,17 @@
                                         <span class="input-group-addon">
                                                 <i class="fa fa-phone"></i>
                                         </span>
-                                        </div>
+                                        </div>                                            
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="control-label">Country: </label>
+                                        <label class="control-label">Country: </label>                            
                                         {!! Form::text('country',null,['class' => 'form-control','placeholder' => 'Enter Country']) !!}
                                     </div>
                                 </div>
                                 <div class="clearfix">&nbsp;</div>
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <label class="control-label">State: </label>
+                                        <label class="control-label">State: </label>                            
                                         {!! Form::text('state',null,['class' => 'form-control','placeholder' => 'Enter State']) !!}
                                     </div>
                                     <div class="col-md-6">
@@ -86,7 +86,7 @@
                                         {!! Form::text('gstn_no',null,['class' => 'form-control','placeholder' => '']) !!}
                                     </div>
                                     <div class="col-md-6">
-                                        <br/>
+                                    <br/>
                                     <div class="form-group">
                                         <div class="col-md-3">Type : <span class="required">*</span></div>
                                         <div class="col-md-9">
@@ -170,8 +170,7 @@
 @section('scripts')
 
 <script type="text/javascript">
-    $(document).ready(function () { 
-        
+    $(document).ready(function () {
         var check_send_email = '{{ $formObj->send_email }}';
         if(check_send_email == 1)
         {
@@ -221,7 +220,7 @@
                         if (result.status == 1)
                         {
                             $.bootstrapGrowl(result.msg, {type: 'success', delay: 4000});
-                            window.location = result.goto;
+                            window.location = result.goto;    
                         }
                         else
                         {

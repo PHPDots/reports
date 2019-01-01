@@ -38,8 +38,8 @@
                     <input type="submit" class="btn blue mTop25" value="Search"/>
                     &nbsp;
                     <a href="{{ $list_url }}" class="btn red mTop25">Reset</a>
-                </div>                                   
+                </div>
             </div>
         </form>
-    </div>    
+    </div>
 </div>

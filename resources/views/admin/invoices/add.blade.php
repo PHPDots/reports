@@ -1,5 +1,6 @@
 @extends('admin.layouts.app')
 @section('styles')
+ 
 @endsection
 
 <?php
@@ -208,7 +209,7 @@
             var sgst_amount = parseInt(sgst_amount);
             $('#cgst_amount').val(cgst_amount);
             $('#sgst_amount').val(sgst_amount); 
-            var gst_total = cgst_amount + sgst_amount;      
+        var gst_total = cgst_amount + sgst_amount;      
         }
         if(is_gst == 0)
         {
@@ -406,7 +407,7 @@
             }            
             return false;
         });
-		$(document).on('click','#save_btn',function(){
+		 $(document).on('click','#save_btn',function(){
             $('#send_id').val(0);
             $('#main-frm1').submit();
         });
@@ -416,4 +417,5 @@
         });
     });
 </script>
+  
 @endsection

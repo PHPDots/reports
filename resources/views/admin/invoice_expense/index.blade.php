@@ -28,6 +28,7 @@
                                <th width="5%">ID</th>                                    
                                <th width="20%">Invoice No</th>
                                <th width="10%">Amount</th>
+							   <th width="10%">Partial Amount</th>
                                <th width="10%">Payment Date</th>
                                <th width="10%">Status</th>
                                <th width="15%">Created At</th>
@@ -82,6 +83,7 @@
                 { data: 'id', name: 'id' },
                 { data: 'invoice_no', name: '{{ TBL_INVOICE}}.invoice_no' },
                 { data: 'amount', name: 'amount' },
+				{ data: 'partial_amount', name: 'partial_amount' },
                 { data: 'payment_date', name: 'payment_date' },
                 { data: 'payment_status', name: 'payment_status' },
                 { data: 'created_at', name: 'created_at' }

@@ -18,7 +18,7 @@ class User extends Model
      *
      * @var array
      */
-    protected $fillable = ['firstname','lastname','email','user_type_id','address','phone','password','name','status','image','joining_date','blood_group','ifsc_code','bank_nm','account_no','account_nm','dob','pan_num','adhar_num','designation','is_add_task','is_show_appraisal_form','balance_paid_leave','salary','is_salary_generate','relieving_date'];
+    protected $fillable = ['firstname','lastname','email','user_type_id','address','phone','password','name','status','image','joining_date','blood_group','ifsc_code','bank_nm','account_no','account_nm','dob','pan_num','adhar_num','designation','is_add_task','is_show_appraisal_form','balance_paid_leave','salary','is_salary_generate','relieving_date','department_id'];
     
     /**
      * The attributes that should be hidden for arrays.
@@ -55,7 +55,15 @@ class User extends Model
 
     public static function getList(){
 
-        $users = User::orderby('name')->pluck("name","id")->all();
+        $users = User::orderby('name');
+        if(\Auth::guard('admins')->check())
+        {
+            $authUser = \Auth::guard('admins')->user();
+            if($authUser->user_type_id == TEAM_LEADER){
+                $users = $users->where("department_id",$authUser->department_id);
+            }
+        }
+        $users = $users->pluck("name","id")->all();
         return $users;
     }
     public static function getAdminEmails()

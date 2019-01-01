@@ -41,7 +41,7 @@
                         <label class="control-label">Status</label>
                         <select name="search_status" class="form-control">
                             <option value="all" {!! \Request::get("search_status") == "all" ? 'selected="selected"':'' !!}>Search Status</option>
-                            <option value="0" {!! \Request::get("search_status") == "0" ? 'selected="selected"':'' !!}>In Active</option>                        
+                            <option value="0" {!! \Request::get("search_status") == "0" ? 'selected="selected"':'' !!}>In Active</option>
                             <option value="1" {!! \Request::get("search_status") == "1" ? 'selected="selected"':'' !!}>Active</option>
                         </select>
                     </div>
@@ -56,4 +56,4 @@
             </div>                
         </form>
     </div>    
-</div>
+</div>      

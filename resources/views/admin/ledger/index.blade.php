@@ -7,13 +7,14 @@
     <div class="container">
 
         <div class="">
-            
+             @include($moduleViewName.".search")           
             <div class="clearfix"></div>    
             <div class="portlet box green">
                 <div class="portlet-title">
                     <div class="caption">
                         <i class="fa fa-list"></i>{{ $page_title }}    
                     </div>
+                    <a class="btn btn-default pull-right btn-sm mTop5" href="{{ $back_url }}">Back</a>
                 </div>
                 <div class="portlet-body">                    
                     <table class="table table-bordered table-striped table-condensed flip-content" id="server-side-datatables">
@@ -85,5 +86,4 @@
         });
     });
     </script>
-
 @endsection

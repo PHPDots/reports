@@ -58,7 +58,7 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td><b> Total experience as on 31st December 2017. </b> (Ex. 5 years and 6 months)</td>
+                                    <td><b> Total experience as on 31st December 2018. </b> (Ex. 5 years and 6 months)</td>
                                     <td> 
                                     <table>
                                         <tr>
@@ -71,12 +71,78 @@
                                     </td>
                                 </tr>
                                 <tr>
+                                    <td><b> English communication with client? </td>
+                                    <td> 
+                                        {!! Form::select('english_communication',[''=>'Select Rate']+$rates,null,['class' => 'form-control', 'data-required' => true]) !!} 
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><b> Requirement understanding without help? </td>
+                                    <td> 
+                                        {!! Form::select('requirement_understanding',[''=>'Select Rate']+$rates,null,['class' => 'form-control', 'data-required' => true]) !!} 
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><b> Timely work completed? </td>
+                                    <td> 
+                                        {!! Form::select('timely_work',[''=>'Select Rate']+$rates,null,['class' => 'form-control', 'data-required' => true]) !!} 
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><b> Office on time? </td>
+                                    <td> 
+                                        {!! Form::select('office_on_time',[''=>'Select Rate']+$rates,null,['class' => 'form-control', 'data-required' => true]) !!} 
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><b> Can able to generate work from current client / Helping on client retention? </td>
+                                    <td> 
+                                        {!! Form::select('generate_work',[''=>'Select Rate']+$rates,null,['class' => 'form-control', 'data-required' => true]) !!} 
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><b> Git knowledge? </td>
+                                    <td> 
+                                        {!! Form::select('git_knowledge',[''=>'Select Rate']+$rates,null,['class' => 'form-control', 'data-required' => true]) !!} 
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><b> Proactive on work? </td>
+                                    <td> 
+                                        {!! Form::select('proactive_on_work',[''=>'Select Rate']+$rates,null,['class' => 'form-control', 'data-required' => true]) !!} 
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><b> Job Profile knowledge? </td>
+                                    <td> 
+                                        {!! Form::select('job_profile',[''=>'Select Rate']+$rates,null,['class' => 'form-control', 'data-required' => true]) !!} 
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><b> Attitude towards job/work? </td>
+                                    <td> 
+                                        {!! Form::select('attitude',[''=>'Select Rate']+$rates,null,['class' => 'form-control', 'data-required' => true]) !!} 
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><b> Work quality? </td>
+                                    <td> 
+                                        {!! Form::select('work_quality',[''=>'Select Rate']+$rates,null,['class' => 'form-control', 'data-required' => true]) !!} 
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><b> Work independently? </td>
+                                    <td> 
+                                        {!! Form::select('Work_independently',[''=>'Select Rate']+$rates,null,['class' => 'form-control', 'data-required' => true]) !!} 
+                                    </td>
+                                </tr>
+                                <tr>
                                     <td><b> Current Salary </td>
                                     <td> {!! Form::number('current_salary',null,['class' => 'form-control','data-required'=>true,'placeholder'=>'Type Current Salary','id'=>'current_salary']) !!}
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td><b> Expected Salary (Year - 2018) </td>
+                                    <td><b> Expected Salary (Year - 2019) </td>
                                     <td> {!! Form::number('expected_salary',null,['class' => 'form-control','data-required'=>true,'placeholder'=>'Type Expected Salary','id'=>'expected_salary']) !!}
                                     </td>
                                 </tr>

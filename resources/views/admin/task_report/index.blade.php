@@ -35,6 +35,7 @@
         </div>
     </div>
 </div>
+</div>            
 @endsection
 
 @section('styles')
@@ -63,8 +64,6 @@
             processing: true,
             serverSide: true,
             searching: false,
-            pageLength: '{{ $length }}',
-            displayStart: '{{ $start }}',
             ajax: {
                 "url": "{!! route($moduleRouteText.'.data') !!}",
                 "data": function ( data ) 
@@ -78,8 +77,8 @@
               [
                 [100,200,300,400,500],
                 [100,200,300,400,500]
-              ],
-            "order": [[ "{{ $orderClm }}", "{{ $orderDir }}" ]],
+              ],          
+            "order": [[ '0', "desc" ]],    
             columns: [
                 { data: 'id', name: 'id' },
                 { data: 'user_name', name: '{{ TBL_USERS }}.name' },

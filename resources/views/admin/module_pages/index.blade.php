@@ -69,6 +69,8 @@
             processing: true,
             serverSide: true,
             searching: false,
+            pageLength: '{{ $length }}',
+            displayStart: '{{ $start }}',
             ajax: {
                 "url": "{!! route($moduleRouteText.'.data') !!}",
                 "data": function ( data ) 
@@ -77,12 +79,12 @@
                     data.search_module_id = $("#search-frm select[name='search_pageGroup']").val();
                 }
             },            
-            "order": [[ '0', "desc" ]],    
+            "order": [[ "{{ $orderClm }}", "{{ $orderDir }}" ]],
             columns: [
                 { data: 'id', name: 'id' },
                 { data: 'group_name', name: '{{ TBL_ADMIN_GROUP }}.title' },
                 { data: 'name', name: 'name' },                                              
-                { data: 'menu_order', name: 'menu_order' },                                              
+                { data: 'menu_order', name: 'menu_order' },
                 { data: 'show_in_menu', name: 'show_in_menu' },
                 { data: 'action', orderable: false, searchable: false}             
             ]

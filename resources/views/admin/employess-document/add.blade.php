@@ -17,7 +17,7 @@
                     </div>
                     <div class="portlet-body">
                         <div class="form-body">
-                           {!! Form::model($formObj,['method' => $method,'files' => true, 'route' => [$action_url,$action_params],'class' => 'sky-form form form-group', 'id' => 'main-frm1']) !!} 
+                           {!! Form::model($formObj,['method' => $method,'files' => true, 'route' => [$action_url,$action_params],'class' => 'sky-form form form-group', 'id' => 'main-frm1']) !!}
                                     <div class="row">
                                         <div class="col-sm-6 nopadding">
                                             {!! Form::select('user_id',[''=>'Select User']+$users,null,['class' => 'form-control', 'data-required' => true,'id'=>'user_id']) !!}
@@ -30,16 +30,14 @@
                                     <div class="clearfix">&nbsp;</div>
 
                                     <div class="row">
-
                                         <div class="col-md-12"> 
                                             <label class="control-label">Select Document: <span class="required">*</span></label>
                                             <input type="file" name="filename" />
                                         </div>
-                                        
                                     </div>
                                 </div>
                                 <div class="clearfix">&nbsp;</div>
-                                                                                           
+
                                 <div class="row">
                                     <div class="col-md-12">
                                         <input type="submit" value="Save" class="btn btn-success pull-right" />
@@ -48,11 +46,11 @@
                             {!! Form::close() !!}
                         </div>
                     </div>
-                </div>                 
+                </div>
             </div>
         </div>
     </div>
-</div>            
+</div>
 
 
 @endsection
@@ -90,7 +88,7 @@
                         if (result.status == 1)
                         {
                             $.bootstrapGrowl(result.msg, {type: 'success', delay: 4000});
-                            window.location = result.goto;
+                            window.location = result.goto;   
                         }
                         else
                         {

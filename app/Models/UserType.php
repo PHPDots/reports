@@ -8,5 +8,5 @@ class UserType extends Model
 {
     protected $fillable = ['title'];
     public $timestamps = true;
-    protected $table = TBL_USER_TYPES;
+    protected $table = TBL_ADMIN_USER_TYPES;
 }

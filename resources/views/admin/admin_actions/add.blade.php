@@ -18,7 +18,7 @@
                             <i class="fa fa-list"></i>
                             {{ $page_title }}
                         </div>
-                        <a class="btn btn-default pull-right btn-sm mTop5" href="{{ $list_url }}">Back</a>
+                        <a class="btn btn-default pull-right btn-sm mTop5" href="{{ $back_url }}">Back</a>
                     </div>
                     
                     <div class="portlet-body">
@@ -85,7 +85,7 @@
                         if (result.status == 1)
                         {
                             $.bootstrapGrowl(result.msg, {type: 'success', delay: 4000});
-                            window.location = '{{ $list_url }}';    
+                            window.location = result.goto;    
                         }
                         else
                         {

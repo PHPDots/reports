@@ -47,9 +47,10 @@ class AdminUserLogsController extends Controller {
 
         $data = array();        
         $data['page_title'] = "List Admin User Logs";       
+       
         $data['users'] = \App\Models\Admin::pluck("name","id")->all();
         $data['userAction'] = \App\Models\AdminAction::pluck("description","id")->all();
-        $data = customSession($this->moduleRouteText, $data, 100);
+     
         return view($this->moduleViewName.".index", $data);         
     }
 
@@ -87,12 +88,9 @@ class AdminUserLogsController extends Controller {
                 $search_end_date = trim(request()->get("search_end_date"));
                 $search_adminuserid = request()->get("search_adminuserid");
                 $search_actionid = request()->get("search_actionid");
-                $search_actionvalue = request()->get("search_actionvalue");
-                $search_remark = request()->get("search_remark");
-                $search_ipaddress = request()->get("search_ipaddress");
-
-                $searchData = array();
-                customDatatble($this->moduleRouteText);
+                $search_actionvalue = request()->get("search_actionvalue");                    
+                $search_remark = request()->get("search_remark");                                   
+                $search_ipaddress = request()->get("search_ipaddress");                          
 
                 if (!empty($search_start_date)){
 
@@ -100,7 +98,6 @@ class AdminUserLogsController extends Controller {
                     $convertFromDate= $from_date;
 
                     $query = $query->where(TBL_ADMIN_LOG.".created_at",">=",addslashes($convertFromDate));
-                    $searchData['search_start_date'] = $search_start_date;
                 }
                 if (!empty($search_end_date)){
 
@@ -108,40 +105,32 @@ class AdminUserLogsController extends Controller {
                     $convertToDate= $to_date;
 
                     $query = $query->where(TBL_ADMIN_LOG.".created_at","<=",addslashes($convertToDate));
-                    $searchData['search_end_date'] = $search_end_date;
                 }
 
                 if(!empty($search_adminuserid))
                 {
                     $query = $query->where('adminuserid', $search_adminuserid);
-                    $searchData['search_adminuserid'] = $search_adminuserid;
                 }
 
                 if(!empty($search_actionid))
                 {
                     $query = $query->where('actionid', $search_actionid);
-                    $searchData['search_actionid'] = $search_actionid;
                 }
 
                 if(!empty($search_actionvalue))
                 {
                     $query = $query->where('actionvalue', $search_actionvalue);
-                    $searchData['search_actionvalue'] = $search_actionvalue;
                 }
 
                 if(!empty($search_remark))
                 {
                     $query = $query->where(TBL_ADMIN_LOG.".remark", 'LIKE', '%'.$search_remark.'%');
-                    $searchData['search_remark'] = $search_remark;
                 }
 
                 if(!empty($search_ipaddress))
                 {
                     $query = $query->where('ipaddress', 'LIKE', '%'.$search_ipaddress.'%');
-                    $searchData['search_ipaddress'] = $search_ipaddress;
-                }
-                $goto = \URL::route($this->moduleRouteText.'.index', $searchData);
-                \session()->put($this->moduleRouteText.'_goto',$goto);
+                }      
             })
             ->make(true);        
     }

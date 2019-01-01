@@ -1,6 +1,6 @@
 <?php
 $search_month = \Request::get("search_month");
-if(isset($search_month) || $search_month == '')
+if(!empty($search_month))
     $search_month = $search_month;
 else
     $search_month = date('Y-m',strtotime('first day of this month')); 
@@ -12,7 +12,7 @@ else
         </div>
         <div class="tools">
             <a href="javascript:;" class="expand"> </a>
-        </div>                    
+        </div>
     </div>
     <div class="portlet-body" style="display: none">  
         <form id="search-frm">
@@ -43,10 +43,10 @@ else
 				 <div class="col-md-4">
                     <label class="control-label">Status</label>
                     <select name="search_status" class="form-control">
-                        <option value="all" {!! \Request::get("search_status") == "all" ? 'selected="selected"':'' !!}>All</option>
-                        <option value="0" {!! \Request::get("search_status") == "0" ? 'selected="selected"':'' !!}>UnPaid</option>
+                        <option value="all" {!! \Request::get("search_status") == "all" ? 'selected="selected"':'' !!}>All</option>                        
+                        <option value="0" {!! \Request::get("search_status") == "0" ? 'selected="selected"':'' !!}>UnPaid</option>                        
                         <option value="1" {!! \Request::get("search_status") == "1" ? 'selected="selected"':'' !!}>Paid</option>
-                    </select>
+                    </select>                                                                 
                 </div>
 				 <div class="col-md-4">
                     <label class="control-label">ID(s)</label>

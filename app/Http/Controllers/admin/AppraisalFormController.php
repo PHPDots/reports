@@ -90,8 +90,9 @@ class AppraisalFormController extends Controller
         $data["method"] = "POST"; 
         $data["past_year_rate"] = ['0'=>'0','1'=>'1','2'=>'2','3'=>'3','4'=>'4','5'=>'5','6'=>'6','7'=>'7','8'=>'8','9'=>'9','10'=>'10']; 
         $data["job_satisfaction"] = ['0'=>'0','1'=>'1','2'=>'2','3'=>'3','4'=>'4','5'=>'5','6'=>'6','7'=>'7','8'=>'8','9'=>'9','10'=>'10']; 
+        $data["rates"] = ['0'=>'0','1'=>'1','2'=>'2']; 
         $data['users'] = User::where('status',1)->whereNull('client_user_id')->pluck("name","id")->all();
-        $appraisal = AppraisalForm::where('user_id',$auth_id)->first();
+        $appraisal = AppraisalForm::where('user_id',$auth_id)->where('form_year',date('Y'))->first();
         if(!empty($appraisal))
         {
             $formObj=$appraisal; 
@@ -106,7 +107,8 @@ class AppraisalFormController extends Controller
                 $data['action_params'] = $formObj->id;
                 $data['method'] = "PUT"; 
                 $data["past_year_rate"] = ['0'=>'0','1'=>'1','2'=>'2','3'=>'3','4'=>'4','5'=>'5','6'=>'6','7'=>'7','8'=>'8','9'=>'9','10'=>'10']; 
-                $data["job_satisfaction"] = ['0'=>'0','1'=>'1','2'=>'2','3'=>'3','4'=>'4','5'=>'5','6'=>'6','7'=>'7','8'=>'8','9'=>'9','10'=>'10'];    
+                $data["job_satisfaction"] = ['0'=>'0','1'=>'1','2'=>'2','3'=>'3','4'=>'4','5'=>'5','6'=>'6','7'=>'7','8'=>'8','9'=>'9','10'=>'10']; 
+                $data["rates"] = ['0'=>'0','1'=>'1','2'=>'2'];   
 
                 return view($this->moduleViewName.'.add', $data);
             }
@@ -172,6 +174,17 @@ class AppraisalFormController extends Controller
             'expected_salary' => 'required|numeric|min:0',
             'raise' => 'required',
             'is_submit' => ['required', Rule::in([0,1])],
+            'english_communication' => ['required', Rule::in([0,1,2])],
+            'requirement_understanding' => ['required', Rule::in([0,1,2])],
+            'timely_work' => ['required', Rule::in([0,1,2])],
+            'office_on_time' => ['required', Rule::in([0,1,2])],
+            'generate_work' => ['required', Rule::in([0,1,2])],
+            'git_knowledge' => ['required', Rule::in([0,1,2])],
+            'proactive_on_work' => ['required', Rule::in([0,1,2])],
+            'job_profile' => ['required', Rule::in([0,1,2])],
+            'attitude' => ['required', Rule::in([0,1,2])],
+            'work_quality' => ['required', Rule::in([0,1,2])],
+            'Work_independently' => ['required', Rule::in([0,1,2])],
         ]);
         if ($validator->fails())         
         {
@@ -201,6 +214,17 @@ class AppraisalFormController extends Controller
             $expected_salary = $request->get('expected_salary');
             $raise = $request->get('raise');
             $is_submit = $request->get('is_submit');
+            $english_communication = $request->get('english_communication');
+            $requirement_understanding = $request->get('requirement_understanding');
+            $timely_work = $request->get('timely_work');
+            $office_on_time = $request->get('office_on_time');
+            $generate_work = $request->get('generate_work');
+            $git_knowledge = $request->get('git_knowledge');
+            $proactive_on_work = $request->get('proactive_on_work');
+            $job_profile = $request->get('job_profile');
+            $attitude = $request->get('attitude');
+            $work_quality = $request->get('work_quality');
+            $Work_independently = $request->get('Work_independently');
 
             $appraisal = new AppraisalForm();
             if($is_submit == 1){
@@ -221,6 +245,18 @@ class AppraisalFormController extends Controller
             $appraisal->expected_salary = $expected_salary;    
             $appraisal->raise = $raise;    
             $appraisal->is_submit = $is_submit;
+            $appraisal->english_communication = $english_communication;
+            $appraisal->requirement_understanding = $requirement_understanding;
+            $appraisal->timely_work = $timely_work;
+            $appraisal->office_on_time = $office_on_time;
+            $appraisal->generate_work = $generate_work;
+            $appraisal->git_knowledge = $git_knowledge;
+            $appraisal->proactive_on_work = $proactive_on_work;
+            $appraisal->job_profile = $job_profile;
+            $appraisal->attitude = $attitude;
+            $appraisal->work_quality = $work_quality;
+            $appraisal->Work_independently = $Work_independently;
+            $appraisal->form_year = date('Y');
             $appraisal->save();
 
             $id = $appraisal->id;
@@ -234,7 +270,7 @@ class AppraisalFormController extends Controller
             $params=array();    
                                     
             $params['adminuserid']  = \Auth::guard('admins')->id();
-            $params['actionid']     = $this->adminAction->ADD_APPRAISAL_FORM ;
+            $params['actionid']     = $this->adminAction->ADD_APPRAISAL_FORM;
             $params['actionvalue']  = $id;
             $params['remark']       = "Add Appraisal Form::".$id;
                                     
@@ -289,7 +325,7 @@ class AppraisalFormController extends Controller
             $data['method'] = "PUT"; 
             $data["past_year_rate"] = ['0'=>'0','1'=>'1','2'=>'2','3'=>'3','4'=>'4','5'=>'5','6'=>'6','7'=>'7','8'=>'8','9'=>'9','10'=>'10']; 
             $data["job_satisfaction"] = ['0'=>'0','1'=>'1','2'=>'2','3'=>'3','4'=>'4','5'=>'5','6'=>'6','7'=>'7','8'=>'8','9'=>'9','10'=>'10'];    
-
+            $data["rates"] = ['0'=>'0','1'=>'1','2'=>'2']; 
             return view($this->moduleViewName.'.add', $data);
         }
         else{
@@ -334,6 +370,17 @@ class AppraisalFormController extends Controller
             'expected_salary' => 'required|numeric',
             'raise' => 'required',
             'is_submit' => ['required', Rule::in([0,1])],
+            'english_communication' => ['required', Rule::in([0,1,2])],
+            'requirement_understanding' => ['required', Rule::in([0,1,2])],
+            'timely_work' => ['required', Rule::in([0,1,2])],
+            'office_on_time' => ['required', Rule::in([0,1,2])],
+            'generate_work' => ['required', Rule::in([0,1,2])],
+            'git_knowledge' => ['required', Rule::in([0,1,2])],
+            'proactive_on_work' => ['required', Rule::in([0,1,2])],
+            'job_profile' => ['required', Rule::in([0,1,2])],
+            'attitude' => ['required', Rule::in([0,1,2])],
+            'work_quality' => ['required', Rule::in([0,1,2])],
+            'Work_independently' => ['required', Rule::in([0,1,2])],
             ]);
 
          // check validations
@@ -357,6 +404,17 @@ class AppraisalFormController extends Controller
             $expected_salary = $request->get('expected_salary');
             $raise = $request->get('raise');
             $is_submit = $request->get('is_submit');
+            $english_communication = $request->get('english_communication');
+            $requirement_understanding = $request->get('requirement_understanding');
+            $timely_work = $request->get('timely_work');
+            $office_on_time = $request->get('office_on_time');
+            $generate_work = $request->get('generate_work');
+            $git_knowledge = $request->get('git_knowledge');
+            $proactive_on_work = $request->get('proactive_on_work');
+            $job_profile = $request->get('job_profile');
+            $attitude = $request->get('attitude');
+            $work_quality = $request->get('work_quality');
+            $Work_independently = $request->get('Work_independently');
 
             if($is_submit == 1){
                 $submited_at = date('Y-m-d h:m:s');
@@ -373,6 +431,18 @@ class AppraisalFormController extends Controller
             $model->months = $months;    
             $model->current_salary = $current_salary;    
             $model->expected_salary = $expected_salary;
+            $model->english_communication = $english_communication;
+            $model->requirement_understanding = $requirement_understanding;
+            $model->timely_work = $timely_work;
+            $model->office_on_time = $office_on_time;
+            $model->generate_work = $generate_work;
+            $model->git_knowledge = $git_knowledge;
+            $model->proactive_on_work = $proactive_on_work;
+            $model->job_profile = $job_profile;
+            $model->attitude = $attitude;
+            $model->work_quality = $work_quality;
+            $model->Work_independently = $Work_independently;
+            $model->form_year = date('Y');
             if(!empty($raise)){   
                 $model->raise = $raise;    
             }    
@@ -422,7 +492,7 @@ class AppraisalFormController extends Controller
         $model = AppraisalForm::select(TBL_APPRAISAL_FORM.".*",TBL_USERS.".name as username")
                 ->join(TBL_USERS,TBL_USERS.".id","=",TBL_APPRAISAL_FORM.".user_id");
 
-        return \Datatables::eloquent($model)        
+        return \Datatables::eloquent($model)
                
             ->addColumn('action', function(AppraisalForm $row) {
                 return view("admin.partials.action",
@@ -452,7 +522,8 @@ class AppraisalFormController extends Controller
             ->filter(function ($query) 
             {                              
                 $search_name = request()->get("search_name");                                
-                $search_submit = request()->get("search_submit");                                         
+                $search_submit = request()->get("search_submit");
+                $search_year = request()->get("search_year");                                         
                 if(!empty($search_name))
                 {
                     $query = $query->where(TBL_APPRAISAL_FORM.".user_id", $search_name);
@@ -460,6 +531,10 @@ class AppraisalFormController extends Controller
                 if($search_submit == "1" || $search_submit == "0")
                 {
                     $query = $query->where(TBL_APPRAISAL_FORM.".is_submit", $search_submit);
+                } 
+                if(!empty($search_year))
+                {
+                    $query = $query->where(TBL_APPRAISAL_FORM.".created_at",'LIKE','%'.$search_year.'%');
                 }                   
             })
             ->make(true);        

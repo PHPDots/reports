@@ -24,9 +24,9 @@ class UsersController extends Controller
         $module = "List Users";
         $this->module = $module;
 
-        $this->adminAction= new AdminAction;
+        $this->adminAction= new AdminAction; 
         
-        $this->modelObj = new User();
+        $this->modelObj = new User();  
 
         $this->addMsg = $module . " has been added successfully!";
         $this->updateMsg = $module . " has been updated successfully!";
@@ -57,6 +57,7 @@ class UsersController extends Controller
         {
             $goto = session()->get($this->moduleRouteText.'_goto');
             if(empty($goto)){  $goto = $this->list_url;  }
+
             $user_id = $request->get("changeID");   
             $status = $request->get("changeStatus");
 
@@ -71,7 +72,7 @@ class UsersController extends Controller
                         $status = 0;
 
                     $request->status = $status;
-                    $request->save();
+                    $request->save();            
 
                         session()->flash('success_message', "Status has been changed successfully.");
                         return redirect($goto);
@@ -87,7 +88,6 @@ class UsersController extends Controller
 
         $data = array();
         $data['page_title'] = "Manage Users"; 
-
         $data['add_url'] = route($this->moduleRouteText.'.create');
         $data['btnAdd'] = \App\Models\Admin::isAccess(\App\Models\Admin::$ADD_USERS);
         $data["types"] = \App\Models\UserType::pluck('title','id')->all();
@@ -120,7 +120,9 @@ class UsersController extends Controller
         $data["show_image"] =''; 
         $data['blood_groups'] = ['A+'=>'A+','B+'=>'B+','O+'=>'O+','AB+'=>'AB+','AB-'=>'AB-','A-'=>'A-','B-'=>'B-','O-'=>'O-'];
         $data["users_type"] = \App\Models\UserType::pluck('title','id')->all();
+        $data["departments"] = \App\Models\Department::pluck('title','id')->all();
         $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
+
         return view($this->moduleViewName.'.add', $data);
     }
 
@@ -149,7 +151,7 @@ class UsersController extends Controller
             'email' => 'required|email|unique:'.TBL_USERS.',email',
             'password' => 'required|min:4|same:password',            
             'confirm_password' => 'required|min:4|same:password',            
-            'user_type_id' => 'required|exists:'.TBL_USER_TYPES.',id',           
+            'user_type_id' => 'required|exists:'.TBL_ADMIN_USER_TYPES.',id',           
             'address' => 'required|min:2',            
             'phone' => 'required|max:15',
             'status' => ['required', Rule::in([0,1])],
@@ -165,6 +167,7 @@ class UsersController extends Controller
             'designation' => 'required',
             'salary' => 'min:0|numeric',
             'is_salary_generate' => Rule::in([0,1]),
+            'department_id' => 'required|exists:'.TBL_DEPARTMENT.',id',           
         ]);
         
         // check validations
@@ -204,7 +207,8 @@ class UsersController extends Controller
 			$is_add_task = $request->get("is_add_task");
             $salary = $request->get("salary");
             $is_salary_generate = $request->get("is_salary_generate");
-			$relieving_date = $request->get("relieving_date");
+            $relieving_date = $request->get("relieving_date");
+			$department_id = $request->get("department_id");
 			
             if($confirm_password == $password)
             {
@@ -244,7 +248,8 @@ class UsersController extends Controller
                 $user->adhar_num = $adhar_num;
                 $user->designation = $designation;
                 $user->is_add_task = $is_add_task;
-				$user->relieving_date = $relieving_date;
+                $user->relieving_date = $relieving_date;
+                $user->department_id = $department_id;
                 if(\Auth::guard('admins')->user()->id == SUPER_ADMIN_ID){
                     $user->salary = $salary;
 				    $user->is_salary_generate = $is_salary_generate;
@@ -291,7 +296,7 @@ class UsersController extends Controller
                             $document->save();
                         }
                     }
-                }
+                }   
                 
                 $id = $user->id;
                 
@@ -332,8 +337,7 @@ class UsersController extends Controller
                 $msg = "Password and confirm password not matched.";
             }
         }
-        
-        return ['status' => $status, 'msg' => $msg, 'data' => $data, 'goto' => $goto];       
+        return ['status' => $status, 'msg' => $msg, 'data' => $data, 'goto' => $goto];
     }
 
     /**
@@ -366,19 +370,21 @@ class UsersController extends Controller
         if(!$formObj)
         {
             abort(404);
-        }   
+        }
 
         $data = array();
         $data['formObj'] = $formObj;
         $data['page_title'] = "Edit ".$this->module;
         $data['buttonText'] = "Update";
         $data['action_url'] = $this->moduleRouteText.".update";
-        $data['action_params'] = $formObj->id;        
+        $data['action_params'] = $formObj->id;
         $data['method'] = "PUT";
         $data["show_image"] ='1'; 
         $data['blood_groups'] = ['A+'=>'A+','B+'=>'B+','O+'=>'O+','AB+'=>'AB+','AB-'=>'AB-','A-'=>'A-','B-'=>'B-','O-'=>'O-'];
         $data["users_type"] = \App\Models\UserType::pluck('title','id')->all();
+        $data["departments"] = \App\Models\Department::pluck('title','id')->all();
         $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
+
         return view($this->moduleViewName.'.add', $data);   
     }
 
@@ -404,7 +410,7 @@ class UsersController extends Controller
 
         // $model = $this->modelObj->find($id);
 
-        $data = array();        
+        $data = array();
         $status = 1;
         $msg = $this->updateMsg;
         $goto = session()->get($this->moduleRouteText.'_goto');
@@ -414,7 +420,7 @@ class UsersController extends Controller
             'firstname' => 'required|min:2',
             'lastname' => 'required|min:2',
             'email' => 'required|email|unique:'.TBL_USERS.',email,'.$id,
-            'user_type_id' => 'required|exists:'.TBL_USER_TYPES.',id',         
+            'user_type_id' => 'required|exists:'.TBL_ADMIN_USER_TYPES.',id',         
             'address' => 'required|min:2',            
             'phone' => 'required|max:15',
             'status' => ['required', Rule::in([0,1])],
@@ -430,6 +436,7 @@ class UsersController extends Controller
 			'balance_paid_leave' => 'required|min:0',
 			'salary' => 'min:0|numeric',
             'is_salary_generate' => Rule::in([0,1]),
+            'department_id' => 'required|exists:'.TBL_DEPARTMENT.',id',           
         ]);
         
         // check validations
@@ -473,7 +480,8 @@ class UsersController extends Controller
 			$balance_paid_leave = $request->get("balance_paid_leave");
             $salary = $request->get("salary");
             $is_salary_generate = $request->get("is_salary_generate");
-			$relieving_date = $request->get("relieving_date");
+            $relieving_date = $request->get("relieving_date");
+			$department_id = $request->get("department_id");
 			$old_balance_leave = $model->balance_paid_leave;
             
             if($request->get('balance_paid_leave') > 0 && $request->get('balance_paid_leave') != $old_balance_leave)
@@ -536,9 +544,10 @@ class UsersController extends Controller
             $model->pan_num = $pan_num;
             $model->adhar_num = $adhar_num;
             $model->designation = $designation;
-            $model->is_add_task = $is_add_task;
-			$model->relieving_date = $relieving_date;
+			$model->is_add_task = $is_add_task;
             $model->balance_paid_leave = $balance_paid_leave;
+            $model->relieving_date = $relieving_date;
+            $model->department_id = $department_id;
             if(\Auth::guard('admins')->user()->id == SUPER_ADMIN_ID){
                 $model->salary = $salary;
                 $model->is_salary_generate = $is_salary_generate;
@@ -557,7 +566,6 @@ class UsersController extends Controller
 
                 $logs=\App\Models\AdminLog::writeadminlog($params);         
         }
-        
         return ['status' => $status,'msg' => $msg, 'data' => $data, 'goto' => $goto];               
     }
 
@@ -594,7 +602,7 @@ class UsersController extends Controller
                 $modelObj->delete();
                 session()->flash('success_message', $this->deleteMsg); 
 
-                    //store logs detail
+                //store logs detail
                     $params=array();
                     
                     $params['adminuserid']  = \Auth::guard('admins')->id();
@@ -629,13 +637,13 @@ class UsersController extends Controller
         }
         $auth_id = \Auth::guard('admins')->user()->id;
 
-        $model = User::select(TBL_USERS.".*",TBL_USER_TYPES.".title as user_type")
-                ->join(TBL_USER_TYPES,TBL_USERS.".user_type_id","=",TBL_USER_TYPES.".id");
+        $model = User::select(TBL_USERS.".*",TBL_ADMIN_USER_TYPES.".title as user_type")
+                ->join(TBL_ADMIN_USER_TYPES,TBL_USERS.".user_type_id","=",TBL_ADMIN_USER_TYPES.".id");
 
 
         return Datatables::eloquent($model)
-
-            ->addColumn('action', function(User $row) {
+               
+            ->addColumn('action', function(User $row) {                
 
                 return view("admin.partials.action",
                     [
@@ -655,7 +663,7 @@ class UsersController extends Controller
                         return '<a class="btn btn-xs btn-danger">Inactive</a>';
             })->rawColumns(['status','action'])
                             
-            ->filter(function ($query)
+            ->filter(function ($query) 
             {
                 $search_start_date = request()->get("search_start_date");
                 $search_end_date = request()->get("search_end_date");
@@ -693,8 +701,8 @@ class UsersController extends Controller
                     if(count($idArr)>0)
                     {
                         $query = $query->whereIn(TBL_USERS.".id",$idArr);
-                    }
-                    $searchData['search_id'] = $search_id;
+                        $searchData['search_id'] = $search_id;
+                    } 
                 } 
                 if(!empty($search_fnm))
                 {
@@ -722,8 +730,10 @@ class UsersController extends Controller
                 }
                     $searchData['search_status'] = $search_status;
                     $goto = \URL::route($this->moduleRouteText.'.index', $searchData);
-                \session()->put($this->moduleRouteText.'_goto',$goto);
+                    \session()->put($this->moduleRouteText.'_goto',$goto);
             })
             ->make(true);
-	}    
+	}
+	 
+    
 }

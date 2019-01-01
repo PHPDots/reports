@@ -36,11 +36,11 @@ class SalarySlip extends Model
         if(!empty($search_year))
         {
             $query = $query->where(TBL_SALARY_SLIP.".year", $search_year);
-            $searchData['search_year'] = $search_year;
+            $searchData['search_year'] = $search_name;
         }
             $goto = \URL::route('salary_slip.index', $searchData);
             \session()->put('salary_slip_goto',$goto);
 
-        return $query;        
+        return $query;
     }
 }

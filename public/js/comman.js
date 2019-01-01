@@ -51,8 +51,9 @@ function equalHeight(group) {
 
 var room = 1;
 function project_task() {
+ 
     room++;
-    var objTo = document.getElementById('project_task');
+    var objTo = document.getElementById('project_task')
     var divtest = document.createElement("div");
   divtest.setAttribute("class", "form-group removeclass"+room);
   var rdiv = 'removeclass'+room;
@@ -101,3 +102,20 @@ divtest.innerHTML = '<div class="add_row_new clearfix"><div class="col-sm-4 nopa
             });
     },400)
    }
+function contHeight(){
+var vpHight= $(window).height();
+var hTop= $('.page-header').height();
+var hFtr= $('.page-footer').outerHeight();
+var hCont=vpHight-(hTop+hFtr);
+$('.page-content').css('min-height', hCont+'px');
+//console.log(vpHight, hTop, hFtr);
+}
+$(document).ready(function(){
+  contHeight();  
+});
+$( window ).load(function() {
+  contHeight();
+});
+$(window).resize(function(){
+   contHeight();
+});

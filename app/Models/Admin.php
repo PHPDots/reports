@@ -155,7 +155,6 @@ class Admin extends Authenticatable
     public static $ADD_FIX_TASK = 113;
     public static $EDIT_FIX_TASK = 114;
     public static $DELETE_FIX_TASK = 115;
-
     public static $USERS_TASK_REPORT = 116;
 
     public static $LIST_LOAN = 117;
@@ -170,16 +169,20 @@ class Admin extends Authenticatable
     public static $VIEW_LOAN=126;
     public static $ADD_ACCOUNT=127;
 
-    public static $LIST_ASSIGN_TASK = 117;
-    public static $ADD_ASSIGN_TASK = 118;
-    public static $EDIT_ASSIGN_TASK = 119;
-    public static $DELETE_ASSIGN_TASK = 120;
-    public static $CHANGE_ASSIGN_TASK_STATUS = 121;
+    public static $LIST_ASSIGN_TASK = 128;
+    public static $ADD_ASSIGN_TASK = 129;
+    public static $EDIT_ASSIGN_TASK = 130;
+    public static $DELETE_ASSIGN_TASK = 131;
+    public static $CHANGE_ASSIGN_TASK_STATUS = 132;
 
-    public static $EMPLOYEE_WISE_MONTHY_REPORT = 122;
-    public static $CLIENT_WISE_MONTHY_REPORT = 123;
+    public static $CLIENT_WISE_MONTHY_REPORT = 133;
+    public static $EMPLOYEE_WISE_MONTHY_REPORT = 134;
  
-    /** 
+    public static $LIST_DEPARTMENT = 135; 
+    public static $ADD_DEPARTMENT = 136; 
+    public static $EDIT_DEPARTMENT = 137; 
+    public static $DELETE_DEPARTMENT = 138;
+    /**
      * check page acces permissions
      *          
      * @var $page_id

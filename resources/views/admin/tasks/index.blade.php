@@ -21,7 +21,7 @@
                         <i class="fa fa-list"></i>{{ $page_title }}    
                     </div>
                   
-                    @if($btnAdd)
+                   @if($btnAdd)
                       
                         <a class="btn btn-primary btn-sm mTop5 pull-right" href="{{ $add_url }}" >Add New</a>
                         <a class="btn btn-primary btn-sm mTop5 btn-download pull-right" style="margin-right: 10px;">Download CSV</a>
@@ -34,26 +34,26 @@
                     <table class="table table-striped table-bordered table-hover table-checkable order-column" id="server-side-datatables">
                         <thead>
                             <tr>
-                               <th width="2%">ID</th>
-                               <th width="10%">UserName</th>
-                               <th width="12%">Project</th>
-                               <th width="20%">Task</th>
+                               <th width="2%">ID</th>                                    
+                               <th width="10%">UserName</th>                                    
+                               <th width="10%">Project</th>
+                               <th width="10%">Task</th>
                                <th width="10%">Status<br/>
                                     <i class="fa fa-clock-o" aria-hidden="true"></i> Hour</th>
                                <th width="15%">Link</th> 
-                               <th width="13%">Task Date<br/><i style="color: blue; font-size: 12px">CreatedAt</i></th>
+                               <th width="10%">Task Date<br/><i style="color: blue; font-size: 12px">CreatedAt</i></th>                          
                                <th width="10%" data-orderable="false">Action</th>
                             </tr>
-                        </thead>                                         
+                        </thead>
                         <tbody>
                         </tbody>
                     </table>
                 </div>
-            </div>              
+            </div>
         </div>
     </div>
 </div>
-
+          
 <div class="modal fade bs-modal-lg" id="task_view" role="dialog" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
     
@@ -128,12 +128,6 @@ function openView($id){
                 minimumInputLength: 2,
                 width: null
         });
-        $("#task_date_id").select2({
-                placeholder: "Search Task Date",
-                allowClear: true,
-                minimumInputLength: 2,
-                width: null
-        });
 		$(document).on('click', '.btn-download', function () {
             $("#is_download").val(1);
             setTimeout(function(){
@@ -150,6 +144,15 @@ function openView($id){
                 window.location = $url;
             },400);                       
         });
+		
+        $(document).ready(function() 
+        {
+          $('#example').DataTable( 
+          {
+              "order": [[ 3, "desc" ]]
+              });
+        });
+
 
         $("#search-frm").submit(function(){
             oTableCustom.draw();
@@ -185,7 +188,7 @@ function openView($id){
                     data.search_end_date = $("#search-frm input[name='search_end_date']").val();
                     data.search_task_date = $("#search-frm select[name='search_task_date']").val();
                     data.search_project = $("#search-frm select[name='search_project']").val();
-                    data.search_user = $("#search-frm sesearch_userlect[name='search_user']").val();
+                    data.search_user = $("#search-frm select[name='search_user']").val();
                     data.search_client = $("#search-frm select[name='search_client']").val();
                     data.search_title = $("#search-frm input[name='search_title']").val();
                     data.search_hour = $("#search-frm input[name='search_hour']").val();
@@ -193,13 +196,14 @@ function openView($id){
                     data.search_hour_op = $("#search-frm select[name='search_hour_op']").val();
                     data.search_min_op = $("#search-frm select[name='search_min_op']").val();
                     data.search_status = $("#search-frm select[name='search_status']").val();
+                 
                 },
-				    dataSrc: function(response){
-                      $("#overall-hours").html(response.hours);
-					            $("#is_total").val(response.hours);
+				dataSrc: function(response){
+                    $("#overall-hours").html(response.hours);
+					          $("#is_total").val(response.hours);
                     return response.data;
                 }
-            },
+            },            
             "order": [[ "{{ $orderClm }}", "{{ $orderDir }}" ]],
             columns: [
                 { data: 'id', name: 'id' },
@@ -209,8 +213,11 @@ function openView($id){
                 { data: 'status', name: 'status' },
                 { data: 'ref_link', name: 'ref_link' },
                 { data: 'task_date', name: 'task_date' },
-                { data: 'action', orderable: false, searchable: false}             
-            ],        
+                { data: 'action', orderable: false, searchable: false}
+            ],
+            //dom: 'Bfrtip',       
+            //  buttons: ['csvHtml5']
+        
         });        
     });
     </script>

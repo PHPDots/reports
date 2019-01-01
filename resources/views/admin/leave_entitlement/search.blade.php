@@ -27,7 +27,6 @@
                     <div class="input-group">
                         {!! Form::select('search_month', [''=>'Search Month'] + $months, Request::get("search_month"), ['class' => 'form-control','id'=>'month_id']) !!} 
                         <span class="input-group-addon"> / </span>
-
                         {!! Form::select('search_year', [''=>'Search Year'] + $years, Request::get("search_year"), ['class' => 'form-control','id'=>'year_id']) !!} 
                     </div>
                 </div> 

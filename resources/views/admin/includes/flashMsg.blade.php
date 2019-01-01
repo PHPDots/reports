@@ -1,5 +1,5 @@
 @if(Session::has('success_message'))
-<div class="page-content">
+<div class="page-content1" style="min-height: 0px !important; padding: 15px 0;">
     <div class="container">
         <div class="col-md-12">
         <div class='custom-alerts alert alert-success fade in'>

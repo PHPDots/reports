@@ -98,7 +98,7 @@ z-index: 9!important;
                     </div>
                     <div id="project_task">
                     </div>
-                    <div class="clearfix">&nbsp;</div>
+                     <div class="clearfix">&nbsp;</div>
                             <div class="row">
                                 <div class="col-md-12">
 									{!! Form::hidden('current_date',$task_date,['id' => 'current_date']) !!}

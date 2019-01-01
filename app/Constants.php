@@ -9,6 +9,7 @@ define("TBL_ADMIN_USERS","admin_users");
 define("TBL_ADMIN_USER_RIGHT","admin_user_rights");
 define("TBL_USERS","users");
 define("TBL_USER_TYPES","user_types");
+define("TBL_ADMIN_USER_TYPES","admin_user_types");
 define("TBL_PROJECT","projects");
 define("TBL_LEAVE_REQUEST","leave_requests");
 define("TBL_LEAVE_DETAIL","leave_request_details");
@@ -49,11 +50,15 @@ define("TBL_MEMBER_LOG","bopal_member_logs");
 define("SUPER_ADMIN_ID","1");
 define("ACTIVE_USER","1");
 define("CURRENCY_USD","60");
+define("FULL_DAY_HR",9);
+define("HALF_DAY_HR",4);
 
 //User Types
 define("NORMAL_USER","3");
 define("ADMIN_USER_TYPE","1");
+define("TEAM_LEADER","2");
 define("CLIENT_USER","4");
+define("ACCOUNT_USER",6);
 define("OTP_COUNTER",3);
 define("OFFER_LETTER_ID",6);
 define("TRAINEE_USER",'5');
@@ -78,4 +83,5 @@ define("PENALTY_RATE", 10);
 define("LOAN_EMI", 10);
 define("MONTHLY_INSTALLMENT", 300);
 define("TBL_LOAN", "bb_loan");
+define("TBL_DEPARTMENT", "departments");
 

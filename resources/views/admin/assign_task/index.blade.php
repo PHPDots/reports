@@ -34,7 +34,7 @@
                                <th width="5%">Priority</th>  
                                <th width="10%">Due Date<br/><i style="color: blue; font-size: 12px">CreatedAt</i></th> 
                                <th width="5%">Status</th>                           
-                               <th width="5%" data-orderable="false">Action</th>
+                               <th width="10%" data-orderable="false">Action</th>
                             </tr>
                         </thead>                                         
                         <tbody>

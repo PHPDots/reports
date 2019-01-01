@@ -38,13 +38,13 @@ $popup_id = request()->get('popup_id');
                         </thead>
                         <tbody>
                         </tbody>
-                    </table>
+                    </table>                                              
                 </div>
-            </div>
+            </div>              
         </div>
     </div>
 </div>
-
+</div>
 <div class="modal fade bs-modal-lg" id="credential_view" role="dialog" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
     
@@ -160,11 +160,11 @@ function openView($id){
                 { data: 'project_name', name: '{{TBL_PROJECT}}.title' },
                 { data: 'protocol', name: 'protocol' }, 
 				        { data: 'title', name: 'title' },
-                { data: 'environment', name: 'environment' },
-                { data: 'created_at', name: 'created_at' },
+                { data: 'environment', name: 'environment' },                         
+                { data: 'created_at', name: 'created_at' },                                         
                 { data: 'action', orderable: false, searchable: false}
             ]
-        });
+        });        
     });
     </script>
 @endsection

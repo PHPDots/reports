@@ -8,7 +8,7 @@
     <div class="container">
 
         <div class="">
-            
+
             @include($moduleViewName.".search") 
 
             <div class="clearfix"></div>    
@@ -19,7 +19,7 @@
                     </div>
                     @if($btnAdd)
                         <a class="btn btn-default pull-right btn-sm mTop5" href="{{ $add_url }}">Add New</a>
-                    @endif        
+                    @endif
                 </div>
                 <div class="portlet-body">                    
                     <table class="table table-bordered table-striped table-condensed flip-content" id="server-side-datatables">
@@ -32,16 +32,16 @@
                                <th width="20%">Created At</th>
                                <th width="5%" data-orderable="false">Action</th>
                             </tr>
-                        </thead>                                         
+                        </thead>
                         <tbody>
                         </tbody>
-                    </table>                                              
+                    </table>
                 </div>
-            </div>              
+            </div>
         </div>
     </div>
 </div>
-</div>            
+        
 @endsection
 
 @section('scripts')

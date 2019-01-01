@@ -20,13 +20,14 @@ $auth = Auth::guard('admins')->user()->user_type_id;
                     <div class="portlet-body">
                         <div class="form-body">
                            {!! Form::model($formObj,['method' => $method,'files' => true, 'route' => [$action_url,$action_params],'class' => 'sky-form form form-group', 'id' => 'main-frm1']) !!} 
+                           
                                 <div class="row">                                
                                     <div class="col-md-12">
-                                        <label class="control-label">Title: <span class="required">*</span></label>                                        
+                                        <label class="control-label">Title: <span class="required">*</span></label>
                                         {!! Form::text('title',null,['class' => 'form-control', 'data-required' => true,'placeholder' => 'Enter Project Title']) !!}
                                     </div>
                                 </div>
-							@if($auth == ADMIN_USER_TYPE)
+							 @if($auth == ADMIN_USER_TYPE)
                                 <div class="clearfix">&nbsp;</div>
                                 <div class="row">
                                     <div class="col-md-6">
@@ -67,8 +68,7 @@ $auth = Auth::guard('admins')->user()->user_type_id;
             </div>
         </div>
     </div>
-</div>            
-
+</div>
 
 @endsection
 

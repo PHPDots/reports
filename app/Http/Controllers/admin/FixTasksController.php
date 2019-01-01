@@ -72,7 +72,7 @@ class FixTasksController extends Controller
                         $invoice_status = 0;
 
                     $request->invoice_status = $invoice_status;
-                    $request->save();
+                    $request->save();            
 
                         session()->flash('success_message', "Status has been changed successfully.");
                         return redirect($goto);
@@ -82,11 +82,11 @@ class FixTasksController extends Controller
                     session()->flash('success_message', "Status not changed, Please try again");
                     return redirect($goto);
                 }
+
             return redirect($this->list_url);
         }
-
         $data = customSession($this->moduleRouteText,$data);
-        return view($this->moduleViewName.".index", $data);
+       return view($this->moduleViewName.".index", $data);
     }
 
     /**
@@ -112,7 +112,6 @@ class FixTasksController extends Controller
         $data["method"] = "POST"; 
         $data["clients"] = \App\Models\Client::pluck('name','id')->all();
         $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
-
         return view($this->moduleViewName.'.edit', $data);
     }
 
@@ -158,9 +157,10 @@ class FixTasksController extends Controller
             {
                 $msg .= $message . "<br />";
             }
-        }
+        }         
         else
         {
+             
             $input = $request->all();
             $obj = $this->modelObj->create($input);
             $id = $obj->id;
@@ -386,7 +386,7 @@ class FixTasksController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function destroy($id,Request $request)
-    {
+    {     
         $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$DELETE_FIX_TASK);
         
         if($checkrights) 
@@ -400,9 +400,9 @@ class FixTasksController extends Controller
             try 
             {
                 $backUrl = $request->server('HTTP_REFERER');
+                $modelObj->delete();
                 $goto = session()->get($this->moduleRouteText.'_goto');
                 if(empty($goto)){  $goto = $this->list_url;  }
-                $modelObj->delete();
                 session()->flash('success_message', $this->deleteMsg); 
 
                 //store logs detail
@@ -464,10 +464,6 @@ class FixTasksController extends Controller
                 }
                     return $html;
             })
-            ->editColumn('hour', function ($row) {
-                    $html = "# ".$row->hour.'<br/> # '.$row->fix.'<br/># '.$row->rate;
-                    return $html;
-            })
             ->addColumn('check_clm', function ($row) {
                     return '<div class="form-group form-md-checkboxes">
                                 <div class="md-checkbox-inline">
@@ -483,18 +479,28 @@ class FixTasksController extends Controller
                                     </div>
                                 </div>
                             </div>';
+
+            })
+            ->editColumn('hour', function ($row) { 
+                    $html = "# ".$row->hour.'<br/> # '.$row->fix.'<br/># '.$row->rate;
+                    return $html;
+            })
+            ->editColumn('task_date', function ($row) { 
+                $created_at = '-';
+                $task_date = '-';
+                if(!empty($row->task_date))
+                    $task_date =  date("j M, Y",strtotime($row->task_date));
+                if(!empty($row->created_at))
+                    $created_at =  date("j M, Y",strtotime($row->created_at));
+
+                $html = "# ".$task_date.'<br/> # '.$created_at;
+                return $html;
             })
             ->editColumn('total', function ($row) { 
                     $row_total = ($row->hour * $row->rate) + $row->fix;
                     return $row_total;
             })
-            ->editColumn('created_at', function($row){
-                
-                if(!empty($row->created_at))
-                    return date("j M, Y",strtotime($row->created_at));
-                else
-                    return '-';    
-            })->rawColumns(['action','invoice_status','hour','check_clm'])
+            ->rawColumns(['action','invoice_status','hour','check_clm','task_date'])
             
             ->filter(function ($query) 
             {
@@ -502,7 +508,6 @@ class FixTasksController extends Controller
             })
             ->make(true);
     }
-
     public function change_checked_status(Request $request)
     {
         $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$EDIT_FIX_TASK);
@@ -517,7 +522,7 @@ class FixTasksController extends Controller
         $msg = 'Status has been changed successfully !';
         $goto = session()->get($this->moduleRouteText.'_goto');
         if(empty($goto)){  $goto = $this->list_url;  }
-
+        
         $rules = ['taskIds.required' => 'Please check atleast one id'];
         $validator = Validator::make($request->all(), [
             'taskIds'=>'required|exists:'.TBL_FIX_TASKS.',id',

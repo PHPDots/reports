@@ -103,7 +103,7 @@
                         if (result.status == 1)
                         {
                             $.bootstrapGrowl(result.msg, {type: 'success', delay: 4000});
-                            window.location = result.goto;
+                            window.location = result.goto;    
                         }
                         else
                         {

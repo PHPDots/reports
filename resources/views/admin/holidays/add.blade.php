@@ -1,6 +1,7 @@
 @extends('admin.layouts.app')
 
 @section('styles')
+ 
 @endsection
 @section('content')
 
@@ -22,14 +23,14 @@
                            
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <label class="control-label">Holiday Title: <span class="required">*</span></label>
+                                        <label class="control-label">Holiday Title: <span class="required">*</span></label>                            
                                         {!! Form::text('holiday_title',null,['class' => 'form-control', 'data-required' => true,'placeholder' => 'Holiday Title','rows'=>4]) !!}
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="control-label">Status: <span class="required">*</span></label>
+                                        <label class="control-label">Status: <span class="required">*</span></label>                            
                                         {!! Form::select('status',['1'=>'Active','0'=>'Inactive'],null,['class' => 'form-control', 'data-required' => true]) !!}
                                     </div>
-
+                                    
                                 </div>
                                 <div class="clearfix">&nbsp;</div>
                                 <div class="row">
@@ -41,7 +42,7 @@
                                                 <i class="fa fa-calendar"></i>
                                             </span>
                                         </div>
-                                    </div>
+                                    </div>                                    
                                     <div class="col-md-6">
                                         <label class="control-label">Holiday To Date:</label>
                                         <div class="input-group input-large date-picker input-daterange" data-date="10/11/2012" data-date-format="mm/dd/yyyy">
@@ -49,8 +50,9 @@
                                             <span class="input-group-addon">
                                                 <i class="fa fa-calendar"></i>
                                             </span>
+                                                                            
                                         </div>
-                                    </div>
+                                    </div>                                    
                                 </div> 
                                 <div class="row">
                                     <div class="col-md-12">

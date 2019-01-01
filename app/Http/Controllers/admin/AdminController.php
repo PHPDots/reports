@@ -28,6 +28,7 @@ class AdminController extends Controller
     public function index(Request $request)
     {                          
         $data = array();
+        $viewName = "newDashboard";
         $this_month = date('Y-m',strtotime('first day of this month')); 
         $today =  date("Y-m-d",strtotime("today"));
         $yesterday =  date("Y-m-d",strtotime("yesterday"));
@@ -43,7 +44,7 @@ class AdminController extends Controller
                 ->get()
 				->toArray();
 		 
-		$calendar_leave = array();
+		  $calendar_leave = array();
 
             $i =0;
             foreach ($user_holidays as $key => $value) {
@@ -55,7 +56,7 @@ class AdminController extends Controller
                 $calendar_leave [$i]['status'] = ''; 
                 $i++;
             }		
-
+            $data['userOnLeaves'] = $calendar_leave;
     //Working Days
         $this_month_days = date("t");
         $first = date('Y-m-d',strtotime('first day of this month')); 
@@ -136,8 +137,34 @@ class AdminController extends Controller
 
         $viewName = "dashboard";
         }
-        if($auth_id == NORMAL_USER || $auth_id == TRAINEE_USER)
+        if($auth_id == NORMAL_USER || $auth_id == TRAINEE_USER || $auth_id == TEAM_LEADER)
         {
+            if($auth_id == TEAM_LEADER){
+                $department_id = \Auth::guard('admins')->user()->department_id;
+                
+            //Admin yesterday Task Details
+                $halfLeaveUsers = Task::halfLeaveUsers($yesterday);
+                $fullLeaveUsers = Task::fullLeaveUsers($yesterday);
+                
+            //yesterday on holiday
+                $yesterday_holiday = Task::yesterdayHoliday($yesterday);
+                $data['yesterday_holiday']= $yesterday_holiday;
+            
+            //Admin Not Added
+                $daily_tasks = Task::NotAdded($fullLeaveUsers,$yesterday);
+                $data['daily_tasks']= $daily_tasks;
+
+            //Admin Below 8 hours Details
+                $below_eight_hour = Task::BelowEightHrs($halfLeaveUsers,$yesterday);
+
+            // Admin Below 4 hours Details
+                $below_four_hour = Task::BelowFourHrs($halfLeaveUsers,$yesterday);
+
+                $final_belows = Task::final_belows($below_eight_hour,$below_four_hour);
+                $data['daily_tasks_hours'] = $final_belows;
+            
+                $data['yesterday_leave'] = LeaveRequest::yesterdayOnLeave(); 
+            }
         //User Leave
             $data['auth_user_leave'] = Custom::usertotalleave($auth_user);        
             $user_month_leave = Custom::usermothleave($auth_user,$this_month);
@@ -305,16 +332,29 @@ class AdminController extends Controller
     // update profile
     public function updateProfile(Request $request)
     {        
+		ini_set('upload_max_filesize', 4000000);
         $status = 1;
         $msg = "Your profile has been updated successfully.";
         
+		$imgSize = '';  
+        $image = $request->file("image");
+            echo 'die';
+        if($image){
+
+            $imgSize = $image->getClientSize();
+            
+            if($imgSize > 2000000 || $imgSize == 0){
+                return ['status' => 0, 'msg' => 'The image may not be greater than 2 MB.'];
+            }
+        }
+		
         $validator = Validator::make($request->all(), [
             //'email' => 'required|email|unique:'.TBL_USERS.',email,'.\Auth::guard("admins")->user()->id,
             'firstname' => 'required|min:2|max:255',
             'lastname' => 'required|min:2|max:255',
             'address' => 'required|min:2',
             'phone' => 'required|numeric',
-            'image' => 'image|max:6000'
+            'image' => 'image|max:2000'
         ]);        
         
         

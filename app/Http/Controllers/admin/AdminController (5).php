@@ -319,8 +319,20 @@ class AdminController extends Controller
     // update profile
     public function updateProfile(Request $request)
     {        
+		ini_set('upload_max_filesize', 3000000);
         $status = 1;
         $msg = "Your profile has been updated successfully.";
+		$imgSize = '';  
+        $image = $request->file("image");
+          
+        if($image){
+
+            $imgSize = $image->getClientSize();
+            
+            if($imgSize > 2000000 || $imgSize == 0){
+                return ['status' => 0, 'msg' => 'The image may not be greater than 2 MB.'];
+            }
+        }
         
         $validator = Validator::make($request->all(), [
             //'email' => 'required|email|unique:'.TBL_USERS.',email,'.\Auth::guard("admins")->user()->id,
@@ -328,7 +340,7 @@ class AdminController extends Controller
             'lastname' => 'required|min:2|max:255',
             'address' => 'required|min:2',
             'phone' => 'required|numeric',
-            'image' => 'image|max:6000'
+            'image' => 'image|max:2000'
         ]);        
         
         

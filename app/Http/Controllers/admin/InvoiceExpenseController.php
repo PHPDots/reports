@@ -150,6 +150,9 @@ class InvoiceExpenseController extends Controller
                         $amount_recevied = '';
                         $payment_recevied_date = '';
                         $cflag = '';
+                        $total_cgst = '';
+                        $total_sgst = '';
+                        $total_igst = '';
                         $bill_name = '';
                         $party_gstn_no = '';
                         $i = 1;
@@ -161,9 +164,6 @@ class InvoiceExpenseController extends Controller
                         {
                             $total_taxable_value = '';
                             $total_tax = '';
-                            $total_cgst = '';
-                            $total_sgst = '';
-                            $total_igst = '';
                             $total_value_rs = '';
                             $total_value_usd = '';
                             $party_gstn_no = $row->gstn_no;
@@ -210,7 +210,7 @@ class InvoiceExpenseController extends Controller
                                 $i = 1;
                             }
                                
-                            $invoice_record[] = [$i, $client_name, $bill_name, $party_gstn_no, $row->invoice_no, $invoice_date, $total_taxable_value, $total_cgst,$total_sgst,$total_igst,$total_value_rs,$total_value_usd,'',$amount_recevied,$payment_recevied_date];
+                            $invoice_record[] = [$i, $client_name, $bill_name, $party_gstn_no, $row->invoice_no, $invoice_date, $total_taxable_value,$total_cgst,$total_sgst,$total_igst,$total_value_rs,$total_value_usd,'',$amount_recevied,$payment_recevied_date];
                             $i++;
                             $inv_border++;
                         }

@@ -168,7 +168,9 @@ $auth = Auth::guard('admins')->user()->user_type_id;
 
 @endsection
 @section('scripts')
- 
+<script src="{{ asset('/themes/admin/assets')}}/global/plugins/select2/js/select2.full.min.js" type="text/javascript"></script>
+<script src="{{ asset('/themes/admin/assets')}}/pages/scripts/components-select2.min.js" type="text/javascript"></script>
+
 <script type="text/javascript">
 
 $(document).ready(function(){
@@ -217,7 +219,7 @@ $(document).ready(function(){
                         if (result.status == 1)
                         {
                             $.bootstrapGrowl(result.msg, {type: 'success', delay: 4000});
-                            window.location = result.goto;
+                            window.location = result.goto;    
                         }
                         else
                         {
@@ -229,10 +231,11 @@ $(document).ready(function(){
                         $.bootstrapGrowl("Internal server error !", {type: 'danger', delay: 4000});
                     }
                 });
-            }
+            }            
             return false;
         });
-    });   
+    });
+   
 </script>
 
 @endsection

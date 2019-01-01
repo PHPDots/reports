@@ -48,9 +48,9 @@ class ExpenseController extends Controller
 
         $data['add_url'] = route($this->moduleRouteText.'.create');
         $data['btnAdd'] = \App\Models\Admin::isAccess(\App\Models\Admin::$ADD_EXPENSE);
+        
         $data = customSession($this->moduleRouteText,$data);
-
-       return view($this->moduleViewName.".index", $data);
+        return view($this->moduleViewName.".index", $data);
       
     }
     /**
@@ -76,6 +76,7 @@ class ExpenseController extends Controller
         $data["method"] = "POST"; 
         $data["editMode"] = 1; 
         $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
+
         return view($this->moduleViewName.'.add', $data);
     }
 
@@ -206,7 +207,7 @@ class ExpenseController extends Controller
         $data['buttonText'] = "Update";
         $data['action_url'] = $this->moduleRouteText.".update";
         $data['action_params'] = $formObj->id;
-        $data['method'] = "PUT";
+        $data['method'] = "PUT";     
         $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
 
         return view($this->moduleViewName.'.add', $data);
@@ -230,7 +231,7 @@ class ExpenseController extends Controller
 
         $model = $this->modelObj->find($id);
 
-        $data = array();
+        $data = array(); 
         $status = 1;
         $msg = $this->updateMsg;
         $goto = session()->get($this->moduleRouteText.'_goto');
@@ -244,11 +245,12 @@ class ExpenseController extends Controller
 		$invoice_no = request()->get('invoice_no'); 
         $gst_amount = request()->get('gst_amount');
 
-        $Validator=\Validator::make($request->all(),[   
-            'title' => 'required|min:2',
-            'date' => 'required',
-            'amount' => 'required',
-            'scanned_bill' => 'image|max:4000',
+        $Validator=\Validator::make($request->all(),
+            [   
+                'title' => 'required|min:2',            
+            'date' => 'required',            
+            'amount' => 'required',            
+            'scanned_bill' => 'image|max:4000',            
             'description_bill' => 'min:2',
             ]);
 
@@ -283,13 +285,13 @@ class ExpenseController extends Controller
             $image_record->save();
 
             //store logs detail
-            $params=array();
-
+            $params=array();    
+                                    
             $params['adminuserid']  = \Auth::guard('admins')->id();
             $params['actionid']     = $this->adminAction->EDIT_EXPENSE ;
             $params['actionvalue']  = $id;
             $params['remark']       = "Edit Expense::".$id;
-
+                                    
             $logs=\App\Models\AdminLog::writeadminlog($params);
         }  
         return ['status' => $status, 'msg' => $msg, 'data' => $data, 'goto' => $goto]; 
@@ -373,8 +375,8 @@ class ExpenseController extends Controller
             ->addColumn('scanned_bill', function (Expense $data) {
                 $path = asset("themes/admin/assets/expense/".$data->scanned_bill);
                 return '<img src="'.$path.'" class="img-responsive" style="width:100px; height:50px" />';
-            })
-
+            })         
+               
             ->addColumn('action', function(Expense $row) {
                 return view("admin.partials.action",
                     [

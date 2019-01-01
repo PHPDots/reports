@@ -57,12 +57,10 @@
 
     $(document).ready(function(){
 
-
         $("#search-frm").submit(function(){
             oTableCustom.draw();
             return false;
         });
-
 
         $.fn.dataTableExt.sErrMode = 'throw';
 
@@ -74,7 +72,7 @@
             displayStart: '{{ $start }}',
             ajax: {
                 "url": "{!! route($moduleRouteText.'.data') !!}",
-                "data": function ( data )
+                "data": function ( data ) 
                 {
                     data.search_start_date = $("#search-frm input[name='search_start_date']").val();
                     data.search_end_date = $("#search-frm input[name='search_end_date']").val();
@@ -100,7 +98,7 @@
                 { data: 'created_at', name: 'created_at' },
                 { data: 'action', orderable: false, searchable: false}
             ]
-        });        
+        });
     });
     </script>
 @endsection

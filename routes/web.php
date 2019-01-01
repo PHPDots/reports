@@ -15,7 +15,7 @@ Route::get('cron-below-hrs-task', 'admin\DailyReportController@cronBelowEightFou
 Route::get('/cron-leave-calculate', 'admin\DailyReportController@cronLeaveCalculate');
 Route::get('cron-task-notifications', 'admin\DailyReportController@cronTaskNotification');
 Route::get('cron-general-daily-report', 'admin\DailyReportController@cronGeneral');
-//Daily cron for client 
+Route::get('cron-daily-report-department', 'admin\DailyReportController@cronDepartment');
 Route::get('cron-daily-report', 'admin\DailyReportController@cron');
 Route::get('cron-user-leaves', 'admin\DailyReportController@cronLeaveEntitlement');
 
@@ -83,12 +83,12 @@ Route::get('clear-cache', function () {
     Route::any('users/data', 'admin\UsersController@data')->name('users.data');
     Route::resource('users', 'admin\UsersController');
 
-    Route::any('user-logs/data', 'admin\AdminUserLogsController@data')->name('user-logs.data');
-    Route::resource('user-logs', 'admin\AdminUserLogsController');
-	
+	Route::any('user-logs/data', 'admin\AdminUserLogsController@data')->name('user-logs.data');
+	Route::resource('user-logs', 'admin\AdminUserLogsController'); 
+
     Route::any('users-task-report/data', 'admin\UserTaskHRReportController@data')->name('users-task-report.data');
     Route::resource('users-task-report', 'admin\UserTaskHRReportController');
-
+    
 //Leaves	
     Route::any('leave-request/userData', 'admin\LeaveRequestController@userData')->name('leave-request.userData');
     Route::get('leave-request/leave-create', 'admin\LeaveRequestController@userCreate')->name('leave-request.userCreate');
@@ -119,20 +119,13 @@ Route::get('clear-cache', function () {
  	Route::any('projects/data', 'admin\ProjectsController@data')->name('projects.data');
  	Route::resource('projects', 'admin\ProjectsController');
  	
+    Route::any('tasks/teamLeaderData', 'admin\TasksController@teamLeaderData')->name('task.teamLeaderData.data');
 	Route::any('tasks/clientData', 'admin\TasksController@clientData')->name('task.client.data');
     Route::any('tasks/userData', 'admin\TasksController@userData')->name('task.user.data');
     Route::any('tasks/view', 'admin\TasksController@viewData');
     Route::any('tasks/data', 'admin\TasksController@data')->name('tasks.data');
     Route::resource('tasks', 'admin\TasksController');
-
-    
-    //Assign Tasks 
-    Route::any('assign-tasks/userData', 'admin\AssignTasksController@assignUserTaskData')->name('assign.task.user.data');
-    Route::any('assign-tasks/save-comment', 'admin\AssignTasksController@SaveComment')->name("savecomment");
-    Route::any('assign-tasks/data', 'admin\AssignTasksController@data')->name('assign-tasks.data');
-    Route::resource('assign-tasks', 'admin\AssignTasksController');
-
-
+	
 	Route::post('credentials/credential-store', 'admin\CredentialController@clientStore')->name('credentials.clientStore');
 	Route::any('credentials/getusers', 'admin\CredentialController@getUsersList')->name('getUsersList');
 	Route::get('credentials/download/{id}', 'admin\CredentialController@downloadFile');
@@ -157,9 +150,18 @@ Route::get('clear-cache', function () {
     Route::post('fix-tasks/change-checked-status', 'admin\FixTasksController@change_checked_status')->name('fix-tasks.check-status');
     Route::any('fix-tasks/data', 'admin\FixTasksController@data')->name('fix-tasks.data');
     Route::resource('fix-tasks', 'admin\FixTasksController');
-    
+
+    //Assign Tasks 
+    Route::any('assign-tasks/userData', 'admin\AssignTasksController@assignUserTaskData')->name('assign.task.user.data');
+    Route::any('assign-tasks/save-comment', 'admin\AssignTasksController@SaveComment')->name("savecomment");
+    Route::any('assign-tasks/data', 'admin\AssignTasksController@data')->name('assign-tasks.data');
+    Route::resource('assign-tasks', 'admin\AssignTasksController');
+
 //Masters
-	Route::any('admin-actions/data', 'admin\AdminActionController@data')->name('admin-actions.data');
+    Route::any('department/data', 'admin\DepartmentController@data')->name('department.data');
+    Route::resource('department', 'admin\DepartmentController');
+	
+    Route::any('admin-actions/data', 'admin\AdminActionController@data')->name('admin-actions.data');
 	Route::resource('admin-actions', 'admin\AdminActionController');
 		
 	Route::get('sent-email/view/{id}', 'admin\EmailSentController@viewEmailData');
@@ -232,5 +234,33 @@ Route::get('clear-cache', function () {
     Route::resource('clients-reports', 'admin\ClientMonthlyReportsController');
 
     Route::any('employee-reports/data', 'admin\EmployeeReportsController@data')->name('employee-reports.data');
-    Route::resource('employee-reports', 'admin\EmployeeReportsController'); 
-});    
+    Route::resource('employee-reports', 'admin\EmployeeReportsController');
+
+    });    
+
+
+//Loan
+    
+    //cron  
+    Route::get('monthly-installment', 'admin\LedgerCronController@MonthlyInstallment');
+    Route::get('monthly-penalty', 'admin\LedgerCronController@MonthlyPenalty');
+    Route::get('monthly-loan-penalty', 'admin\LedgerCronController@MonthlyLoanPenalty');
+
+    Route::any('member-accounts/data', 'admin\MemberAccountsController@data')->name('member-accounts.data');
+    Route::resource('member-accounts', 'admin\MemberAccountsController');
+    Route::get('member-accounts/add/{id}', 'admin\MemberAccountsController@add')->name("member-accounts.add");
+    Route::post('member-accounts/addmultipleAc', 'admin\MemberAccountsController@addmultipleAc')->name("member-accounts.addmultipleAc");
+
+    Route::any('multiple-account/data', 'admin\MultipleAccountController@data')->name('multiple-account.data');
+    Route::get('multiple-account/addpayment/{id}', 'admin\MultipleAccountController@addpayment')->name("multiple-account.addpayment");
+    Route::post('multiple-account/editpayment', 'admin\MultipleAccountController@editpayment')->name("multiple-account.editpayment");
+    Route::resource('multiple-account', 'admin\MultipleAccountController');
+
+    Route::any('ledger/data', 'admin\LedgerController@data')->name('ledger.data');
+    Route::resource('ledger', 'admin\LedgerController');
+
+    Route::get('loans/addpayment/{id}', 'admin\LoansController@addpayment')->name("loans.addpayment");
+    Route::get('loans/view/{id}', 'admin\LoansController@view')->name("loans.view");
+    Route::post('loans/editpayment', 'admin\LoansController@editpayment')->name("loans.editpayment");  
+    Route::any('loans/data', 'admin\LoansController@data')->name('loans.data');
+    Route::resource('loans', 'admin\LoansController');

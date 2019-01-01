@@ -21,16 +21,16 @@ class Task extends Model
 	public static function listFilter($query)
     {
         $search_start_date = request()->get("search_start_date");
-        $search_end_date = request()->get("search_end_date");
+        $search_end_date = request()->get("search_end_date");                                
         $search_id = request()->get("search_id");
 		$search_task_date = request()->get("search_task_date");
-        $search_project = request()->get("search_project");
-        $search_title = request()->get("search_title");
-        $search_status = request()->get("search_status");
+        $search_project = request()->get("search_project");                                
+        $search_title = request()->get("search_title");                                
+        $search_status = request()->get("search_status");                            
         $search_user = request()->get("search_user");
         $search_client = request()->get("search_client");
-        $search_hour = request()->get("search_hour");
-        $search_hour_op = request()->get("search_hour_op");
+        $search_hour = request()->get("search_hour");                                
+        $search_hour_op = request()->get("search_hour_op");                                
         $search_min = request()->get("search_min");
         $search_min_op = request()->get("search_min_op");
 		$is_download = request()->get("isDownload");
@@ -40,12 +40,12 @@ class Task extends Model
 
         if(!empty($search_hour) && empty($search_min))
         {
-            $search_min ='0.00';
+            $search_min ='0.00';   
         }
         else if(empty($search_hour) && !empty($search_min))
         {
             $search_hour = '0.00';
-        }
+        } 
         if (!empty($search_start_date)){
 
             $from_date=$search_start_date.' 00:00:00';
@@ -97,7 +97,7 @@ class Task extends Model
             $searchData['search_hour_op'] = $search_hour_op;
         }
         if (!empty($search_min)) {
-            $query = $query->where(TBL_TASK.".min", $search_min_op, $search_min);
+               $query = $query->where(TBL_TASK.".min", $search_min_op, $search_min);
             $searchData['search_min'] = $search_min;
             $searchData['search_min_op'] = $search_min_op;
         }
@@ -115,12 +115,12 @@ class Task extends Model
         {
             $query = $query->limit(1000)->get();
         }
-        
         if(\Auth::guard('admins')->user()->user_type_id == ADMIN_USER_TYPE)
         {
             $goto = \URL::route('tasks.index', $searchData);
             \session()->put('tasks_goto',$goto);
         }
+
         return $query;
     }
 	public static function halfLeaveUsers($yesterday)
@@ -177,13 +177,19 @@ class Task extends Model
                 ])
                 ->join(TBL_USERS,TBL_USERS.".id","=",TBL_TASK.".user_id")
                 ->where(TBL_TASK.'.task_date','LIKE',"%".$yesterday."%");
-
+            if(\Auth::guard('admins')->check())
+            {
+                $authUser = \Auth::guard('admins')->user();
+                if($authUser->user_type_id == TEAM_LEADER){
+                    $query = $query->where(TBL_USERS.".department_id",$authUser->department_id);
+                }
+            }
         if(count($notUsers) > 0)
         {
             $query = $query->whereNotin(TBL_USERS.".id",$notUsers);
         }       
         $query = $query->groupBy(TBL_TASK.'.user_id') 
-                ->having('total','<','9')
+                ->having('total','<',FULL_DAY_HR)
                 ->get();
         return $query;
     }
@@ -196,7 +202,13 @@ class Task extends Model
                     return $query->select(TBL_TASK.'.user_id')->from(TBL_TASK)
                     ->where(TBL_TASK.'.task_date','LIKE',"%".$yesterday."%");
                 });
-         
+        if(\Auth::guard('admins')->check())
+        {
+            $auth_id = \Auth::guard('admins')->user();
+            if($auth_id->user_type_id == TEAM_LEADER){
+                $query = $query->where(TBL_USERS.".department_id",$auth_id->department_id);
+            }
+        }
         if(count($fullLeaveUsers) > 0)
         {
             $query = $query->whereNotin(TBL_USERS.".id",$fullLeaveUsers);
@@ -215,7 +227,6 @@ class Task extends Model
         $below_four_hour = false;
         if(count($users) > 0)
         {
-            
             $below_four_hour = \DB::table(TBL_TASK)
                     ->select([TBL_USERS.'.name',TBL_USERS.'.id as userid',TBL_TASK.'.task_date as date',TBL_USERS.'.name as username',
                         \DB::raw("sum(".TBL_TASK.".total_time) as total")
@@ -223,9 +234,17 @@ class Task extends Model
                     ->join(TBL_USERS,TBL_USERS.".id","=",TBL_TASK.".user_id")
                     ->where(TBL_TASK.'.task_date','LIKE',"%".$yesterday."%")
                     ->whereIn(TBL_USERS.".id",$users)
-                    ->having('total','<','4')
-                    ->groupBy(TBL_TASK.'.user_id')
-                    ->get();            
+                    ->having('total','<',HALF_DAY_HR)
+                    ->groupBy(TBL_TASK.'.user_id');
+
+                if(\Auth::guard('admins')->check())
+                {
+                    $authUser = \Auth::guard('admins')->user();
+                    if($authUser->user_type_id == TEAM_LEADER){
+                        $below_four_hour = $below_four_hour->where(TBL_USERS.".department_id",$authUser->department_id);
+                    }          
+                }
+                $below_four_hour = $below_four_hour->get();  
         }    
 
         return $below_four_hour;
@@ -239,7 +258,7 @@ class Task extends Model
             $below_8[$i]['name'] = $key->name;
             $below_8[$i]['total'] = $key->total;
             $below_8[$i]['date'] = $key->date; 
-            $below_8[$i]['below'] = 9; 
+            $below_8[$i]['below'] = FULL_DAY_HR; 
         }
         $below_4 = array();
         $i=0;
@@ -252,7 +271,7 @@ class Task extends Model
                 $below_4[$i]['name'] = $key->name;
                 $below_4[$i]['total'] = $key->total;
                 $below_4[$i]['date'] = $key->date;
-                $below_4[$i]['below'] = 4;
+                $below_4[$i]['below'] = HALF_DAY_HR;
             }            
         }
         $final_belows = array();

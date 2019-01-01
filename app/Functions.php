@@ -147,7 +147,7 @@ function sendHtmlMail($params) {
     $params['to_emails'] = $toEmails;
     
 
-    /*\Mail::send('emails.index', $params, function($message) use ($params, $files) {
+    \Mail::send('emails.index', $params, function($message) use ($params, $files) {
 		
 		$fromName = "PHPDots";
 		if(isset($params['from_name']))
@@ -169,7 +169,7 @@ function sendHtmlMail($params) {
                 $message->attach($file['path']);
             }
         }
-    }); */
+    }); 
 
     $dataToInsert = [
             'to_email' => $params['to'],

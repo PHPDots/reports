@@ -215,14 +215,14 @@ class DailyReportController extends Controller
     }
   }
 	public function cronLeaveCalculate(Request $request)
-    {
+  {
     $msg = 'Leave calculated successfully !';
     if($request->get('fromcron') == 1)
     {
-        $last_month_start =  date("Y-m-d", strtotime("first day of this month"));
-        $last_month_end =  date("Y-m-d", strtotime("last day of this month"));
+      $last_month_start =  date("Y-m-d", strtotime("first day of this month"));
+      $last_month_end =  date("Y-m-d", strtotime("last day of this month"));
 
-        $user_details = User::whereIn('user_type_id',[1,3])
+      $user_details = User::whereIn('user_type_id',[1,3])
                           ->whereNotIn('id',[10,1])
                           ->where('status',1)
                           ->get();
@@ -238,13 +238,13 @@ class DailyReportController extends Controller
         $current_balance_leave = $user->balance_paid_leave;
         if(!$leave_log)
         {
-            if(!empty($user) && $leave_days > 0)
+            if(!empty($user) && $leave_days>0)
             {
                 $type = 'debit';
                 $days = $leave_days;
 
                 $new_balance_leave = $current_balance_leave - $leave_days;
-        
+            
                 if($new_balance_leave < 0)
                 {
                     $new_balance_leave = 0;
@@ -264,31 +264,31 @@ class DailyReportController extends Controller
                 $log->save();
 
                 $leave_log = new \App\Models\LeaveMonthlyLog();
-            
+                
                 $leave_log->user_id = $user->id;    
                 $leave_log->month = date("m", strtotime($last_month_start));    
                 $leave_log->year = date("Y", strtotime($last_month_start));    
-                $leave_log->leave_taken = $leave_days;
+                $leave_log->leave_taken = $leave_days;    
                 $leave_log->balance_leave = $new_balance_leave;    
-                $leave_log->save();
+                $leave_log->save();    
             }
             else
             {
                 $leave_log = new \App\Models\LeaveMonthlyLog();
-
-                $leave_log->user_id = $user->id;
+                
+                $leave_log->user_id = $user->id;    
                 $leave_log->month = date("m", strtotime($last_month_start));    
                 $leave_log->year = date("Y", strtotime($last_month_start));    
                 $leave_log->leave_taken = $leave_days;    
                 $leave_log->balance_leave = $current_balance_leave;    
-                $leave_log->save();
+                $leave_log->save();  
             }
-            // Leave Deduct Cal
+          // Leave Deduct Cal
             $deductLeave = LeaveEntitlement::where('user_id',$user->id)->where('is_run',0)
-                            ->where('type','debit')
-                            ->where('month',date("m", strtotime($last_month_start)))
-                            ->where('year',date("Y", strtotime($last_month_start)))
-                            ->sum('leave_day');
+                        ->where('type','debit')
+                        ->where('month',date("m", strtotime($last_month_start)))
+                        ->where('year',date("Y", strtotime($last_month_start)))
+                        ->sum('leave_day');
 
             if($deductLeave > 0)
             {
@@ -376,8 +376,8 @@ class DailyReportController extends Controller
 				$leave->year = $this_year;
 				$leave->remark = $remark;
 				$leave->leave_day = $leave_day;
-				$leave->save();
-                				
+				$leave->save();			  	
+				
             	$remark = 'added from leave entitlement cron';
             	LeaveEmtitlementLog::addBalancePaidLeave($user->id,$remark,$leave_day);
           	}
@@ -396,6 +396,7 @@ class DailyReportController extends Controller
 	public function cronTaskNotificationss(Request $request )
 	{
 		$fromcron = $request->get('fromcron');
+		exit;
 	if(!empty($fromcron) && $fromcron == 1){
 		//Task Query
         //$today =  date("Y-m-d");
@@ -531,7 +532,7 @@ class DailyReportController extends Controller
         }
 		}
     }
-    //daily users report
+
 	public function cronGeneral(Request $request )
 	{
 		/*$params["to"]= "kishan.lashkari@phpdots.com";
@@ -543,7 +544,7 @@ class DailyReportController extends Controller
 		if($request->get('fromcron') == 1){
 
 		$date = date("Y-m-d");
-		// $date= '2017-12-05';
+		 //$date= '2018-07-05';
 
         // Get Tasks
       $sql = "
@@ -666,7 +667,6 @@ class DailyReportController extends Controller
       exit;
 
 	}
-    //client reports
     public function cron(Request $request){
 		
 		if($request->get('fromcron') == 1){
@@ -690,8 +690,10 @@ class DailyReportController extends Controller
             ';
 
       $rows = \DB::select($sql);
+
       // Get Admin Emails
       $admin_emails = User::getAdminEmails();
+
 
       $user_id = 0;
 	  $client_id = 0;
@@ -700,11 +702,11 @@ class DailyReportController extends Controller
 
 	  if(count($rows) > 0 ) {
 		  
-		//$updateSQL = "UPDATE tasks SET report_sent = 1, report_sent_date = NOW();";  
-		//\DB::update($updateSQL);  
+		$updateSQL = "UPDATE tasks SET report_sent = 1, report_sent_date = NOW();";  
+		\DB::update($updateSQL);  
 		  
         foreach ($rows as $task_detail) {
-            
+          # code...
           if(!empty($client_id) && !empty($user_id) && ($user_id!=$task_detail->user_id || $client_id!=$task_detail->client_id))
           {
 
@@ -722,7 +724,7 @@ class DailyReportController extends Controller
         // echo "<pre>";print_r($report_data);
 
         foreach ($report_data as $user_id => $user_report) 
-        {
+        {                   
 
           $i = 1;
 
@@ -784,10 +786,15 @@ class DailyReportController extends Controller
                           ->pluck("email")
                           ->toArray();
 
-            $toEmails = array_merge($clientUsers,$admin_emails);                
-            echo "Send Emails To:<br/>";
-            echo "<pre>";
-            print_r($toEmails);
+          $toEmails = array_merge($clientUsers,$admin_emails);                
+          echo "Send Emails To:<br />";
+          echo "<pre>";
+          print_r($toEmails);
+          echo "<pre>";
+          echo "HTML";
+
+
+
 
             $table .= "<p>Thanks & Regards,<br />".$empName."</p>";
             $subject = "Daily Report - (Hr-".$totalHours.") - ".date("j M, Y");
@@ -811,26 +818,22 @@ class DailyReportController extends Controller
 			$params["from_name"] = $empName;  
             $params["body"] = "<html><body>".$table."</body></html>";
             
-            // if($from_email != 'mayur.devmurari@phpdots.com')
+
+            //echo $table;
+
             if(!empty($selectedUsers) && is_array($selectedUsers))
             {
                 if(in_array($from_user_id, $selectedUsers))
                 {
-                    //sendHtmlMail($params);
-                    echo $table;
+                    sendHtmlMail($params);
+                    //echo $table;
                 }
 
             }else
             {
-                echo $table;
-                //sendHtmlMail($params);
+                sendHtmlMail($params);
             }
-
-            //echo $table;
-          }          
-
-
-
+          } 
         }
 		  }
 
@@ -857,5 +860,110 @@ class DailyReportController extends Controller
        	}
        dd($count);
  
+    }
+    public function cronDepartment(request $request){
+        if($request->get('fromcron') == 1){
+            $date = date("Y-m-d");
+            
+            // Get Tasks
+            $sql = "
+                  SELECT  tasks.*,users.firstname,users.lastname,users.department_id,users.email as user_email,projects.title as project_name 
+                  FROM tasks
+                  JOIN users ON users.id = tasks.user_id
+                  JOIN projects ON tasks.project_id = projects.id              
+                  WHERE date_format(tasks.task_date, '%Y-%m-%d') = '".$date."'
+                  ORDER BY users.firstname
+                ";
+            $rows = \DB::select($sql);
+
+            $user_id = 0;
+            $client_id = 0;
+            $clients = array();
+            if(count($rows) > 0 ) {
+                foreach ($rows as $task_detail) {
+                  # code...
+                  if(!empty($client_id) && !empty($user_id) && ($user_id!=$task_detail->user_id))
+                  {
+
+                  }
+
+                  $user_id = $task_detail->user_id;
+                  $client_id = $task_detail->user_id;
+                  if(!in_array($task_detail->user_id, $clients)) 
+                  {
+                    $clients[] = $task_detail->user_id;
+                  }
+                    $report_data[$task_detail->user_id][$task_detail->user_id][]= $task_detail;
+                }
+                foreach ($report_data as $user_id => $user_report) 
+                {
+                    $i = 1; $j=0;
+                    foreach ($user_report as $client_id => $user_client_reportRow) 
+                    {
+                        $user_client_reportRow = json_decode(json_encode($user_client_reportRow),1);
+
+                        $empName = "";
+
+                        $table = "<p><b>Hello Sir,</b></p>";
+                        $table .= "<p>Please find daily report below.</p>";
+
+                        $table .= '<table width="100%" border="0" cellspacing="0" cellpadding="3" style="font-size:13px; border-top:1px solid #666; border-left:1px solid #666; font-family:Arial, Helvetica, sans-serif;">';
+                        $table .= "<tr>";
+                        $table .= '<td width="9%" align="left" valign="middle" style="font-weight:600; background-color:#d9d9d9; border-right:1px solid #777; border-bottom:1px solid #777;">Sr. No.</td>';
+                        $table .= '<td width="9%" align="left" valign="middle" style="font-weight:600; background-color:#d9d9d9; border-right:1px solid #777; border-bottom:1px solid #777;">Project</td>';
+                        $table .= '<td width="9%" align="left" valign="middle" style="font-weight:600; background-color:#d9d9d9; border-right:1px solid #777; border-bottom:1px solid #777;">Task/Feature</td>';
+                        $table .= '<td width="9%" align="left" valign="middle" style="font-weight:600; background-color:#d9d9d9; border-right:1px solid #777; border-bottom:1px solid #777;">Date</td>';
+                        $table .= '<td width="9%" align="left" valign="middle" style="font-weight:600; background-color:#d9d9d9; border-right:1px solid #777; border-bottom:1px solid #777;">Hour</td>';
+                        $table .= '<td width="9%" align="left" valign="middle" style="font-weight:600; background-color:#d9d9d9; border-right:1px solid #777; border-bottom:1px solid #777;">Status</td>';
+                        $table .= '<td width="9%" align="left" valign="middle" style="font-weight:600; background-color:#d9d9d9; border-right:1px solid #777; border-bottom:1px solid #777;">Task Link</td>';
+                        $table .= "</tr>";            $totalHours = 0;
+
+                        foreach($user_client_reportRow as $user_client_report )
+                        {
+                          $from_email = $user_client_report['user_email'];
+                          $department_id = $user_client_report['department_id'];
+                          $empName = ucfirst($user_client_report['firstname'])." ".ucfirst($user_client_report['lastname']);
+
+                          $status = $user_client_report['status'] == 1 ? "DONE":"In Progress";
+
+                          $table .= "<tr>";
+                          $table .= '<td align="left" valign="middle" style="border-right:1px solid #777; border-bottom:1px solid #777;">'.$i."</td>";
+                          $table .= '<td align="left" valign="middle" style="border-right:1px solid #777; border-bottom:1px solid #777;">'.$user_client_report['project_name']."</td>";
+                          $table .= '<td align="left" valign="middle" style="border-right:1px solid #777; border-bottom:1px solid #777;">'.$user_client_report['title']."</td>";
+                          $table .= '<td align="left" valign="middle" style="border-right:1px solid #777; border-bottom:1px solid #777;">'.date("m/d/Y",strtotime($user_client_report['task_date']))."</td>";
+                          $table .= '<td align="left" valign="middle" style="border-right:1px solid #777; border-bottom:1px solid #777;">'.$user_client_report['total_time']."</td>";
+                          $table .= '<td align="left" valign="middle" style="border-right:1px solid #777; border-bottom:1px solid #777;">'.$status."</td>";
+                          $table .= '<td align="left" valign="middle" style="border-right:1px solid #777; border-bottom:1px solid #777;">'.$user_client_report['ref_link']."</td>";
+                          $table .= "</tr>";
+                          $i++;
+
+                          $totalHours += floatval($user_client_report['total_time']);
+                        }  
+
+                        $table .= "</table>";
+                        $team_email = User::where("user_type_id",TEAM_LEADER)
+                                        ->where('id','!=',1)
+                                        ->where('department_id','=',$department_id)
+                                        ->pluck("email")
+                                        ->first();
+                        $table .= "<p>Thanks & Regards,<br />".$empName."</p>";
+                        $subject = "Daily Report - (Hr-".$totalHours.") - ".date("j M, Y")." - $empName";
+                         //echo "<p>Subject: $subject</p>";
+
+                        $params["to"]= $team_email;
+                        $params["subject"] = $subject;
+                        $params["from"] = $from_email;
+                        $params["from_name"] = $empName;  
+                        $params["body"] = "<html><body>".$table."</body></html>";
+
+                        $data =array();
+                        $data['body']= $table;
+                        sendHtmlMail($params);
+                        $returnHTML = view('emails.index',$data)->render();
+                    }
+                }
+            }
+        }
+        exit;
     }
 }

@@ -1,6 +1,6 @@
 @extends('admin.layouts.app')
 @section('styles')
- 
+
 @endsection
 
 <?php
@@ -101,7 +101,7 @@
                                 </tr>
                                 <tr>
                                     <td></td>
-                                    <td colspan="2" align="center"><b> SGST </b> </td>
+                                    <td colspan="2" align="center"><b>SGST </b> </td>
                                     <td>{!! Form::text('sgst',"9.00%",['class' => 'form-control', 'data-required' => true,'id'=>'sgst']) !!}</td>
                                     <td align="left">{!! Form::text('sgst_amount',null,['class' => 'form-control', 'data-required' => true,'id'=>'sgst_amount']) !!}</td>
                                 </tr>
@@ -198,7 +198,7 @@
             var sgst_amount = parseInt(sgst_amount);
             $('#cgst_amount').val(cgst_amount);
             $('#sgst_amount').val(sgst_amount); 
-            var gst_total = cgst_amount + sgst_amount;      
+        var gst_total = cgst_amount + sgst_amount;      
         }
         if(is_gst == 0)
         {
@@ -305,7 +305,7 @@
 							$("#main-frm1 textarea[name='to_address']").val(result.address);
                             $("#main-frm1 select[name='currency']").val(result.currency);
                         }      
-                    }
+                    }                 
                 },
                 error : function (error) {
                     alert(error);
@@ -330,7 +330,7 @@
             cell4.innerHTML = '<input type="text" name="particular[]" class="form-control"  placeholder="Type..." required>';
             cell5.innerHTML = '<input type="text" name="amount[]" value="0" class="form-control amounts" required>';
             $('#add_no').val(add_no);
-            $('#no').val(no);
+            $('#no').val(no);                       
         });
         $('#delete_tr').click(function(){
             $text = 'Are you sure you want to remove?';
@@ -384,5 +384,8 @@
         });
     });
 </script>
-
+ <script src="{{ asset("themes/admin/assets/")}}/global/plugins/select2/js/select2.full.min.js" type="text/javascript"></script>
+<script src="{{ asset("themes/admin/assets/")}}/assets/global/plugins/select2/js/select2.full.min.js" type="text/javascript"></script>
+<script src="{{ asset("themes/admin/assets/")}}/global/plugins/bootstrap-wizard/jquery.bootstrap.wizard.min.js" type="text/javascript"></script>
+<script src="{{ asset("themes/admin/assets/")}}/pages/scripts/form-wizard.min.js" type="text/javascript"></script>
 @endsection
