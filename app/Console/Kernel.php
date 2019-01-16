@@ -20,6 +20,7 @@ class Kernel extends ConsoleKernel
         'App\Console\Commands\MonthlyPenalty',
         'App\Console\Commands\MonthlyLoanPenalty',
         'App\Console\Commands\departmentDailyReport',
+        'App\Console\Commands\SendDailyWorkReportOfDepartment',
     ];
 
     /**

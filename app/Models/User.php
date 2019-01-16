@@ -18,7 +18,7 @@ class User extends Model
      *
      * @var array
      */
-    protected $fillable = ['firstname','lastname','email','user_type_id','address','phone','password','name','status','image','joining_date','blood_group','ifsc_code','bank_nm','account_no','account_nm','dob','pan_num','adhar_num','designation','is_add_task','is_show_appraisal_form','balance_paid_leave','salary','is_salary_generate','relieving_date','department_id'];
+    protected $fillable = ['firstname','lastname','email','user_type_id','address','phone','password','name','status','image','joining_date','blood_group','ifsc_code','bank_nm','account_no','account_nm','dob','pan_num','adhar_num','designation','is_add_task','is_show_appraisal_form','balance_paid_leave','salary','is_salary_generate','relieving_date','department_id','send_reports_type'];
     
     /**
      * The attributes that should be hidden for arrays.

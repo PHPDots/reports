@@ -208,7 +208,8 @@ class UsersController extends Controller
             $salary = $request->get("salary");
             $is_salary_generate = $request->get("is_salary_generate");
             $relieving_date = $request->get("relieving_date");
-			$department_id = $request->get("department_id");
+            $department_id = $request->get("department_id");
+			$send_reports_type = $request->get("send_reports_type");
 			
             if($confirm_password == $password)
             {
@@ -250,6 +251,7 @@ class UsersController extends Controller
                 $user->is_add_task = $is_add_task;
                 $user->relieving_date = $relieving_date;
                 $user->department_id = $department_id;
+                $user->send_reports_type = $send_reports_type;
                 if(\Auth::guard('admins')->user()->id == SUPER_ADMIN_ID){
                     $user->salary = $salary;
 				    $user->is_salary_generate = $is_salary_generate;
@@ -481,7 +483,8 @@ class UsersController extends Controller
             $salary = $request->get("salary");
             $is_salary_generate = $request->get("is_salary_generate");
             $relieving_date = $request->get("relieving_date");
-			$department_id = $request->get("department_id");
+            $department_id = $request->get("department_id");
+			$send_reports_type = $request->get("send_reports_type");
 			$old_balance_leave = $model->balance_paid_leave;
             
             if($request->get('balance_paid_leave') > 0 && $request->get('balance_paid_leave') != $old_balance_leave)
@@ -548,6 +551,7 @@ class UsersController extends Controller
             $model->balance_paid_leave = $balance_paid_leave;
             $model->relieving_date = $relieving_date;
             $model->department_id = $department_id;
+            $model->send_reports_type = $send_reports_type;
             if(\Auth::guard('admins')->user()->id == SUPER_ADMIN_ID){
                 $model->salary = $salary;
                 $model->is_salary_generate = $is_salary_generate;

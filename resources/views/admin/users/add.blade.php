@@ -177,11 +177,11 @@ $user_id =$formObj->id;
                                 @if(\Auth::guard('admins')->user()->id == SUPER_ADMIN_ID)
                                 <div class="clearfix">&nbsp;</div>
                                 <div class="row">
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <label class="control-label">Salary</label>  
                                         {!! Form::text('salary',null,['class' => 'form-control','placeholder'=>'Enter User Salary']) !!}
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <label class="control-label">&nbsp;</label>  
                                         <div class="md-checkbox">
                                             {!! Form::checkbox('is_salary_generate',1,null,['class' => 'md-check','id'=>"checkbox1"]) !!}
@@ -193,8 +193,20 @@ $user_id =$formObj->id;
                                             </label>
                                         </div>
                                     </div>
-                                </div>
                                 @endif
+                                    <div class="col-md-4" id="sendMail">
+                                            <label class="control-label">&nbsp;</label>  
+                                            <div class="md-checkbox">
+                                                {!! Form::checkbox('send_reports_type',1,null,['class' => 'md-check','id'=>"reportType"]) !!}
+                                                <label for="reportType">
+                                                    <span></span>
+                                                    <span class="check" style="z-index: 1;"></span>
+                                                    <span class="box" ></span>
+                                                    All reports on single user.
+                                                </label>
+                                            </div>
+                                    </div>
+                                </div>
                                 
                             </fieldset> 
 
@@ -259,7 +271,19 @@ legend.scheduler-border
 </style>
 @section('scripts') 
 <script type="text/javascript">
-    $(document).ready(function () { 
+    $(document).ready(function () {
+        var user_id = $('#user_id').val();
+        if(user_id == 1 || user_id == 2)
+            $('#sendMail').show();
+
+        $('#user_id').on('change',function(){
+            var user_type = $(this).val();
+            
+            if(user_type == 1 || user_type == 2)
+                $('#sendMail').show();
+            else
+                $('#sendMail').hide();
+        }); 
 		$("#user_id").select2({
                 placeholder: "Search User Type",
                 allowClear: true,
