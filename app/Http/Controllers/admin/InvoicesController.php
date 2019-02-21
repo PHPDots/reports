@@ -83,8 +83,8 @@ class InvoicesController extends Controller
             $viewName = $this->moduleViewName.".clientIndex";
         }else{
 			//Check Admin Type
-            $auth_id = \Auth::guard("admins")->user()->id;
-			$authUser = \Auth::guard("admins")->user();
+			$auth_id = \Auth::guard("admins")->user()->id;
+            $authUser = \Auth::guard("admins")->user();
 			$auth_user =  superAdmin($auth_id);
 			if($auth_user == 0 && $authUser->user_type_id != ACCOUNT_USER) 
 			{

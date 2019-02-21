@@ -44,7 +44,7 @@ class AdminController extends Controller
                 ->get()
 				->toArray();
 		 
-		  $calendar_leave = array();
+		$calendar_leave = array();
 
             $i =0;
             foreach ($user_holidays as $key => $value) {
@@ -137,34 +137,8 @@ class AdminController extends Controller
 
         $viewName = "dashboard";
         }
-        if($auth_id == NORMAL_USER || $auth_id == TRAINEE_USER || $auth_id == TEAM_LEADER)
+        if($auth_id == NORMAL_USER || $auth_id == TRAINEE_USER)
         {
-            if($auth_id == TEAM_LEADER){
-                $department_id = \Auth::guard('admins')->user()->department_id;
-                
-            //Admin yesterday Task Details
-                $halfLeaveUsers = Task::halfLeaveUsers($yesterday);
-                $fullLeaveUsers = Task::fullLeaveUsers($yesterday);
-                
-            //yesterday on holiday
-                $yesterday_holiday = Task::yesterdayHoliday($yesterday);
-                $data['yesterday_holiday']= $yesterday_holiday;
-            
-            //Admin Not Added
-                $daily_tasks = Task::NotAdded($fullLeaveUsers,$yesterday);
-                $data['daily_tasks']= $daily_tasks;
-
-            //Admin Below 8 hours Details
-                $below_eight_hour = Task::BelowEightHrs($halfLeaveUsers,$yesterday);
-
-            // Admin Below 4 hours Details
-                $below_four_hour = Task::BelowFourHrs($halfLeaveUsers,$yesterday);
-
-                $final_belows = Task::final_belows($below_eight_hour,$below_four_hour);
-                $data['daily_tasks_hours'] = $final_belows;
-            
-                $data['yesterday_leave'] = LeaveRequest::yesterdayOnLeave(); 
-            }
         //User Leave
             $data['auth_user_leave'] = Custom::usertotalleave($auth_user);        
             $user_month_leave = Custom::usermothleave($auth_user,$this_month);

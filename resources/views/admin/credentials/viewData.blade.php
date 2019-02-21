@@ -94,7 +94,7 @@
 			<div class="col-md-7 value"> {{$view->mode}}</div>
 		</div>
 		@endif
-		@if($view->protocol == 'EXTRA')
+		@if($view->protocol == 'EXTRA' || $view->protocol == 'SSH')
 		<div class="row static-info">
 			<div class="col-md-5 name"> Description: </div>
 			<div class="col-md-7 value"> <?php echo nl2br($view->description);?></div>

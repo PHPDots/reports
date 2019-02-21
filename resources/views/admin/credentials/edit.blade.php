@@ -97,7 +97,7 @@ $auth = Auth::guard('admins')->user()->user_type_id;
                                     </div>
                                 </div>
                                 @endif
-                                @if($formObj->protocol == 'EXTRA')
+                                @if($formObj->protocol == 'EXTRA' || $formObj->protocol == 'SSH')
                                 <div class="clearfix">&nbsp;</div>
                                 <div class="row">
                                     <div class="col-md-12">

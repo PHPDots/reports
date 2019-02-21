@@ -21,7 +21,7 @@ class UsersController extends Controller
         $this->moduleViewName = "admin.users";
         $this->list_url = route($this->moduleRouteText.".index");
 
-        $module = "List Users";
+        $module = "User";
         $this->module = $module;
 
         $this->adminAction= new AdminAction; 
@@ -120,7 +120,6 @@ class UsersController extends Controller
         $data["show_image"] =''; 
         $data['blood_groups'] = ['A+'=>'A+','B+'=>'B+','O+'=>'O+','AB+'=>'AB+','AB-'=>'AB-','A-'=>'A-','B-'=>'B-','O-'=>'O-'];
         $data["users_type"] = \App\Models\UserType::pluck('title','id')->all();
-        $data["departments"] = \App\Models\Department::pluck('title','id')->all();
         $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
 
         return view($this->moduleViewName.'.add', $data);
@@ -155,7 +154,7 @@ class UsersController extends Controller
             'address' => 'required|min:2',            
             'phone' => 'required|max:15',
             'status' => ['required', Rule::in([0,1])],
-            'is_add_task' => ['required', Rule::in([0,1])],
+			'is_add_task' => ['required', Rule::in([0,1])],
             'image' => 'image|max:4000',
             'joining_date' => 'required',
             'blood_group' => ['required', Rule::in(['A+','B+','O+','AB+','AB-','A-','B-','O-'])],
@@ -163,11 +162,10 @@ class UsersController extends Controller
             'account_no' => 'required|numeric',
             'bank_nm' => 'required',
             'ifsc_code' => 'required',
-            'dob' => 'required',
-            'designation' => 'required',
-            'salary' => 'min:0|numeric',
+			'dob' => 'required',
+			'designation' => 'required',
+			'salary' => 'min:0|numeric',
             'is_salary_generate' => Rule::in([0,1]),
-            'department_id' => 'required|exists:'.TBL_DEPARTMENT.',id',           
         ]);
         
         // check validations
@@ -207,9 +205,7 @@ class UsersController extends Controller
 			$is_add_task = $request->get("is_add_task");
             $salary = $request->get("salary");
             $is_salary_generate = $request->get("is_salary_generate");
-            $relieving_date = $request->get("relieving_date");
-            $department_id = $request->get("department_id");
-			$send_reports_type = $request->get("send_reports_type");
+			$relieving_date = $request->get("relieving_date");
 			
             if($confirm_password == $password)
             {
@@ -250,8 +246,6 @@ class UsersController extends Controller
                 $user->designation = $designation;
                 $user->is_add_task = $is_add_task;
                 $user->relieving_date = $relieving_date;
-                $user->department_id = $department_id;
-                $user->send_reports_type = $send_reports_type;
                 if(\Auth::guard('admins')->user()->id == SUPER_ADMIN_ID){
                     $user->salary = $salary;
 				    $user->is_salary_generate = $is_salary_generate;
@@ -384,7 +378,6 @@ class UsersController extends Controller
         $data["show_image"] ='1'; 
         $data['blood_groups'] = ['A+'=>'A+','B+'=>'B+','O+'=>'O+','AB+'=>'AB+','AB-'=>'AB-','A-'=>'A-','B-'=>'B-','O-'=>'O-'];
         $data["users_type"] = \App\Models\UserType::pluck('title','id')->all();
-        $data["departments"] = \App\Models\Department::pluck('title','id')->all();
         $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
 
         return view($this->moduleViewName.'.add', $data);   
@@ -438,7 +431,6 @@ class UsersController extends Controller
 			'balance_paid_leave' => 'required|min:0',
 			'salary' => 'min:0|numeric',
             'is_salary_generate' => Rule::in([0,1]),
-            'department_id' => 'required|exists:'.TBL_DEPARTMENT.',id',           
         ]);
         
         // check validations
@@ -482,9 +474,7 @@ class UsersController extends Controller
 			$balance_paid_leave = $request->get("balance_paid_leave");
             $salary = $request->get("salary");
             $is_salary_generate = $request->get("is_salary_generate");
-            $relieving_date = $request->get("relieving_date");
-            $department_id = $request->get("department_id");
-			$send_reports_type = $request->get("send_reports_type");
+			$relieving_date = $request->get("relieving_date");
 			$old_balance_leave = $model->balance_paid_leave;
             
             if($request->get('balance_paid_leave') > 0 && $request->get('balance_paid_leave') != $old_balance_leave)
@@ -550,8 +540,6 @@ class UsersController extends Controller
 			$model->is_add_task = $is_add_task;
             $model->balance_paid_leave = $balance_paid_leave;
             $model->relieving_date = $relieving_date;
-            $model->department_id = $department_id;
-            $model->send_reports_type = $send_reports_type;
             if(\Auth::guard('admins')->user()->id == SUPER_ADMIN_ID){
                 $model->salary = $salary;
                 $model->is_salary_generate = $is_salary_generate;

@@ -12,7 +12,9 @@ use App\Models\User;
 use App\Models\SalarySlip;
 use App\Custom;
 use App\Models\HolidayDetail;
+use App\Models\SalaryBreakup;
 use PDF;
+use Excel;
 //require_once(app_path() . "/mpdf/mpdf.php");
 
 
@@ -60,12 +62,13 @@ class SalarySlipController extends Controller
 
         $data['add_url'] = route($this->moduleRouteText.'.create');
         $data['btnAdd'] = \App\Models\Admin::isAccess(\App\Models\Admin::$ADD_SALARY_SLIP);
+        $data['btnAdd'] = \App\Models\Admin::isAccess(\App\Models\Admin::$FINANCIAL_YEAR_REPORTS);
         $data["months"] = ['01'=>'January','02'=>'February','03'=>'March','04'=>'April','05'=>'May','06'=>'June','07'=>'July','08'=>'August','09'=>'September','10'=>'October','11'=>'November','12'=>'December']; 
         $data["years"] = ['2016'=>'2016','2017'=>'2017','2018'=>'2018','2019'=>'2019','2020'=>'2020','2021'=>'2021','2022'=>'2022','2023'=>'2023','2024'=>'2024','2025'=>'2025','2026'=>'2026','2027'=>'2027','2028'=>'2028','2029'=>'2029','2030'=>'2030']; 
 
         $auth_id = \Auth::guard('admins')->user()->user_type_id;
 
-        if ($auth_id == NORMAL_USER || $auth_id == TEAM_LEADER) {
+        if ($auth_id == NORMAL_USER) {
             $data['users'] = '';
             $viewName = $this->moduleViewName . ".userIndex";
         } else {
@@ -77,6 +80,7 @@ class SalarySlipController extends Controller
         {
             return Redirect('/dashboard');
         }
+			
             $data['users'] = User::pluck("name","id")->all();
             $viewName = $this->moduleViewName . ".index";        
         }    
@@ -658,8 +662,8 @@ class SalarySlipController extends Controller
 
     function download_salary_slip(Request $request) 
     {
-        $auth_id = \Auth::guard('admins')->id();
-		$authUser = \Auth::guard('admins')->user();
+		$auth_id = \Auth::guard('admins')->id();
+        $authUser = \Auth::guard('admins')->user();
         $slip_id = $request->get('slip_id');
         $slip_detail = SalarySlip::select(TBL_SALARY_SLIP.".*",TBL_USERS.".firstname as firstname",TBL_USERS.".lastname as lastname",TBL_USERS.".name as user_name")
                     ->join(TBL_USERS,TBL_USERS.".id","=",TBL_SALARY_SLIP.".user_id")
@@ -830,7 +834,7 @@ class SalarySlipController extends Controller
                                 $user_salary = round($user_data->salary);
                                 $ctc = $user_data->salary;
 
-                                $basic_salary = $ctc/2;
+                                $basic_salary = $breakup->basic_salary;
                                 $hra = $breakup->hra;
                                 $conveyance_allowance = $breakup->conveyance_allowance;
                                 $telephone_allowance = $breakup->telephone_allowance;
@@ -966,6 +970,259 @@ class SalarySlipController extends Controller
             session()->flash('success_message', $msg);
         }
         return ['status' => $status, 'msg' => $msg];
+    }
+    public function ViewConsolidatedSalary(Request $request)
+    {  
+        $auth_id = \Auth::guard('admins')->user()->user_type_id;
+        $auth_id = \Auth::guard("admins")->user()->id;
+        $authUser = \Auth::guard("admins")->user();
+        $auth_user =  superAdmin($auth_id);
+        if($auth_user == 0 && $authUser->user_type_id != ACCOUNT_USER) 
+        {
+            return Redirect('/dashboard');
+        } 
+        
+        $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$FINANCIAL_YEAR_REPORTS);
+        
+        if($checkrights) 
+        {
+            return $checkrights;
+        } 
+        
+        $data = array(); 
+        $data['request'] =  $request->all();
+        $data['slip'] = 'Financial Year Reports'; 
+        $data['users'] = User::pluck("name","id")->all();
+        $data['back_url']='salary_slip';
+        $data['list_url']='view-consolidated-salary';
+         
+        $query = SalarySlip::select(TBL_USERS.".firstname as firstname",TBL_USERS.".lastname as lastname")
+            ->addSelect(\DB::raw("SUM(salary_slips.basic_salary) as basic_salary"))
+            ->addSelect(\DB::raw("SUM(salary_slips.hra) as hra"))
+            ->addSelect(\DB::raw("SUM(salary_slips.conveyance_allowance) as conveyance_allowance"))
+            ->addSelect(\DB::raw("SUM(salary_slips.telephone_allowance) as telephone_allowance"))
+            ->addSelect(\DB::raw("SUM(salary_slips.medical_allowance) as medical_allowance"))
+            ->addSelect(\DB::raw("SUM(salary_slips.uniform_allowance) as uniform_allowance"))
+            ->addSelect(\DB::raw("SUM(salary_slips.special_allowance) as special_allowance"))
+            ->addSelect(\DB::raw("SUM(salary_slips.bonus) as bonus"))
+            ->addSelect(\DB::raw("SUM(salary_slips.arrear_salary) as arrear_salary"))
+            ->addSelect(\DB::raw("SUM(salary_slips.advance_given) as advance_given"))
+            ->addSelect(\DB::raw("SUM(salary_slips.leave_encashment) as leave_encashment"))
+            ->addSelect(\DB::raw("SUM(salary_slips.leave_deduction) as leave_deduction"))
+            ->addSelect(\DB::raw("SUM(salary_slips.advance) as advance"))
+            ->addSelect(\DB::raw("SUM(salary_slips.other_deduction) as other_deduction"))
+            ->addSelect(\DB::raw("SUM(salary_slips.tds) as tds"))
+            ->addSelect(\DB::raw("SUM(salary_slips.net_pay) as net_pay"))
+            ->join(TBL_USERS,TBL_USERS.".id","=",TBL_SALARY_SLIP.".user_id");
+
+            if(isset($request->search_start_date) && $request->search_start_date !="" && isset($request->search_end_date) && $request->search_end_date){
+                $query->whereBetween(\DB::raw("date(salary_slips.created_at)"),[$request->search_start_date,$request->search_end_date]);
+            }
+            if(isset($request->search_name) && $request->search_name !=""){
+                $query->where('salary_slips.user_id',$request->search_name);
+            }
+            $data['record'] = $query->first();
+        return view("admin.salary_slips.viewConsolidatedSalary", $data);
+    }
+
+    public function salaryReport()
+    {
+        $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$SALARY_REPORT);
+        
+        if($checkrights) 
+        {
+            return $checkrights;
+        }
+        
+        $data = array();
+        $data['users'] = User::where('status',1)->whereNotIn('id',[SUPER_ADMIN_ID,1])
+                        ->pluck('name','id')->all();
+        return view($this->moduleViewName.'.salaryReport', $data);
+    }
+    public function salaryReportData(Request $request)
+    {
+        $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$SALARY_REPORT);
+        
+        if($checkrights) 
+        {
+            return $checkrights;
+        }
+
+        $data = array();
+        $reportData = array();
+        $viewData = array();
+        $status = 1;
+        $viewTable = '';
+        $msg = 'Report generated successfully!';
+
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required|exists:'.TBL_USERS.',id',
+            'start_month_year' => 'required',
+            'end_month_year' => 'required',
+        ]);
+        if ($validator->fails())
+        {
+            $messages = $validator->messages();
+
+            $status = 0;
+            $msg = "";
+            
+            foreach ($messages->all() as $message) 
+            {
+                $msg .= $message . "<br />";
+            }
+        }else{
+            
+            $user_id = $request->get('user_id');
+            $start_month_year = date('m-Y',strtotime($request->get('start_month_year')));
+            $end_month_year = date('m-Y',strtotime($request->get('end_month_year')));
+
+            $userSalary = SalarySlip::select('*',\DB::raw('concat(month,"-",year) as monthYear'))->where('user_id',$user_id)
+                            ->whereBetween(\DB::raw('concat(month,"-",year)'),[$start_month_year,$end_month_year])
+                            ->orderBy('month','year')
+                            ->get();
+            $toDate = date('Y-m-01',strtotime($request->get('start_month_year')));
+            $endDate = date('Y-m-01',strtotime($request->get('end_month_year')));
+
+            $user = User::find($user_id);
+            $username = isset($user->name) ? ucwords($user->name) : '';
+
+            $dates = array();
+            while (strtotime($toDate) <= strtotime($endDate)) {
+                $dates[] = date('m-Y',strtotime($toDate));
+                $toDate = date ("Y-m", strtotime("+1 month", strtotime($toDate)));
+            }
+            if(count($dates))
+            {
+                $k = 1;
+                foreach ($dates as $date)
+                {
+                    $userSalary = SalarySlip::select('*',\DB::raw('concat(month,"-",year) as monthYear'))->where('user_id',$user_id)
+                            ->where(\DB::raw('concat(month,"-",year)'),$date)
+                            ->orderBy('month','year')
+                            ->first();
+                    if($userSalary)
+                    {
+                        $reportData[$k]['date'] = $date;
+                        $reportData[$k]['month_year'] = $userSalary->monthYear;
+                        $reportData[$k]['basic_salary'] = $userSalary->basic_salary;
+                        $reportData[$k]['hra'] = $userSalary->hra;
+                        $reportData[$k]['conveyance_allowance'] = $userSalary->conveyance_allowance;
+                        $reportData[$k]['telephone_allowance'] = $userSalary->telephone_allowance;
+                        $reportData[$k]['medical_allowance'] = $userSalary->medical_allowance;
+                        $reportData[$k]['uniform_allowance'] = $userSalary->uniform_allowance;
+                        $reportData[$k]['special_allowance'] = $userSalary->special_allowance;
+                        $reportData[$k]['bonus'] = $userSalary->bonus;
+                        $reportData[$k]['arrear_salary'] = $userSalary->arrear_salary;
+                        $reportData[$k]['advance_given'] = $userSalary->advance_given;
+                        $reportData[$k]['leave_encashment'] = $userSalary->leave_encashment;
+                        $reportData[$k]['advance'] = $userSalary->advance;
+                        $reportData[$k]['leave_deduction'] = $userSalary->leave_deduction;
+                        $reportData[$k]['other_deduction'] = $userSalary->other_deduction;
+                        $reportData[$k]['tds'] = $userSalary->tds;
+                    }
+                    else
+                    {
+                        $empSalary = $empBasicSalary = 0;
+                        
+                        if(isset($user->salary) && !empty($user->salary))
+                            $empBasicSalary = $user->salary/2; 
+
+                        $salaryBreakup = SalaryBreakup::where('user_id',$user_id)->first();
+                        if($salaryBreakup)
+                        {
+                            $reportData[$k]['date'] = $date;
+                            $reportData[$k]['month_year'] = $date;
+                            $reportData[$k]['basic_salary'] = $salaryBreakup->basic_salary;
+                            $reportData[$k]['hra'] = $salaryBreakup->hra;
+                            $reportData[$k]['conveyance_allowance'] = $salaryBreakup->conveyance_allowance;
+                            $reportData[$k]['telephone_allowance'] = $salaryBreakup->telephone_allowance;
+                            $reportData[$k]['medical_allowance'] = $salaryBreakup->medical_allowance;
+                            $reportData[$k]['uniform_allowance'] = $salaryBreakup->uniform_allowance;
+                            $reportData[$k]['special_allowance'] = $salaryBreakup->special_allowance;
+                            $reportData[$k]['bonus'] = $salaryBreakup->bonus;
+                            $reportData[$k]['arrear_salary'] = $salaryBreakup->arrear_salary;
+                            $reportData[$k]['advance_given'] = $salaryBreakup->advance_given;
+                            $reportData[$k]['leave_encashment'] = $salaryBreakup->leave_encashment;
+                            $reportData[$k]['advance'] = $salaryBreakup->advance;
+                            $reportData[$k]['leave_deduction'] = $salaryBreakup->leave_deduction;
+                            $reportData[$k]['other_deduction'] = $salaryBreakup->other_deduction;
+                            $reportData[$k]['tds'] = $salaryBreakup->tds;
+                        }
+                    }
+                    $k++;
+                }
+            }
+            if($request->get('is_download_xls') == 1)
+            {
+                if(count($reportData))
+                {
+                    $basic_salary=$hra=$conveyance_allowance=$telephone_allowance=$medical_allowance=$uniform_allowance=$special_allowance=$bonus=$arrear_salary=$advance_given=$leave_encashment=$advance=$leave_deduction=$other_deduction=$tds = 0;
+
+                    $xls_data[] = array("No","Month","Basic Salary","HRA","Conveyance Allowance","Telephone Allowance","Medical Allowance","Uniform Allowance","Special Allowance","Bonus","Arrear Salary","Advance Given","Leave Encashment","Advance","Leave Deduction","Other Deduction","TDS");
+                    $p = 1;
+                    foreach ($reportData as $id => $row)
+                    {
+                        $xls_data[] = [$p,$row['date'],round($row['basic_salary'],2),round($row['hra'],2),round($row['conveyance_allowance'],2),round($row['telephone_allowance'],2),round($row['medical_allowance'],2),round($row['uniform_allowance'],2),round($row['special_allowance'],2),round($row['bonus'],2),round($row['arrear_salary'],2),round($row['advance_given'],2),round($row['leave_encashment'],2),round($row['advance'],2),round($row['leave_deduction'],2),round($row['other_deduction'],2),round($row['tds'],2)];
+                        
+                            $basic_salary += $row['basic_salary'];
+                            $hra += $row['hra'];
+                            $conveyance_allowance += $row['conveyance_allowance'];
+                            $telephone_allowance += $row['telephone_allowance'];
+                            $medical_allowance += $row['medical_allowance'];
+                            $uniform_allowance += $row['uniform_allowance'];
+                            $special_allowance += $row['special_allowance'];
+                            $bonus += $row['bonus'];
+                            $arrear_salary += $row['arrear_salary'];
+                            $advance_given += $row['advance_given'];
+                            $leave_encashment += $row['leave_encashment'];
+                            $advance += $row['advance'];
+                            $leave_deduction += $row['leave_deduction'];
+                            $other_deduction += $row['other_deduction'];
+                            $tds += $row['tds'];
+                        $p++;
+                    }
+                    $xls_data[] = array("Total",'',round($basic_salary,2),round($hra,2),round($conveyance_allowance,2),round($telephone_allowance,2),round($medical_allowance,2),round($uniform_allowance,2),round($special_allowance,2),round($bonus,2),round($arrear_salary,2),round($advance_given,2),round($leave_encashment,2),round($advance,2),round($leave_deduction,2),round($other_deduction,2),round($tds,2));
+                    if(count($xls_data) > 2)
+                    {
+                        $filename = $username.' Salary Report';
+                        $xls_sheet = Excel::create($filename, function($excel) use ($xls_data) {
+                            $excel->sheet('data', function($sheet) use ($xls_data) {
+                                $border = count($xls_data);
+                                $sheet->mergeCells('A'.$border.':B'.$border);
+                                
+                                $sheet->setAutoSize(true);
+                                $sheet->cell('A1:Q1', function($cell) {
+                                    $cell->setBackground('#aebbc2');
+                                    $cell->setAlignment('center');
+                                    $cell->setFont(array('family'=>'Calibri','size'=>'12','bold'=>true));
+                                });
+                                $sheet->cell('A'.$border.':B'.$border, function($cell) {
+                                    $cell->setAlignment('center');
+                                    $cell->setFont(array('family'=>'Calibri','size'=>'14','bold'=>true));
+                                });
+                                $sheet->cell('C'.$border.':Q'.$border, function($cell) {
+                                    $cell->setFont(array('size'=>'12','bold'=>true));
+                                });
+                                $sheet->setColumnFormat(array(
+                                    'A2:Q2' => '0'
+                                ));
+                                $sheet->setBorder('A1:Q'.$border, 'thin');
+                                $sheet->fromArray($xls_data, null, 'A1', true, false);
+                            });
+                        });
+                        $xls_sheet->download('xlsx');
+                    }
+                }
+                exit('Run');
+            }
+            $viewData['dates'] = $dates;
+            $viewData['reportData'] = $reportData;
+            $viewData['username'] = $username;
+            $viewTable = view($this->moduleViewName.'.salaryReportData', $viewData)->render();
+        }
+        return ['status' => $status, 'msg' => $msg, 'viewTable' => $viewTable];              
+
     }
     
 }

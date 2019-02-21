@@ -194,7 +194,7 @@ $auth = Auth::guard('admins')->user()->user_type_id;
                 parent.find('#port_id').val('22');
                 parent.find('.url').hide();
                 parent.find('.key_file').show();
-                parent.find('.description').hide();
+                parent.find('.description').show();
 				parent.find('.title').show();
                 parent.find('.environment').show();
 				parent.find('.key_password').show();

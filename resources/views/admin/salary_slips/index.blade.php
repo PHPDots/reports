@@ -22,7 +22,8 @@
                   
                     @if($btnAdd)
                         <a class="btn btn-default pull-right btn-sm mTop5" href="{{ $add_url }}">Add New</a>
-						<a class="btn btn-default btn-sm mTop5 pull-right" style="margin-right: 10px;" href="{{ route('salaryslipForAll') }}">Add For All</a>
+						            <a class="btn btn-default btn-sm mTop5 pull-right" style="margin-right: 10px;" href="{{ route('salaryslipForAll') }}">Add For All</a>
+                        <a class="btn btn-default btn-sm mTop5 pull-right" style="margin-right: 10px;" href="{{ route('ViewConsolidatedSalaryAll') }}">View Consolidated Salary</a>
                     @endif                     
 
                 </div>

@@ -398,12 +398,6 @@ class TasksController extends Controller
             $data['clients']='';
             $viewName = $this->moduleViewName.".clientIndex";
         }
-        else if($auth_id ==TEAM_LEADER){
-            $data['users'] = User::getList();
-            $data['clients'] = Client::pluck("name","id")->all();
-
-            $viewName = $this->moduleViewName.".teamleaderIndex";
-        }
         $data = customSession($this->moduleRouteText,$data, 100);
         return view($viewName, $data);  
     }
@@ -1152,83 +1146,7 @@ class TasksController extends Controller
 
             return $data;        
     }
-	public function teamLeaderData(Request $request){
-     $department_id = \Auth::guard('admins')->user()->department_id;
-        
-     $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$LIST_TASKS);
-        
-        if($checkrights) 
-        {
-            return $checkrights;
-        }
-
-        $model = Task::select(TBL_TASK.".*",TBL_PROJECT.".title as project_name",TBL_USERS.".name as user_name")
-                ->join(TBL_USERS,TBL_TASK.".user_id","=",TBL_USERS.".id")
-                ->join(TBL_PROJECT,TBL_TASK.".project_id","=",TBL_PROJECT.".id")
-                ->where(TBL_USERS.".department_id",$department_id);
-        
-        $hours_query = Task::select(TBL_TASK.".*",TBL_PROJECT.".title as project_name",TBL_USERS.".name as user_name")
-                ->join(TBL_USERS,TBL_TASK.".user_id","=",TBL_USERS.".id")
-                ->join(TBL_PROJECT,TBL_TASK.".project_id","=",TBL_PROJECT.".id")
-                ->where(TBL_USERS.".department_id",$department_id);
-
-        $hours_query = Task::listFilter($hours_query);        
-
-        $totalHours = $hours_query->sum("total_time");
-        $totalHours = number_format($totalHours,2);
-
-        $data = \Datatables::eloquent($model)        
-               
-            ->addColumn('action', function(Task $row) {
-                return view("admin.partials.action",
-                    [
-                        'currentRoute' => $this->moduleRouteText,
-                        'row' => $row, 
-                        'isEdit' => \App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_TASKS),                                                  
-                        'isDelete' => \App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_TASKS),
-                        'isView' =>\App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_TASKS),
-                                                  
-                    ]
-                )->render();
-            })
-            ->editColumn('status', function ($row) { 
-                if ($row->status == 1){
-                    $html = "<a class='btn btn-xs btn-success'>Completed</a><br/>";
-                    $html.='<i class="fa fa-clock-o" aria-hidden="true"></i>  '.$row->total_time;
-                    return $html;
-                }
-                else{
-                    $html ='<a class="btn btn-xs btn-danger">In Progress</a><br/>';
-                    $html.='<i class="fa fa-clock-o" aria-hidden="true"></i>  '.$row->total_time;
-                    return $html;
-                }
-            })
-            ->editColumn('task_date', function($row){
-                if(!empty($row->task_date))          
-                    return date("j M, Y",strtotime($row->task_date)).'<br/><span style="color: blue; font-size: 12px">'.date("j M, Y",strtotime($row->created_at))."</span>";
-                else
-                    return '-';    
-            })
-            ->editColumn('ref_link', function($row){
-                $html='';
-
-                if(!empty($row->ref_link))
-                {
-                  $label = strlen($row->ref_link) > 15 ? substr($row->ref_link,0,15)."...":$row->ref_link; 
-                  $html = "<a href='".$row->ref_link."' target='_blank'>".$label."</a>";  
-                }
-                return $html;  
-            })            
-            ->rawColumns(['status','action','ref_link','description','task_date'])             
-          
-            ->filter(function ($query) 
-            {                              
-                $query = Task::listFilter($query);                  
-            });
-        $data = $data->with('hours',$totalHours);
-        $data = $data->make(true);
-        return $data;   
-    }
+	
 	public function getMonthlyReport(Request $request)
     {
 		$checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$DOWNLOAD_MONTHLY_REPORT);

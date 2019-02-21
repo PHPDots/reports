@@ -1,5 +1,5 @@
 <?php
-if(\Auth::guard('admins')->check())
+if(Auth::guard('admins')->check())
 {
 	$pending = \App\Custom::getLeaveRequest();
 	$today_leave = \App\Custom::getLeaveUser();

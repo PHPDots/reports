@@ -47,16 +47,13 @@ define("TBL_SMS_SENT_LOG","sms_sent_logs");
 define("TBL_MEMBER_LOG","bopal_member_logs");
 
 //variables
-define("SUPER_ADMIN_ID","1");
+define("SUPER_ADMIN_ID","10");
 define("ACTIVE_USER","1");
 define("CURRENCY_USD","60");
-define("FULL_DAY_HR",9);
-define("HALF_DAY_HR",4);
 
 //User Types
 define("NORMAL_USER","3");
 define("ADMIN_USER_TYPE","1");
-define("TEAM_LEADER","2");
 define("CLIENT_USER","4");
 define("ACCOUNT_USER",6);
 define("OTP_COUNTER",3);
@@ -83,5 +80,4 @@ define("PENALTY_RATE", 10);
 define("LOAN_EMI", 10);
 define("MONTHLY_INSTALLMENT", 300);
 define("TBL_LOAN", "bb_loan");
-define("TBL_DEPARTMENT", "departments");
 

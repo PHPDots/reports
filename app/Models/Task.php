@@ -177,19 +177,13 @@ class Task extends Model
                 ])
                 ->join(TBL_USERS,TBL_USERS.".id","=",TBL_TASK.".user_id")
                 ->where(TBL_TASK.'.task_date','LIKE',"%".$yesterday."%");
-            if(\Auth::guard('admins')->check())
-            {
-                $authUser = \Auth::guard('admins')->user();
-                if($authUser->user_type_id == TEAM_LEADER){
-                    $query = $query->where(TBL_USERS.".department_id",$authUser->department_id);
-                }
-            }
+
         if(count($notUsers) > 0)
         {
             $query = $query->whereNotin(TBL_USERS.".id",$notUsers);
         }       
         $query = $query->groupBy(TBL_TASK.'.user_id') 
-                ->having('total','<',FULL_DAY_HR)
+                ->having('total','<','9')
                 ->get();
         return $query;
     }
@@ -202,13 +196,7 @@ class Task extends Model
                     return $query->select(TBL_TASK.'.user_id')->from(TBL_TASK)
                     ->where(TBL_TASK.'.task_date','LIKE',"%".$yesterday."%");
                 });
-        if(\Auth::guard('admins')->check())
-        {
-            $auth_id = \Auth::guard('admins')->user();
-            if($auth_id->user_type_id == TEAM_LEADER){
-                $query = $query->where(TBL_USERS.".department_id",$auth_id->department_id);
-            }
-        }
+         
         if(count($fullLeaveUsers) > 0)
         {
             $query = $query->whereNotin(TBL_USERS.".id",$fullLeaveUsers);
@@ -227,6 +215,7 @@ class Task extends Model
         $below_four_hour = false;
         if(count($users) > 0)
         {
+            
             $below_four_hour = \DB::table(TBL_TASK)
                     ->select([TBL_USERS.'.name',TBL_USERS.'.id as userid',TBL_TASK.'.task_date as date',TBL_USERS.'.name as username',
                         \DB::raw("sum(".TBL_TASK.".total_time) as total")
@@ -234,17 +223,9 @@ class Task extends Model
                     ->join(TBL_USERS,TBL_USERS.".id","=",TBL_TASK.".user_id")
                     ->where(TBL_TASK.'.task_date','LIKE',"%".$yesterday."%")
                     ->whereIn(TBL_USERS.".id",$users)
-                    ->having('total','<',HALF_DAY_HR)
-                    ->groupBy(TBL_TASK.'.user_id');
-
-                if(\Auth::guard('admins')->check())
-                {
-                    $authUser = \Auth::guard('admins')->user();
-                    if($authUser->user_type_id == TEAM_LEADER){
-                        $below_four_hour = $below_four_hour->where(TBL_USERS.".department_id",$authUser->department_id);
-                    }          
-                }
-                $below_four_hour = $below_four_hour->get();  
+                    ->having('total','<','4')
+                    ->groupBy(TBL_TASK.'.user_id')
+                    ->get();            
         }    
 
         return $below_four_hour;
@@ -258,7 +239,7 @@ class Task extends Model
             $below_8[$i]['name'] = $key->name;
             $below_8[$i]['total'] = $key->total;
             $below_8[$i]['date'] = $key->date; 
-            $below_8[$i]['below'] = FULL_DAY_HR; 
+            $below_8[$i]['below'] = 9; 
         }
         $below_4 = array();
         $i=0;
@@ -271,7 +252,7 @@ class Task extends Model
                 $below_4[$i]['name'] = $key->name;
                 $below_4[$i]['total'] = $key->total;
                 $below_4[$i]['date'] = $key->date;
-                $below_4[$i]['below'] = HALF_DAY_HR;
+                $below_4[$i]['below'] = 4;
             }            
         }
         $final_belows = array();

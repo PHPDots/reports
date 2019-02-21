@@ -65,7 +65,7 @@ class LeaveRequestController extends Controller {
         }
         $data['btnAdd'] = \App\Models\Admin::isAccess(\App\Models\Admin::$ADD_LEAVE_REPORT);
 
-        if ($auth_id == NORMAL_USER || $auth_id == TRAINEE_USER || $auth_id == TEAM_LEADER) {
+        if ($auth_id == NORMAL_USER || $auth_id == TRAINEE_USER) {
             $viewName = $this->moduleViewName . ".userIndex";
         } else {
 

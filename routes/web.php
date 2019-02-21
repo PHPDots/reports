@@ -15,7 +15,6 @@ Route::get('cron-below-hrs-task', 'admin\DailyReportController@cronBelowEightFou
 Route::get('/cron-leave-calculate', 'admin\DailyReportController@cronLeaveCalculate');
 Route::get('cron-task-notifications', 'admin\DailyReportController@cronTaskNotification');
 Route::get('cron-general-daily-report', 'admin\DailyReportController@cronGeneral');
-Route::get('cron-daily-report-department', 'admin\DailyReportController@cronDepartment');
 Route::get('cron-daily-report', 'admin\DailyReportController@cron');
 Route::get('cron-user-leaves', 'admin\DailyReportController@cronLeaveEntitlement');
 
@@ -119,7 +118,6 @@ Route::get('clear-cache', function () {
  	Route::any('projects/data', 'admin\ProjectsController@data')->name('projects.data');
  	Route::resource('projects', 'admin\ProjectsController');
  	
-    Route::any('tasks/teamLeaderData', 'admin\TasksController@teamLeaderData')->name('task.teamLeaderData.data');
 	Route::any('tasks/clientData', 'admin\TasksController@clientData')->name('task.client.data');
     Route::any('tasks/userData', 'admin\TasksController@userData')->name('task.user.data');
     Route::any('tasks/view', 'admin\TasksController@viewData');
@@ -158,10 +156,7 @@ Route::get('clear-cache', function () {
     Route::resource('assign-tasks', 'admin\AssignTasksController');
 
 //Masters
-    Route::any('department/data', 'admin\DepartmentController@data')->name('department.data');
-    Route::resource('department', 'admin\DepartmentController');
-	
-    Route::any('admin-actions/data', 'admin\AdminActionController@data')->name('admin-actions.data');
+	Route::any('admin-actions/data', 'admin\AdminActionController@data')->name('admin-actions.data');
 	Route::resource('admin-actions', 'admin\AdminActionController');
 		
 	Route::get('sent-email/view/{id}', 'admin\EmailSentController@viewEmailData');
@@ -176,6 +171,10 @@ Route::get('clear-cache', function () {
     Route::any('getuserdetail', 'admin\SalarySlipController@getuserdetail')->name('getuserdetail');
 	Route::get('salaryslip-for-all', 'admin\SalarySlipController@salaryslip_for_all')->name('salaryslipForAll');
     Route::post('salaryslip-for-all/data', 'admin\SalarySlipController@salaryslip_for_all_data')->name('salaryslipForAllData');
+    // view consolidated salary
+    Route::get('salaryReport', 'admin\SalarySlipController@salaryReport')->name('salaryReport');
+    Route::any('salaryReport/data', 'admin\SalarySlipController@salaryReportData')->name('salaryReportData');
+    Route::get('view-consolidated-salary', 'admin\SalarySlipController@ViewConsolidatedSalary')->name('ViewConsolidatedSalaryAll');
 		
 	Route::any('holidays/data', 'admin\HolidaysController@data')->name('holidays.data');
     Route::resource('holidays', 'admin\HolidaysController');
