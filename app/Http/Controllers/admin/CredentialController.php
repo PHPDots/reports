@@ -692,7 +692,7 @@ class CredentialController extends Controller
                     [
                         'currentRoute' => $this->moduleRouteText,
                         'row' => $row,
-                        'isView' =>\App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_PROJECT_CREDENTIAL),
+                        'isView' =>\App\Models\Admin::isAccess(\App\Models\Admin::$LIST_PROJECT_CREDENTIAL),
                         'isEdit' =>\App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_PROJECT_CREDENTIAL),
                         'isDelete' => \App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_PROJECT_CREDENTIAL),
                     ]
@@ -749,7 +749,7 @@ class CredentialController extends Controller
                 ->leftJoin(TBL_SHARE_USER,TBL_SHARE_USER.".credential_id","=",TBL_CREDENTIAL.".id")               
                 ->where(TBL_CREDENTIAL.".created_by",$auth_id)
                 ->orWhere(TBL_SHARE_USER.".user_id",$auth_id)
-                ;
+                ->groupBy(TBL_CREDENTIAL.".id");
 
         return \Datatables::eloquent($model)
                
@@ -767,7 +767,7 @@ class CredentialController extends Controller
                     [
                         'currentRoute' => $this->moduleRouteText,
                         'row' => $row,                                 
-                        'isView' =>\App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_PROJECT_CREDENTIAL),
+                        'isView' =>\App\Models\Admin::isAccess(\App\Models\Admin::$LIST_PROJECT_CREDENTIAL),
                         'isEdit' => $editFlag,
                         'isDelete' => $deleteFlag,
                     ]

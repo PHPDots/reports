@@ -116,6 +116,8 @@ function openView($id){
                 {
                     data.search_month = $("#search-frm select[name='search_month']").val();
                     data.search_year = $("#search-frm select[name='search_year']").val();
+                    data.search_start_date = $("#search-frm input[name='search_start_date']").val();
+                    data.search_end_date = $("#search-frm input[name='search_end_date']").val();
                 }
             },
 			lengthMenu:

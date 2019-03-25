@@ -27,7 +27,7 @@
                     @endif                     
 
                 </div>
-                <div class="portlet-body">                    
+                <div class="portlet-body">
                     <table class="table table-bordered table-striped table-condensed flip-content" id="server-side-datatables">
                         <thead>
                             <tr>
@@ -127,8 +127,10 @@ function openView($id){
                 "data": function ( data ) 
                 {
                     data.search_name = $("#search-frm select[name='search_name']").val();
-                    data.search_month = $("#search-frm select[name='search_month']").val();
-                    data.search_year = $("#search-frm select[name='search_year']").val();
+                    //data.search_month = $("#search-frm select[name='search_month']").val();
+                    //data.search_year = $("#search-frm select[name='search_year']").val();
+                    data.search_start_date = $("#search-frm input[name='search_start_date']").val();
+                    data.search_end_date = $("#search-frm input[name='search_end_date']").val();
                 },
                 dataSrc: function(response){
                     $("#overall-netpay").html(response.net_total);

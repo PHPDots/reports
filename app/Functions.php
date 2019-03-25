@@ -147,7 +147,7 @@ function sendHtmlMail($params) {
     $params['to_emails'] = $toEmails;
     
 
-    \Mail::send('emails.index', $params, function($message) use ($params, $files) {
+    /*\Mail::send('emails.index', $params, function($message) use ($params, $files) {
 		
 		$fromName = "PHPDots";
 		if(isset($params['from_name']))
@@ -169,7 +169,7 @@ function sendHtmlMail($params) {
                 $message->attach($file['path']);
             }
         }
-    }); 
+    }); */
 
     $dataToInsert = [
             'to_email' => $params['to'],
@@ -422,7 +422,7 @@ function getAdminUserTypes()
 
 function superAdmin($current_login_user_id){
 
-    if($current_login_user_id == SUPER_ADMIN_ID || $current_login_user_id == 11)
+    if($current_login_user_id == SUPER_ADMIN_ID || $current_login_user_id == 1)
         return 1;
     else
         return 0;

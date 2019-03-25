@@ -588,7 +588,7 @@ class SalarySlipController extends Controller
             
             ->editColumn('created_at', function($row){
                 
-                if(!empty($row->created_at))          
+                if(!empty($row->created_at))
                     return date("j M, Y h:i:s A",strtotime($row->created_at));
                 else
                     return '-';
@@ -646,15 +646,25 @@ class SalarySlipController extends Controller
             ->filter(function ($query) 
             {                              
                 $search_month = request()->get("search_month");                                
-                $search_year = request()->get("search_year");                                         
-                if(!empty($search_month))
+                $search_end_date = request()->get("search_end_date");                                         
+                $search_start_date = request()->get("search_start_date");                                         
+                 
+                if (!empty($search_start_date))
                 {
-                    $query = $query->where(TBL_SALARY_SLIP.".month", $search_month);
+                    $search_start_date = date('Y-m',strtotime($search_start_date));
+                    $from_date=$search_start_date.'-01 00:00:00';
+                    $convertFromDate= $from_date;
+                   
+                    $query = $query->where(\DB::raw("CONCAT(".TBL_SALARY_SLIP.".year, '-', ".TBL_SALARY_SLIP.".month, '-01 00:00:00')"),">=",addslashes($convertFromDate));
                 }
-                if(!empty($search_year))
+                if (!empty($search_end_date))
                 {
-                    $query = $query->where(TBL_SALARY_SLIP.".year", $search_year);
-                }                   
+                    $search_end_date = date('Y-m',strtotime($search_end_date));
+                    $to_date=$search_end_date.'-01 23:59:59';
+                    $convertToDate= $to_date;
+
+                    $query = $query->where(\DB::raw("CONCAT(".TBL_SALARY_SLIP.".year, '-', ".TBL_SALARY_SLIP.".month, '-01 23:59:59')"),"<=",addslashes($convertToDate));
+                }                 
             })
             ->make(true);        
     }
@@ -984,7 +994,7 @@ class SalarySlipController extends Controller
         
         $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$FINANCIAL_YEAR_REPORTS);
         
-        if($checkrights) 
+        if(!$checkrights) 
         {
             return $checkrights;
         } 
@@ -995,6 +1005,16 @@ class SalarySlipController extends Controller
         $data['users'] = User::pluck("name","id")->all();
         $data['back_url']='salary_slip';
         $data['list_url']='view-consolidated-salary';
+
+        $search_start_date = (date('Y') - 1).'-04-01';
+        if(isset($request->search_start_date) && $request->search_start_date !=""){
+            $search_start_date =  $request->search_start_date;
+        }
+
+        $search_end_date = (date('Y')).'-03-31';
+        if(isset($request->search_end_date) && $request->search_end_date !=""){
+            $search_end_date =  $request->search_end_date;
+        }
          
         $query = SalarySlip::select(TBL_USERS.".firstname as firstname",TBL_USERS.".lastname as lastname")
             ->addSelect(\DB::raw("SUM(salary_slips.basic_salary) as basic_salary"))
@@ -1015,12 +1035,27 @@ class SalarySlipController extends Controller
             ->addSelect(\DB::raw("SUM(salary_slips.net_pay) as net_pay"))
             ->join(TBL_USERS,TBL_USERS.".id","=",TBL_SALARY_SLIP.".user_id");
 
-            if(isset($request->search_start_date) && $request->search_start_date !="" && isset($request->search_end_date) && $request->search_end_date){
-                $query->whereBetween(\DB::raw("date(salary_slips.created_at)"),[$request->search_start_date,$request->search_end_date]);
+            if(!empty($search_start_date) && !empty($search_end_date))
+            {
+                $search_start_date = date('Y-m',strtotime($search_start_date));
+                $from_date=$search_start_date.'-01 00:00:00';
+                $convertFromDate= $from_date;
+           
+                $query->where(\DB::raw("CONCAT(".TBL_SALARY_SLIP.".year, '-', ".TBL_SALARY_SLIP.".month, '-01 00:00:00')"),">=",addslashes($convertFromDate));
+
+                $search_end_date = date('Y-m',strtotime($search_end_date));
+                $to_date=$search_end_date.'-01 23:59:59';
+                $convertToDate= $to_date;
+
+                $query = $query->where(\DB::raw("CONCAT(".TBL_SALARY_SLIP.".year, '-', ".TBL_SALARY_SLIP.".month, '-01 23:59:59')"),"<=",addslashes($convertToDate));
+
+                //$query->whereBetween(\DB::raw("date(salary_slips.created_at)"),[$search_start_date,$search_end_date]);
             }
             if(isset($request->search_name) && $request->search_name !=""){
                 $query->where('salary_slips.user_id',$request->search_name);
             }
+            $data['search_start_date']=$search_start_date;
+            $data['search_end_date']=$search_end_date;
             $data['record'] = $query->first();
         return view("admin.salary_slips.viewConsolidatedSalary", $data);
     }

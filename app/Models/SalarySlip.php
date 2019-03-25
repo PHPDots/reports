@@ -19,6 +19,8 @@ class SalarySlip extends Model
 		$search_name = request()->get("search_name");
         $search_month = request()->get("search_month");
         $search_year = request()->get("search_year");
+        $search_start_date = request()->get("search_start_date");
+        $search_end_date = request()->get("search_end_date");
 
         $searchData = array();
         customDatatble('salary_slip');
@@ -37,6 +39,24 @@ class SalarySlip extends Model
         {
             $query = $query->where(TBL_SALARY_SLIP.".year", $search_year);
             $searchData['search_year'] = $search_name;
+        }
+        if (!empty($search_start_date))
+        {
+            $search_start_date = date('Y-m',strtotime($search_start_date));
+            $from_date=$search_start_date.'-01 00:00:00';
+            $convertFromDate= $from_date;
+           
+            $query = $query->where(\DB::raw("CONCAT(".TBL_SALARY_SLIP.".year, '-', ".TBL_SALARY_SLIP.".month, '-01 00:00:00')"),">=",addslashes($convertFromDate));
+            $searchData['search_start_date'] = $search_start_date;
+        }
+        if (!empty($search_end_date))
+        {
+            $search_end_date = date('Y-m',strtotime($search_end_date));
+            $to_date=$search_end_date.'-01 23:59:59';
+            $convertToDate= $to_date;
+
+            $query = $query->where(\DB::raw("CONCAT(".TBL_SALARY_SLIP.".year, '-', ".TBL_SALARY_SLIP.".month, '-01 23:59:59')"),"<=",addslashes($convertToDate));
+            $searchData['search_end_date'] = $search_end_date;
         }
             $goto = \URL::route('salary_slip.index', $searchData);
             \session()->put('salary_slip_goto',$goto);
