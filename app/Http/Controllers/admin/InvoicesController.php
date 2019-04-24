@@ -51,7 +51,7 @@ class InvoicesController extends Controller
     {
         $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$LIST_INVOICE);
         
-		if($checkrights) 
+        if($checkrights) 
         {
             return $checkrights;
         }
@@ -60,7 +60,7 @@ class InvoicesController extends Controller
 
         $data['add_url'] = route($this->moduleRouteText.'.create');
         $data['btnAdd'] = \App\Models\Admin::isAccess(\App\Models\Admin::$ADD_INVOICE);        
-    	$dates = \DB::table(TBL_INVOICE)->select(\DB::raw("MIN(invoice_date)as mindate,MAX(invoice_date) as maxdate"))->get();
+        $dates = \DB::table(TBL_INVOICE)->select(\DB::raw("MIN(invoice_date)as mindate,MAX(invoice_date) as maxdate"))->get();
          
         foreach ($dates as $date) {
             $mindate = $date->mindate;
@@ -75,22 +75,22 @@ class InvoicesController extends Controller
             $data['months'][date('Y-m',strtotime($start_date))] = $start_date; 
             $start_date = date ("Y-M", strtotime("+1 month", strtotime($start_date)));
         }
-		
-		$data['clients'] = Client::pluck("name","id")->all();
+        
+        $data['clients'] = Client::pluck("name","id")->all();
         $auth_id = \Auth::guard('admins')->user()->user_type_id;
         if($auth_id == CLIENT_USER){
           
             $viewName = $this->moduleViewName.".clientIndex";
         }else{
-			//Check Admin Type
-			$auth_id = \Auth::guard("admins")->user()->id;
+            //Check Admin Type
+            $auth_id = \Auth::guard("admins")->user()->id;
             $authUser = \Auth::guard("admins")->user();
-			$auth_user =  superAdmin($auth_id);
-			if($auth_user == 0 && $authUser->user_type_id != ACCOUNT_USER) 
-			{
-				return Redirect('/dashboard');
-			}
-			if($request->get("changeID") > 0)
+            $auth_user =  superAdmin($auth_id);
+            if($auth_user == 0 && $authUser->user_type_id != ACCOUNT_USER) 
+            {
+                return Redirect('/dashboard');
+            }
+            if($request->get("changeID") > 0)
             {
                 $goto = session()->get($this->moduleRouteText.'_goto');
                 if(empty($goto)){  $goto = $this->list_url;  }
@@ -136,14 +136,14 @@ class InvoicesController extends Controller
      */
     public function create(Request $request)
     {
-		//Check Admin Type
+        //Check Admin Type
         $auth_id = \Auth::guard("admins")->user()->id;
         $auth_user =  superAdmin($auth_id);
         if($auth_user == 0) 
         {
             return Redirect('/dashboard');
         }
-		
+        
         $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$ADD_INVOICE);
         
         if($checkrights) 
@@ -165,13 +165,13 @@ class InvoicesController extends Controller
                 $last_invoice = str_replace("exp-","",$last_invoice->invoice_no);
                 $last_no =  explode("/",$last_invoice);
                 $no = $last_no[2] + 1;
-                $invoice_no = 'PD/'.$this_year.'-'.$next_year.'/'.$no; 
+                $invoice_no = 'PDots/'.$this_year.'-'.$next_year.'/'.$no; 
             }else{
-                $invoice_no = 'PD/'.$this_year.'-'.$next_year.'/1';
+                $invoice_no = 'PDots/'.$this_year.'-'.$next_year.'/1';
             }
         $data['invoice_no'] = $invoice_no;
-		$data['address'] = \Config('app.phpdots_address');
-		$data['clients'] = Client::pluck("name","id")->all();
+        $data['address'] = \Config('app.phpdots_address');
+        $data['clients'] = Client::pluck("name","id")->all();
         $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
         $copytocreate = $request->get('copytocreate');
         if(!empty($copytocreate))
@@ -186,29 +186,29 @@ class InvoicesController extends Controller
                     $client_type = $client->client_type;
                     if($client_type == 1)
                     {
-                        $last_invoice = Invoice::select('invoice_no','id')->where('invoice_no','NOT LIKE','%exp-%')->orderBy('created_at','DES')->first();
+                        $last_invoice = Invoice::select('invoice_no','id')->where('invoice_no','NOT LIKE','%Exp-%')->orderBy('created_at','DES')->first();
                         $this_year = date('Y');
                         $next_year = $this_year + 1;
                         if(!empty($last_invoice))
                         {
-                            $last_invoice = str_replace("exp-","",$last_invoice->invoice_no);
+                            $last_invoice = str_replace("Exp-","",$last_invoice->invoice_no);
                             $last_no =  explode("/",$last_invoice);
                             $no = $last_no[2] + 1;
-                            $invoice_no = 'PD/'.$this_year.'-'.$next_year.'/'.$no; 
+                            $invoice_no = 'PDots/'.$this_year.'-'.$next_year.'/'.$no; 
                         }
                     }
                     if ($client_type == 2)
                     {
-                        $last_invoice = Invoice::select('invoice_no','id')->where('invoice_no','LIKE','%exp-%')->orderBy('created_at','DES')->first();
+                        $last_invoice = Invoice::select('invoice_no','id')->where('invoice_no','LIKE','%Exp-%')->orderBy('created_at','DES')->first();
 
                         $this_year = date('Y');
                         $next_year = $this_year + 1;
                         if(!empty($last_invoice))
                         {
-                            $last_invoice = str_replace("exp-","",$last_invoice->invoice_no);
+                            $last_invoice = str_replace("Exp-","",$last_invoice->invoice_no);
                             $last_no =  explode("/",$last_invoice);
                             $no = $last_no[2] + 1;
-                            $invoice_no = 'EXP/'.$this_year.'-'.$next_year.'/exp-'.$no;
+                            $invoice_no = 'PDots/'.$this_year.'-'.$next_year.'/Exp-'.$no;
                         }
                     }
                     $data['invoice_detail'] = InvoiceDetail::where('invoice_id',$copytocreate)->get();
@@ -230,7 +230,7 @@ class InvoicesController extends Controller
      */
     public function store(Request $request)
     {
-		//Check Admin Type
+        //Check Admin Type
         $auth_id = \Auth::guard("admins")->user()->id;
         $auth_user =  superAdmin($auth_id);
         if($auth_user == 0) 
@@ -261,7 +261,7 @@ class InvoicesController extends Controller
             'total_amount' => 'required|numeric',
             'require_gst' => Rule::in([1, 0]),
             'currency' => ['required',Rule::in(['in_rs','in_usd'])],
-			'client_id' => 'required|exists:'.TBL_CLIENT.',id',
+            'client_id' => 'required|exists:'.TBL_CLIENT.',id',
             'require_igst' => Rule::in([1, 0]),
             'igst_amount' => 'required|numeric',
         ]);
@@ -284,7 +284,7 @@ class InvoicesController extends Controller
             $to_address = $request->get('to_address');
             $invoice_no = $request->get('invoice_no');
             $invoice_date = $request->get('invoice_date');
-			$invoice_date = date("Y-m-d h:i:s",strtotime($invoice_date));
+            $invoice_date = date("Y-m-d h:i:s",strtotime($invoice_date));
             $cgst_amount = $request->get('cgst_amount');
             $sgst_amount = $request->get('sgst_amount');
             $total_amount = $request->get('total_amount');
@@ -292,11 +292,11 @@ class InvoicesController extends Controller
             $address = $request->get('address');
             $require_gst = $request->get('require_gst');
             $currency = $request->get('currency');
-			$client_id = $request->get('client_id');
-			$total_with_gst = $request->get('total_with_gst');
+            $client_id = $request->get('client_id');
+            $total_with_gst = $request->get('total_with_gst');
             $total_without_gst = $request->get('total_without_gst');
             $require_igst = $request->get('require_igst');
-			$igst_amount = $request->get('igst_amount');
+            $igst_amount = $request->get('igst_amount');
             $pan_no = 'AAUFP4850D';
             $gst_regn_no = '24AAUFP4850D1Z3';
             $bank_account_no = '201001635127';
@@ -321,11 +321,11 @@ class InvoicesController extends Controller
             $invoice->ifsc_code = $ifsc_code;
             $invoice->require_gst = $require_gst;
             $invoice->currency = $currency;
-			$invoice->client_id = $client_id;
-			$invoice->total_with_gst = $total_with_gst;
+            $invoice->client_id = $client_id;
+            $invoice->total_with_gst = $total_with_gst;
             $invoice->total_without_gst = $total_without_gst;
             $invoice->require_igst = $require_igst;
-			$invoice->igst_amount = $igst_amount;
+            $invoice->igst_amount = $igst_amount;
             $invoice->save();
             $invoice_id = $invoice->id;
 
@@ -343,8 +343,8 @@ class InvoicesController extends Controller
             }
 
             $id = $invoice->id;
-			$send_id = $request->get('send_id');
-			if($send_id == 1)
+            $send_id = $request->get('send_id');
+            if($send_id == 1)
             {
                 $data = array();
                 $data['invoices'] = Invoice::where('id',$invoice_id)->first();
@@ -354,7 +354,7 @@ class InvoicesController extends Controller
                 $pdfFilePath = public_path().DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.'invoices/'.$filename;
                 $pdf = PDF::loadView('pdf.invoice', $data);
                 $pdf->save($pdfFilePath);
-				
+                
                 //$pdfFilePath = public_path().'/uploads/invoices/invoice.pdf';
                 $client = \App\Models\Client::find($client_id);
                 if($client)
@@ -418,14 +418,14 @@ class InvoicesController extends Controller
      */
     public function edit($id)
     {
-		//Check Admin Type
+        //Check Admin Type
         $auth_id = \Auth::guard("admins")->user()->id;
         $auth_user =  superAdmin($auth_id);
         if($auth_user == 0) 
         {
             return Redirect('/dashboard');
         }
-		
+        
         $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$EDIT_INVOICE);
         
         if($checkrights) 
@@ -448,7 +448,7 @@ class InvoicesController extends Controller
         $data['method'] = "PUT";
         $data['invoice_detail'] = InvoiceDetail::where('invoice_id',$id)->get();
         $data["currency"] = ['in_rs'=>'In Rs.','in_usd'=>'In USD'];
-		$data['clients'] = Client::pluck("name","id")->all();
+        $data['clients'] = Client::pluck("name","id")->all();
         $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
 
         return view($this->moduleViewName.'.edit', $data);
@@ -463,14 +463,14 @@ class InvoicesController extends Controller
      */
     public function update(Request $request, $id)
     {
-		//Check Admin Type
+        //Check Admin Type
         $auth_id = \Auth::guard("admins")->user()->id;
         $auth_user =  superAdmin($auth_id);
         if($auth_user == 0) 
         {
             return Redirect('/dashboard');
         }
-		
+        
         $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$EDIT_INVOICE);
         
         if($checkrights) 
@@ -498,7 +498,7 @@ class InvoicesController extends Controller
             'total_amount' => 'required|numeric',
             'require_gst' => Rule::in([1, 0]),
             'currency' => ['required',Rule::in(['in_rs','in_usd'])],
-			'client_id' => 'required|exists:'.TBL_CLIENT.',id',
+            'client_id' => 'required|exists:'.TBL_CLIENT.',id',
             'igst_amount' => 'required|numeric',
             'require_igst' => Rule::in([1, 0]),
         ]);
@@ -526,18 +526,18 @@ class InvoicesController extends Controller
             $to_address = $request->get('to_address');
             $invoice_no = $request->get('invoice_no');
             $invoice_date = $request->get('invoice_date');
-			$invoice_date = date("Y-m-d h:i:s",strtotime($invoice_date));
+            $invoice_date = date("Y-m-d h:i:s",strtotime($invoice_date));
             $cgst_amount = $request->get('cgst_amount');
             $sgst_amount = $request->get('sgst_amount');
             $total_amount = $request->get('total_amount');
             $total_amount_words = $request->get('total_amount_words');
             $require_gst = $request->get('require_gst');
             $currency = $request->get('currency');
-			$client_id = $request->get('client_id');
-			$total_with_gst = $request->get('total_with_gst');
+            $client_id = $request->get('client_id');
+            $total_with_gst = $request->get('total_with_gst');
             $total_without_gst = $request->get('total_without_gst');
             $require_igst = $request->get('require_igst');
-			$igst_amount = $request->get('igst_amount');
+            $igst_amount = $request->get('igst_amount');
             $pan_no = 'AAUFP4850D';
             $gst_regn_no = '24AAUFP4850D1Z3';
             $bank_account_no = '201001635127';
@@ -561,11 +561,11 @@ class InvoicesController extends Controller
             $model->ifsc_code = $ifsc_code;
             $model->require_gst = $require_gst;
             $model->currency = $currency;
-			$model->client_id = $client_id;
-			$model->total_with_gst = $total_with_gst;
+            $model->client_id = $client_id;
+            $model->total_with_gst = $total_with_gst;
             $model->total_without_gst = $total_without_gst;
             $model->igst_amount = $igst_amount;
-			$model->require_igst = $require_igst;
+            $model->require_igst = $require_igst;
             $model->save(); 
 
             $invoice_details = InvoiceDetail::where('invoice_id',$id);
@@ -605,8 +605,8 @@ class InvoicesController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function destroy($id, Request $request)
-	{
-		//Check Admin Type
+    {
+        //Check Admin Type
         $auth_id = \Auth::guard("admins")->user()->id;
         $auth_user =  superAdmin($auth_id);
         if($auth_user == 0) 
@@ -656,7 +656,7 @@ class InvoicesController extends Controller
 
     public function data(Request $request)
     {
-		//Check Admin Type
+        //Check Admin Type
         $auth_id = \Auth::guard("admins")->user()->id;
         $authUser = \Auth::guard("admins")->user();
         $auth_user =  superAdmin($auth_id);
@@ -677,8 +677,8 @@ class InvoicesController extends Controller
                 ->join(TBL_CLIENT,TBL_CLIENT.".id","=",TBL_INVOICE.".client_id");
         //$amount_query2 = Invoice::select(TBL_INVOICE.".*",TBL_CLIENT.".name as client_name")
                 //->join(TBL_CLIENT,TBL_CLIENT.".id","=",TBL_INVOICE.".client_id");
-		
-		$amount_query2 = Invoice::select(TBL_INVOICE.".*",TBL_CLIENT.".name as client_name",TBL_INVOICE_EXPENSE.'.partial_amount as unpaid_amount',TBL_INVOICE_EXPENSE.'.amount as paid_amount',TBL_INVOICE_EXPENSE.'.payment_status')
+        
+        $amount_query2 = Invoice::select(TBL_INVOICE.".*",TBL_CLIENT.".name as client_name",TBL_INVOICE_EXPENSE.'.partial_amount as unpaid_amount',TBL_INVOICE_EXPENSE.'.amount as paid_amount',TBL_INVOICE_EXPENSE.'.payment_status')
                 ->join(TBL_CLIENT,TBL_CLIENT.".id","=",TBL_INVOICE.".client_id")
                 ->leftJoin(TBL_INVOICE_EXPENSE,TBL_INVOICE.".id","=",TBL_INVOICE_EXPENSE.".invoice_id");
 
@@ -687,9 +687,9 @@ class InvoicesController extends Controller
         
         $totalamounts = $amount_query1->where('currency','in_rs')->sum("total_amount");
         //$totalamountsUSD = $amount_query2->where('currency','in_usd')->sum("total_amount");
-		$totalamountsUSD = $amount_query2->get();
+        $totalamountsUSD = $amount_query2->get();
         
-		$invoice_id = 0;
+        $invoice_id = 0;
         $current_amount = 0;
         $remaining_amount = 0;
         $total_amount_rs = 0;
@@ -770,11 +770,11 @@ class InvoicesController extends Controller
         $totalamounts += $total_amount_rs;
 
         $total_unpaid_amt = $totalamounts - $total_paid_amt;
-		
-		/*echo "\r\n:: Total Amount :: ".$totalamounts." :: Paid :: ".$total_paid_amt." :: UnPaid :: ".$total_unpaid_amt;
+        
+        /*echo "\r\n:: Total Amount :: ".$totalamounts." :: Paid :: ".$total_paid_amt." :: UnPaid :: ".$total_unpaid_amt;
         die;*/
-		
-		$total_arr['total_paid_amt'] = number_format($total_paid_amt,0);
+        
+        $total_arr['total_paid_amt'] = number_format($total_paid_amt,0);
         $total_arr['total_unpaid_amt'] = number_format($total_unpaid_amt,0);
         
         //$totalamountsUSD = $totalamountsUSD * CURRENCY_USD;
@@ -788,7 +788,7 @@ class InvoicesController extends Controller
                 else
                     return '-';    
             })
-			->editColumn('payment', function ($row) { 
+            ->editColumn('payment', function ($row) { 
                 if ($row->payment == 1){
                     return "<a class='btn btn-xs btn-success'>Paid</a><br/>";
                 }
@@ -796,7 +796,7 @@ class InvoicesController extends Controller
                     return '<a class="btn btn-xs btn-danger">UnPaid</a><br/>';
                 }
             })
-			->editColumn('invoice_date', function($row){
+            ->editColumn('invoice_date', function($row){
                 if(!empty($row->invoice_date))          
                     return date("M-Y",strtotime($row->invoice_date));
                 else
@@ -811,14 +811,14 @@ class InvoicesController extends Controller
                         'inPDF' =>\App\Models\Admin::isAccess(\App\Models\Admin::$LIST_INVOICE),
                         'isDelete' => \App\Models\Admin::isAccess(\App\Models\Admin::$DELETE_INVOICE),
                         'isView' => \App\Models\Admin::isAccess(\App\Models\Admin::$LIST_INVOICE), 
-						'payment' => \App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_INVOICE),
-						'viewExpe' => \App\Models\Admin::isAccess(\App\Models\Admin::$LIST_INVOICE_EXPENSE),
+                        'payment' => \App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_INVOICE),
+                        'viewExpe' => \App\Models\Admin::isAccess(\App\Models\Admin::$LIST_INVOICE_EXPENSE),
                         'copyInvoice' => \App\Models\Admin::isAccess(\App\Models\Admin::$ADD_INVOICE)
                     ]
                 )->render();
             })->rawColumns(['action','created_at','payment','invoice_date'])
             ->filter(function ($query) {
-				$query = Invoice::listFilter($query);                 
+                $query = Invoice::listFilter($query);                 
             });
             
             $total_arr['amounts'] = $totalamounts;
@@ -848,16 +848,16 @@ class InvoicesController extends Controller
             if(!empty($client_user))
             {
                 $client_type = $client_user->client_id;
-            }			
-			
-			if(($invoices && $invoices->client_id == $client_type) || superadmin($auth_id) || $authUser->user_type_id == ACCOUNT_USER)	
+            }           
+            
+            if(($invoices && $invoices->client_id == $client_type) || superadmin($auth_id) || $authUser->user_type_id == ACCOUNT_USER)  
             {
                 $name = $invoices->invoice_date;
                 $data['invoices'] = $invoices;
                 $data['invoice_details'] = $invoice_details;
                 $pdf = PDF::loadView('pdf.invoice', $data);
 
-            	return $pdf->download("invoice_".$name.".pdf");
+                return $pdf->download("invoice_".$name.".pdf");
             }
         }
         else{
@@ -895,7 +895,7 @@ class InvoicesController extends Controller
                 $client_type = $client_user->client_id;
             }
            
-           	if(($invoices && $invoices->client_id == $client_type) || $auth_user == 1 || $authUser->user_type_id == ACCOUNT_USER)
+            if(($invoices && $invoices->client_id == $client_type) || $auth_user == 1 || $authUser->user_type_id == ACCOUNT_USER)
             {    
                 $data['invoices'] = $invoices;
                 $data['invoice_details'] = $invoice_details;
@@ -906,7 +906,7 @@ class InvoicesController extends Controller
             }
         }
     }
-	public function clientData(Request $request)
+    public function clientData(Request $request)
     {
         $checkrights = \App\Models\Admin::checkPermission(\App\Models\Admin::$LIST_INVOICE);
         
@@ -931,7 +931,7 @@ class InvoicesController extends Controller
                 else
                     return '-';
             })
-			->editColumn('payment', function ($row) { 
+            ->editColumn('payment', function ($row) { 
                 if ($row->payment == 1){
                     return "<a class='btn btn-xs btn-success'>Paid</a><br/>";
                 }
@@ -955,22 +955,22 @@ class InvoicesController extends Controller
 
             return $data;        
     }
-	public function client_type(Request $request)
+    public function client_type(Request $request)
     {
         $data = [];
         $client_id = $request->get('id');
         $request->get('invoice_no');
         $type = '';
-		$address = null;
+        $address = null;
         $currency = '';
         if ($client_id) {
 
             $client = Client::find($client_id);
             if($client)
             {
-				$address = $client->address;
+                $address = $client->address;
                 $currency = $client->client_currency;
-				if(empty($currency))
+                if(empty($currency))
                 {
                     $currency = 'in_rs';
                 }
@@ -981,12 +981,12 @@ class InvoicesController extends Controller
                     $invoice_no = $request->get('invoice_no');
                     $invoice_id = $request->get('invoice_id');
 
-                    $expPos = strpos($invoice_no,'xp-');
+                    $expPos = strpos($invoice_no,'Exp-');
                     if($expPos > 0)
                     {
                         if ($type == 2)
                         {
-                            $last_invoice = Invoice::select('invoice_no','id')->where('invoice_no','LIKE','%exp-%')->orderBy('created_at','DES')->first();
+                            $last_invoice = Invoice::select('invoice_no','id')->where('invoice_no','LIKE','%Exp-%')->orderBy('created_at','DES')->first();
 
                             $this_year = date('Y');
                             $next_year = $this_year + 1;
@@ -995,11 +995,11 @@ class InvoicesController extends Controller
                                 $last_invoice = str_replace("exp-","",$last_invoice->invoice_no);
                                 $last_no =  explode("/",$last_invoice);
                                 $no = $last_no[2] + 1;
-                                $invoice_no = 'EXP/'.$this_year.'-'.$next_year.'/exp-'.$no; 
+                                $invoice_no = 'PDots/'.$this_year.'-'.$next_year.'/Exp-'.$no; 
                                 
                                 if($invoice_id)
                                 {
-                                    $yes = strpos($invoice_on_form, 'xp-');
+                                    $yes = strpos($invoice_on_form, 'Exp-');
                                     if($yes > 0){
                                         $invoice_no = $invoice_on_form;
                                     }
@@ -1009,15 +1009,15 @@ class InvoicesController extends Controller
 
                         if ($type == 1)
                         {
-                            $last_invoice = Invoice::select('invoice_no','id')->where('invoice_no','NOT LIKE','%exp-%')->orderBy('created_at','DES')->first();
+                            $last_invoice = Invoice::select('invoice_no','id')->where('invoice_no','NOT LIKE','%Exp-%')->orderBy('created_at','DES')->first();
                             $this_year = date('Y');
                             $next_year = $this_year + 1;
                             if(!empty($last_invoice))
                             {
-                                $last_invoice = str_replace("exp-","",$last_invoice->invoice_no);
+                                $last_invoice = str_replace("Exp-","",$last_invoice->invoice_no);
                                 $last_no =  explode("/",$last_invoice);
                                 $no = $last_no[2] + 1;
-                                $invoice_no = 'PD/'.$this_year.'-'.$next_year.'/'.$no; 
+                                $invoice_no = 'PDots/'.$this_year.'-'.$next_year.'/'.$no; 
                             }
                         }
                     }
@@ -1025,20 +1025,20 @@ class InvoicesController extends Controller
                     {
                         if ($type == 2)
                         {
-                            $last_invoice = Invoice::select('invoice_no','id')->where('invoice_no','LIKE','%exp-%')->orderBy('created_at','DES')->first();
+                            $last_invoice = Invoice::select('invoice_no','id')->where('invoice_no','LIKE','%Exp-%')->orderBy('created_at','DES')->first();
 
                             $this_year = date('Y');
                             $next_year = $this_year + 1;
                             if(!empty($last_invoice))
                             {
-                                $last_invoice = str_replace("exp-","",$last_invoice->invoice_no);
+                                $last_invoice = str_replace("Exp-","",$last_invoice->invoice_no);
                                 $last_no =  explode("/",$last_invoice);
                                 $no = $last_no[2] + 1;
-                                $invoice_no = 'EXP/'.$this_year.'-'.$next_year.'/exp-'.$no; 
+                                $invoice_no = 'PDots/'.$this_year.'-'.$next_year.'/Exp-'.$no; 
                                 
                                 if($invoice_id)
                                 {
-                                    $yes = strpos($invoice_on_form, 'xp-');
+                                    $yes = strpos($invoice_on_form, 'Exp-');
                                     if($yes > 0){
                                         $invoice_no = $invoice_on_form;
                                     }
@@ -1053,7 +1053,7 @@ class InvoicesController extends Controller
                 }
                 
                 $data['invoice_no'] = $invoice_no;
-				$data['address'] = $address;
+                $data['address'] = $address;
                 $data['currency'] = $currency;
                 return $data;
             }
@@ -1063,7 +1063,7 @@ class InvoicesController extends Controller
             }
         }
     }
-	public function change_paymet_satus(Request $request)
+    public function change_paymet_satus(Request $request)
     {
         $data = array();
         $status = 1;
@@ -1076,7 +1076,7 @@ class InvoicesController extends Controller
             'payment_status' => ['required',Rule::in([1,0])],
             'amount' => 'required|min:0',
             'payment_date' => 'required',
-			'partial_amount' => 'min:0',
+            'partial_amount' => 'min:0',
         ]);
         if ($validator->fails()) 
         {
@@ -1098,14 +1098,14 @@ class InvoicesController extends Controller
             $partial_amount = $request->get('partial_amount');
             if($payment_status == 1)
                 $partial_amount = 0;
-			
+            
             $invoice = Invoice::find($invoice_id);
             if($invoice)
             {
                 $exp = new InvoiceExpense();       
                 $exp->invoice_id = $invoice_id;
                 $exp->payment_status = $payment_status;
-				$exp->partial_amount = $partial_amount;
+                $exp->partial_amount = $partial_amount;
                 $exp->amount = $amount;
                 $exp->payment_date = $payment_date;
                 $exp->save();
