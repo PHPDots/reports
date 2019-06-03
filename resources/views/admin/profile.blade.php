@@ -64,7 +64,7 @@ $user_id = Auth::guard('admins')->user()->id;
                                     {!! Form::text('lastname',null,['placeholder' => 'Enter Your Last Name','data-required' => true, 'class' => "form-control"]) !!}
                                 </div>
                                 <div class="form-group">
-                                    <label class="control-label">Email</label>                                    
+                                    <label class="control-label">Email Address</label>                                    
                                     {!! Form::text('email',null,['placeholder' => 'Enter Your Email','data-required' => true, 'data-type' => "email",'class' => "form-control" ,'disabled' => 'disabled']) !!}
                                 </div>
                                 <div class="form-group">
