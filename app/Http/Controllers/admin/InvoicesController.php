@@ -974,6 +974,9 @@ class InvoicesController extends Controller
                 {
                     $currency = 'in_rs';
                 }
+                if($currency == 'in_gbp'){
+                    $currency = 'in_usd';
+                }
                 $type = $client->client_type;
                 if ($request->get('invoice_no'))
                 {
