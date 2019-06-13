@@ -157,7 +157,7 @@ class InvoicesController extends Controller
         $data['action_params'] = 0;
         $data['buttonText'] = "Save";
         $data["method"] = "POST";
-        $data["currency"] = ['in_rs'=>'In Rs.','in_usd'=>'In USD'];
+        $data["currency"] = ['in_rs'=>'In Rs.','in_usd'=>'In USD','in_gbp'=>'In GBP'];
         $last_invoice = Invoice::select('invoice_no','id')->where('invoice_no','NOT LIKE','%exp-%')->orderBy('created_at','DES')->first();
             $this_year = date('Y');
             $next_year = $this_year + 1;
@@ -179,7 +179,7 @@ class InvoicesController extends Controller
             $invoice = Invoice::find($copytocreate);
             if($invoice)
             {
-                $data["currency"] = ['in_rs'=>'In Rs.','in_usd'=>'In USD'];
+                $data["currency"] = ['in_rs'=>'In Rs.','in_usd'=>'In USD','in_gbp'=>'In GBP'];
                 $client = Client::find($invoice->client_id);
                 if($client)
                 {
@@ -260,7 +260,7 @@ class InvoicesController extends Controller
             'sgst_amount' => 'required|numeric',
             'total_amount' => 'required|numeric',
             'require_gst' => Rule::in([1, 0]),
-            'currency' => ['required',Rule::in(['in_rs','in_usd'])],
+            'currency' => ['required',Rule::in(['in_rs','in_usd','in_gbp'])],
             'client_id' => 'required|exists:'.TBL_CLIENT.',id',
             'require_igst' => Rule::in([1, 0]),
             'igst_amount' => 'required|numeric',
@@ -447,7 +447,7 @@ class InvoicesController extends Controller
         $data['action_params'] = $formObj->id;
         $data['method'] = "PUT";
         $data['invoice_detail'] = InvoiceDetail::where('invoice_id',$id)->get();
-        $data["currency"] = ['in_rs'=>'In Rs.','in_usd'=>'In USD'];
+        $data["currency"] = ['in_rs'=>'In Rs.','in_usd'=>'In USD','in_gbp'=>'In GBP'];
         $data['clients'] = Client::pluck("name","id")->all();
         $data = customBackUrl($this->moduleRouteText, $this->list_url, $data);
 
@@ -497,7 +497,7 @@ class InvoicesController extends Controller
             'sgst_amount' => 'required|numeric',
             'total_amount' => 'required|numeric',
             'require_gst' => Rule::in([1, 0]),
-            'currency' => ['required',Rule::in(['in_rs','in_usd'])],
+            'currency' => ['required',Rule::in(['in_rs','in_usd','in_gbp'])],
             'client_id' => 'required|exists:'.TBL_CLIENT.',id',
             'igst_amount' => 'required|numeric',
             'require_igst' => Rule::in([1, 0]),

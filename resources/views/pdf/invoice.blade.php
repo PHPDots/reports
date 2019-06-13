@@ -102,6 +102,7 @@ td { border: 1px solid #ddd; padding: 0.5em; }
               <?php $currency = $invoices->currency;
                 if(!empty($currency) && $currency == 'in_rs') echo "(In Rs.)";?>
               <?php  if(!empty($currency) && $currency == 'in_usd') echo "(In USD)";?>
+              <?php  if(!empty($currency) && $currency == 'in_gbp') echo "(In GBP)";?>
                 </center></th>
             </tr>
           <?php  

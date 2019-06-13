@@ -275,6 +275,7 @@
          $(document).on('change','#currency',function(){
             var curr_name = $('#currency').val();
             if(curr_name == 'in_usd'){ var curr = '(In USD)';}
+            else if(curr_name == 'in_gbp'){ var curr = '(In GBP)';}
             else{var curr = '(In Rs.)';}
             $('#curr_name').html(curr);
         });
